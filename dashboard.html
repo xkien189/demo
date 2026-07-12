@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Hệ thống Quản lý CLB Sinh viên</title>
+    <!-- CSS libraries -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    
+    <!-- Custom theme & layout styles -->
+    <link rel="stylesheet" href="assets/css/theme.css">
+    <link rel="stylesheet" href="assets/css/layout.css">
+    <link rel="stylesheet" href="assets/css/sidebar.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <link rel="stylesheet" href="assets/css/table.css">
+    <link rel="stylesheet" href="assets/css/button.css">
+    <link rel="stylesheet" href="assets/css/modal.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+</head>
+<body>
+
+    <div class="app-wrapper">
+        <!-- Dynamic Sidebar Injection -->
+        <div id="sidebar-container"></div>
+        
+        <div class="main-content">
+            <!-- Dynamic Topbar Injection -->
+            <div id="topbar-container"></div>
+            
+            <div class="content-container fade-in">
+                <!-- Header Title -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="mb-1 fw-bold">Tổng quan CLB</h4>
+                        <p class="text-muted small mb-0" id="slogan-txt">Slogan description loading...</p>
+                    </div>
+                    <div id="quick-action-btns">
+                        <!-- Filled in dashboard.js according to permissions -->
+                    </div>
+                </div>
+                
+                <!-- Stat Cards Row -->
+                <div class="row">
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card metric-card info">
+                            <div class="card-body">
+                                <div class="metric-value" id="stat-members">0</div>
+                                <div class="metric-label">Thành viên</div>
+                                <i class="bi bi-people metric-icon text-info"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card metric-card primary">
+                            <div class="card-body">
+                                <div class="metric-value" id="stat-depts">0</div>
+                                <div class="metric-label">Số ban</div>
+                                <i class="bi bi-building metric-icon text-primary"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card metric-card warning">
+                            <div class="card-body">
+                                <div class="metric-value" id="stat-tasks">0</div>
+                                <div class="metric-label">Công việc</div>
+                                <i class="bi bi-list-task metric-icon text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card metric-card success">
+                            <div class="card-body">
+                                <div class="metric-value" id="stat-progress">0%</div>
+                                <div class="metric-label">Hoàn thành</div>
+                                <i class="bi bi-patch-check metric-icon text-success"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts & Mid Contents -->
+                <div class="row">
+                    <!-- Progress Chart -->
+                    <div class="col-xl-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="card-title"><i class="bi bi-bar-chart-line me-2"></i>Thống kê Công việc theo Ban</h5>
+                            </div>
+                            <div class="card-body">
+                                <div style="position: relative; height: 320px;">
+                                    <canvas id="tasksChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Leaderboard -->
+                    <div class="col-xl-3 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="card-title"><i class="bi bi-trophy me-2"></i>Bảng Xếp Hạng</h5>
+                            </div>
+                            <div class="card-body" style="max-height: 350px; overflow-y: auto;">
+                                <div id="leaderboard-container">
+                                    <!-- Dynamic list of top members -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Urgent Tasks -->
+                    <div class="col-xl-3 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="card-title"><i class="bi bi-exclamation-triangle me-2"></i>Task Sắp Hạn</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="urgent-tasks-container">
+                                    <!-- Dynamic list of urgent tasks -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grid Details: Activity Logs & Quick Notifications -->
+                <div class="row">
+                    <!-- Notifications feed -->
+                    <div class="col-xl-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="card-title"><i class="bi bi-bell me-2"></i>Thông báo Mới nhất</h5>
+                                <a href="notifications.html" class="btn btn-sm btn-secondary">Xem tất cả</a>
+                            </div>
+                            <div class="card-body">
+                                <div id="notifications-container">
+                                    <!-- Notifications -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Recent logs -->
+                    <div class="col-xl-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="card-title"><i class="bi bi-journal-text me-2"></i>Hoạt động Gần đây</h5>
+                            </div>
+                            <div class="card-body" style="max-height: 350px; overflow-y: auto;">
+                                <ul class="activity-feed" id="logs-container">
+                                    <!-- Dynamic Activity Logs -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script src="assets/js/storage.js"></script>
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/sidebar.js"></script>
+    <script src="assets/js/dashboard.js"></script>
+</body>
+</html>

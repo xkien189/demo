@@ -1,0 +1,38 @@
+@media (max-width: 991.98px) {
+    .main-content {
+        margin-left: 0 !important;
+    }
+    
+    .sidebar {
+        left: -260px;
+        transition: left var(--transition-normal);
+    }
+    
+    .app-wrapper.sidebar-open .sidebar {
+        left: 0;
+        width: 260px;
+    }
+    
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.5);
+        z-index: 100;
+    }
+    
+    .app-wrapper.sidebar-open .sidebar-overlay {
+        display: block;
+    }
+    
+    .metric-value {
+        font-size: 1.75rem;
+    }
+    
+    .content-container {
+        padding: 1rem;
+    }
+}

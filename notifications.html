@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông báo - Hệ thống Quản lý CLB Sinh viên</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="assets/css/theme.css">
+    <link rel="stylesheet" href="assets/css/layout.css">
+    <link rel="stylesheet" href="assets/css/sidebar.css">
+    <link rel="stylesheet" href="assets/css/table.css">
+    <link rel="stylesheet" href="assets/css/form.css">
+    <link rel="stylesheet" href="assets/css/button.css">
+    <link rel="stylesheet" href="assets/css/modal.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+</head>
+<body>
+
+    <div class="app-wrapper">
+        <div id="sidebar-container"></div>
+        
+        <div class="main-content">
+            <div id="topbar-container"></div>
+            
+            <div class="content-container fade-in">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="mb-1 fw-bold">Thông báo CLB</h4>
+                        <p class="text-muted small mb-0">Xem và đăng tải các bảng tin chính thức của câu lạc bộ.</p>
+                    </div>
+                    <div id="create-noti-area">
+                        <!-- Dynamic based on role -->
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Filters List -->
+                    <div class="col-lg-3 mb-4">
+                        <div class="card shadow-none border">
+                            <div class="card-body p-2">
+                                <div class="list-group list-group-flush border-0">
+                                    <button class="list-group-item list-group-item-action border-0 rounded active" id="btn-noti-all" onclick="filterNotifications('All', this)">
+                                        <i class="bi bi-inbox me-2"></i>Tất cả thông báo
+                                    </button>
+                                    <button class="list-group-item list-group-item-action border-0 rounded" id="btn-noti-general" onclick="filterNotifications('General', this)">
+                                        <i class="bi bi-globe me-2"></i>Thông báo chung
+                                    </button>
+                                    <button class="list-group-item list-group-item-action border-0 rounded" id="btn-noti-dept" onclick="filterNotifications('Department', this)">
+                                        <i class="bi bi-building me-2"></i>Theo Ban bộ phận
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Details List -->
+                    <div class="col-lg-9">
+                        <div class="card shadow-none border">
+                            <div class="card-body" id="notifications-list-container">
+                                <!-- Dynamic notifications list -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Notification Modal -->
+    <div class="modal fade" id="createNotiModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Đăng thông báo mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="noti-form">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="n-title" class="form-label">Tiêu đề thông báo *</label>
+                            <input type="text" id="n-title" class="form-control" placeholder="Nhập tiêu đề thông báo" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="n-type" class="form-label">Phân loại đối tượng *</label>
+                            <select id="n-type" class="form-select" required>
+                                <option value="General">Thông báo chung toàn CLB</option>
+                                <option value="Department">Theo Ban bộ phận</option>
+                            </select>
+                        </div>
+                        <div class="mb-3" id="target-dept-wrapper" style="display: none;">
+                            <label for="n-target" class="form-label">Chọn Ban nhận tin *</label>
+                            <select id="n-target" class="form-select">
+                                <!-- Departments options dynamically injected -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="n-text" class="form-label">Nội dung thông báo *</label>
+                            <textarea id="n-text" class="form-control" rows="5" placeholder="Nhập văn bản nội dung chi tiết..." required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                        <button type="submit" class="btn btn-primary">Đăng thông báo</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script src="assets/js/storage.js"></script>
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/sidebar.js"></script>
+    <script src="assets/js/notification.js"></script>
+</body>
+</html>

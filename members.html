@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Thành viên - Hệ thống Quản lý CLB Sinh viên</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="assets/css/theme.css">
+    <link rel="stylesheet" href="assets/css/layout.css">
+    <link rel="stylesheet" href="assets/css/sidebar.css">
+    <link rel="stylesheet" href="assets/css/table.css">
+    <link rel="stylesheet" href="assets/css/form.css">
+    <link rel="stylesheet" href="assets/css/button.css">
+    <link rel="stylesheet" href="assets/css/modal.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+</head>
+<body>
+
+    <div class="app-wrapper">
+        <div id="sidebar-container"></div>
+        
+        <div class="main-content">
+            <div id="topbar-container"></div>
+            
+            <div class="content-container fade-in">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="mb-1 fw-bold">Quản lý Thành viên</h4>
+                        <p class="text-muted small mb-0">Danh sách thành viên chính thức và cộng tác viên của Câu lạc bộ.</p>
+                    </div>
+                    <div id="add-member-btn-area">
+                        <!-- Only visible to admin, vice, leader, assistant -->
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <!-- Filter Controls -->
+                        <div class="row g-3">
+                            <div class="col-md-5">
+                                <div class="input-icon-group">
+                                    <i class="bi bi-search"></i>
+                                    <input type="text" id="search-input" class="form-control" placeholder="Tìm theo tên, email, SĐT...">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <select id="filter-dept" class="form-select">
+                                    <option value="">Tất cả Ban</option>
+                                    <!-- Dynamic options -->
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select id="filter-status" class="form-select">
+                                    <option value="">Tất cả trạng thái</option>
+                                    <option value="Active">Hoạt động (Active)</option>
+                                    <option value="Inactive">Nghỉ (Inactive)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-1">
+                                <button class="btn btn-secondary w-100" id="reset-filters" title="Reset bộ lọc">
+                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Row -->
+                <div class="row">
+                    <!-- Table Card -->
+                    <div class="col-lg-9 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle">
+                                        <thead>
+                                            <tr>
+                                                <th>Thành viên</th>
+                                                <th>Mã SV</th>
+                                                <th>Ban bộ phận</th>
+                                                <th>Vai trò CLB</th>
+                                                <th>Ngày tham gia</th>
+                                                <th>Trạng thái</th>
+                                                <th><i class="bi bi-star-fill text-warning me-1"></i>Điểm HĐ</th>
+                                                <th class="text-end">Hành động</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="members-tbody">
+                                            <!-- Dynamic members listing -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-white border-0 py-3 mt-auto">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <div class="text-muted small" id="pagination-info">Hiển thị 0 của 0 thành viên</div>
+                                    <nav aria-label="Page navigation">
+                                        <ul class="pagination mb-0" id="members-pagination">
+                                            <!-- Dynamic pagination -->
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Leaderboard Card -->
+                    <div class="col-lg-3 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-transparent border-bottom">
+                                <h5 class="card-title"><i class="bi bi-trophy text-warning me-2"></i>Bảng Điểm Hoạt Động</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="members-leaderboard">
+                                    <!-- Dynamic leaderboard list -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script src="assets/js/storage.js"></script>
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/sidebar.js"></script>
+    <script src="assets/js/member.js"></script>
+</body>
+</html>

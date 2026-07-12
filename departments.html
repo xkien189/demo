@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Ban bộ phận - Hệ thống Quản lý CLB Sinh viên</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="assets/css/theme.css">
+    <link rel="stylesheet" href="assets/css/layout.css">
+    <link rel="stylesheet" href="assets/css/sidebar.css">
+    <link rel="stylesheet" href="assets/css/table.css">
+    <link rel="stylesheet" href="assets/css/button.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+</head>
+<body>
+
+    <div class="app-wrapper">
+        <div id="sidebar-container"></div>
+        
+        <div class="main-content">
+            <div id="topbar-container"></div>
+            
+            <div class="content-container fade-in">
+                <div class="mb-4">
+                    <h4 class="mb-1 fw-bold">Danh sách Ban bộ phận</h4>
+                    <p class="text-muted small mb-0">Cơ cấu tổ chức và sơ đồ phân nhiệm các ban trong Câu lạc bộ.</p>
+                </div>
+
+                <div class="row" id="departments-list">
+                    <!-- Dynamic department cards -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal view members of department -->
+    <div class="modal fade" id="deptMembersModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-dept-title">Thành viên Ban bộ phận</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Thành viên</th>
+                                    <th>Mã SV</th>
+                                    <th>Vai trò CLB</th>
+                                    <th>Email</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modal-members-tbody">
+                                <!-- Dynamic list -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script src="assets/js/storage.js"></script>
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/sidebar.js"></script>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            if (!ClubAuth.checkRouteGuard()) return;
+
+            const depts = ClubStorage.getData("club_departments") || [];
+            const members = ClubStorage.getData("club_members") || [];
+            const container = document.getElementById("departments-list");
+
+            container.innerHTML = depts.map(d => {
+                const leaderMember = members.find(m => m.id === d.leader);
+                const assistantMember = members.find(m => m.id === d.assistant);
+                const deptMembersCount = members.filter(m => m.department === d.name).length;
+
+                return `
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 shadow-none border">
+                            <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                                <span class="badge bg-light-primary fw-bold">${d.code}</span>
+                                <span class="small text-muted"><i class="bi bi-people me-1"></i>${deptMembersCount} thành viên</span>
+                            </div>
+                            <div class="card-body py-2">
+                                <h5 class="fw-bold text-primary mb-2">${d.name}</h5>
+                                <p class="text-secondary small" style="min-height: 48px;">${d.description}</p>
+                                
+                                <div class="mt-3 pt-3 border-top">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="small text-muted">Trưởng ban:</span>
+                                        <span class="small fw-bold">${leaderMember ? leaderMember.name : "Chưa phân nhiệm"}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span class="small text-muted">Phó ban:</span>
+                                        <span class="small fw-bold">${assistantMember ? assistantMember.name : "Chưa phân nhiệm"}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent border-0 pt-0 pb-3">
+                                <button class="btn btn-secondary w-100 btn-sm" onclick="showDeptMembers('${d.name}')">
+                                    <i class="bi bi-eye"></i> Xem danh sách thành viên
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        });
+
+        function showDeptMembers(deptName) {
+            const members = ClubStorage.getData("club_members") || [];
+            const deptMembers = members.filter(m => m.department === deptName);
+            
+            document.getElementById("modal-dept-title").innerText = `Thành viên - ${deptName}`;
+            const tbody = document.getElementById("modal-members-tbody");
+            
+            if (deptMembers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-3">Không có thành viên nào thuộc ban này</td></tr>`;
+            } else {
+                tbody.innerHTML = deptMembers.map(m => `
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <img src="${m.avatar}" class="user-cell-img" style="width: 32px; height: 32px;">
+                                <div class="user-cell-name small">${m.name}</div>
+                            </div>
+                        </td>
+                        <td>${m.id}</td>
+                        <td><span class="badge bg-light-primary">${ClubAuth.ROLES[m.role]?.title || m.role}</span></td>
+                        <td>${m.email}</td>
+                        <td><span class="badge ${m.status === 'Active' ? 'bg-success' : 'bg-danger'}">${m.status}</span></td>
+                    </tr>
+                `).join("");
+            }
+
+            const modal = new bootstrap.Modal(document.getElementById("deptMembersModal"));
+            modal.show();
+        }
+    </script>
+</body>
+</html>

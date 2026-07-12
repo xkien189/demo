@@ -1,0 +1,110 @@
+.table-responsive {
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.table {
+    margin-bottom: 0;
+    vertical-align: middle;
+}
+
+.table th {
+    background-color: var(--bg-tertiary) !important;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    padding: 1rem 1.25rem;
+    border-bottom-width: 1px;
+    border-color: var(--border-color);
+}
+
+.table td {
+    padding: 1rem 1.25rem;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--bg-secondary);
+}
+
+.table tr:last-child td {
+    border-bottom: 0;
+}
+
+.table-hover tbody tr:hover td {
+    background-color: var(--bg-tertiary);
+}
+
+/* Custom User Cell */
+.user-cell {
+    display: flex;
+    align-items: center;
+}
+
+.user-cell-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 0.75rem;
+}
+
+.user-cell-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.15rem;
+}
+
+.user-cell-sub {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* Badge Styling */
+.badge {
+    padding: 0.45em 0.75em;
+    font-weight: 500;
+    border-radius: 6px;
+    font-size: 0.75rem;
+}
+
+.badge.bg-primary { background-color: var(--primary-light) !important; color: var(--primary) !important; }
+.badge.bg-success { background-color: var(--success-light) !important; color: var(--success) !important; }
+.badge.bg-warning { background-color: var(--warning-light) !important; color: var(--warning) !important; }
+.badge.bg-danger { background-color: var(--danger-light) !important; color: var(--danger) !important; }
+.badge.bg-info { background-color: var(--info-light) !important; color: var(--info) !important; }
+
+/* Custom Pagination styles */
+.pagination {
+    margin-top: 1.5rem;
+    justify-content: flex-end;
+    gap: 4px;
+}
+
+.page-link {
+    border-radius: 8px !important;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    background-color: var(--bg-secondary);
+    padding: 0.5rem 0.85rem;
+    font-weight: 500;
+    transition: all var(--transition-fast);
+}
+
+.page-link:hover {
+    background-color: var(--bg-tertiary);
+    color: var(--primary);
+    border-color: var(--border-color);
+}
+
+.page-item.active .page-link {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: #ffffff;
+}
+
+.page-item.disabled .page-link {
+    background-color: var(--bg-primary);
+    border-color: var(--border-color);
+    color: var(--text-muted);
+}

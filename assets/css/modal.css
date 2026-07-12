@@ -1,0 +1,37 @@
+.modal-content {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow-lg);
+    overflow: hidden;
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--border-color);
+    padding: 1.25rem 1.5rem;
+    background-color: var(--bg-secondary);
+}
+
+.modal-title {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.modal-body {
+    padding: 1.5rem;
+    color: var(--text-secondary);
+}
+
+.modal-footer {
+    border-top: 1px solid var(--border-color);
+    padding: 1rem 1.5rem;
+    background-color: var(--bg-secondary);
+}
+
+.modal-backdrop {
+    background-color: #090d16;
+}
+
+.modal-backdrop.show {
+    opacity: 0.6;
+}

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chỉnh sửa Công việc - Hệ thống Quản lý CLB Sinh viên</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="assets/css/theme.css">
+    <link rel="stylesheet" href="assets/css/layout.css">
+    <link rel="stylesheet" href="assets/css/sidebar.css">
+    <link rel="stylesheet" href="assets/css/form.css">
+    <link rel="stylesheet" href="assets/css/button.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+</head>
+<body>
+
+    <div class="app-wrapper">
+        <div id="sidebar-container"></div>
+        
+        <div class="main-content">
+            <div id="topbar-container"></div>
+            
+            <div class="content-container fade-in">
+                <div class="mb-4">
+                    <a href="tasks.html" class="btn btn-secondary btn-sm"><i class="bi bi-arrow-left"></i> Quay lại danh sách</a>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0" id="task-form-title">Giao công việc mới</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="task-form">
+                            <div class="row g-3">
+                                <div class="col-md-12">
+                                    <label for="t-title" class="form-label">Tên công việc / Nhiệm vụ *</label>
+                                    <input type="text" id="t-title" class="form-control" placeholder="Nhập tên nhiệm vụ cụ thể" required>
+                                </div>
+                                <div class="col-md-12">
+                                    <label for="t-desc" class="form-label">Mô tả công việc chi tiết</label>
+                                    <textarea id="t-desc" class="form-control" rows="4" placeholder="Mô tả cụ thể yêu cầu, tài liệu đính kèm nếu có..."></textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="t-dept" class="form-label">Ban bộ phận đảm nhận *</label>
+                                    <select id="t-dept" class="form-select" required>
+                                        <option value="" selected disabled>-- Chọn ban bộ phận --</option>
+                                    </select>
+                                </div>
+
+                                <script>
+                                const departments = [
+                                    { value: "ban-su-kien", name: "Ban Sự kiện" },
+                                    { value: "ban-truyen-thong", name: "Ban Truyền thông" },
+                                    { value: "ban-hoc-tap", name: "Ban Học tập" },
+                                    { value: "ban-doi-noi", name: "Ban Đối nội" },
+                                    { value: "ban-doi-ngoai", name: "Ban Đối ngoại" }
+                                ];
+
+                                const select = document.getElementById("t-dept");
+
+                                departments.forEach(dept => {
+                                    const option = document.createElement("option");
+                                    option.value = dept.value;
+                                    option.textContent = dept.name;
+                                    select.appendChild(option);
+                                });
+                                </script>
+                                <div class="col-md-6">
+                                    <label for="t-assignee" class="form-label">Người phụ trách thực hiện *</label>
+                                    <select id="t-assignee" class="form-select" required>
+                                        <option value="">-- Chọn thành viên phụ trách --</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="t-priority" class="form-label">Mức độ ưu tiên *</label>
+                                    <select id="t-priority" class="form-select" required>
+                                        <option value="Low">Thấp (Low)</option>
+                                        <option value="Medium" selected>Trung bình (Medium)</option>
+                                        <option value="High">Cao (High)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="t-start" class="form-label">Ngày bắt đầu *</label>
+                                    <input type="date" id="t-start" class="form-control" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="t-deadline" class="form-label">Hạn hoàn thành (Deadline) *</label>
+                                    <input type="date" id="t-deadline" class="form-control" required>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Lưu công việc</button>
+                                <a href="tasks.html" class="btn btn-secondary">Hủy bỏ</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script src="assets/js/storage.js"></script>
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/sidebar.js"></script>
+    <script src="assets/js/task.js"></script>
+</body>
+</html>

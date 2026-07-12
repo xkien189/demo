@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Công việc - Hệ thống Quản lý CLB Sinh viên</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="assets/css/theme.css">
+    <link rel="stylesheet" href="assets/css/layout.css">
+    <link rel="stylesheet" href="assets/css/sidebar.css">
+    <link rel="stylesheet" href="assets/css/table.css">
+    <link rel="stylesheet" href="assets/css/form.css">
+    <link rel="stylesheet" href="assets/css/button.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+</head>
+<body>
+
+    <div class="app-wrapper">
+        <div id="sidebar-container"></div>
+        
+        <div class="main-content">
+            <div id="topbar-container"></div>
+            
+            <div class="content-container fade-in">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="mb-1 fw-bold">Danh sách Công việc</h4>
+                        <p class="text-muted small mb-0">Theo dõi, phân công, và quản lý tiến độ thực hiện công việc của CLB.</p>
+                    </div>
+                    <div id="add-task-btn-area">
+                        <!-- Filled dynamically -->
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="input-icon-group">
+                                    <i class="bi bi-search"></i>
+                                    <input type="text" id="search-task" class="form-control" placeholder="Tìm theo tên công việc...">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <select id="filter-task-dept" class="form-select">
+                                    <option value="">Tất cả Ban</option>
+                                    <!-- Options -->
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <select id="filter-task-status" class="form-select">
+                                    <option value="">Tất cả trạng thái</option>
+                                    <option value="Pending">Chờ xử lý (Pending)</option>
+                                    <option value="In Progress">Đang thực hiện (In Progress)</option>
+                                    <option value="Completed">Hoàn thành (Completed)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select id="filter-task-priority" class="form-select">
+                                    <option value="">Tất cả mức ưu tiên</option>
+                                    <option value="High">Cao (High)</option>
+                                    <option value="Medium">Trung bình (Medium)</option>
+                                    <option value="Low">Thấp (Low)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-1">
+                                <button class="btn btn-secondary w-100" id="reset-task-filters" title="Reset bộ lọc">
+                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tasks Listing Table -->
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Mã CV</th>
+                                        <th>Tên công việc</th>
+                                        <th>Ban</th>
+                                        <th>Người phụ trách</th>
+                                        <th>Độ ưu tiên</th>
+                                        <th>Thời hạn</th>
+                                        <th>Tiến độ</th>
+                                        <th>Trạng thái</th>
+                                        <th class="text-end">Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tasks-tbody">
+                                    <!-- Dynamic -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script src="assets/js/storage.js"></script>
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/sidebar.js"></script>
+    <script src="assets/js/task.js"></script>
+</body>
+</html>

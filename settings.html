@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cài đặt - Hệ thống Quản lý CLB Sinh viên</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="assets/css/theme.css">
+    <link rel="stylesheet" href="assets/css/layout.css">
+    <link rel="stylesheet" href="assets/css/sidebar.css">
+    <link rel="stylesheet" href="assets/css/form.css">
+    <link rel="stylesheet" href="assets/css/button.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+</head>
+<body>
+
+    <div class="app-wrapper">
+        <div id="sidebar-container"></div>
+        
+        <div class="main-content">
+            <div id="topbar-container"></div>
+            
+            <div class="content-container fade-in">
+                <div class="mb-4">
+                    <h4 class="mb-1 fw-bold">Cài đặt hệ thống</h4>
+                    <p class="text-muted small mb-0">Cập nhật thông tin chung và cấu hình hệ thống của Câu lạc bộ.</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0"><i class="bi bi-gear-fill me-2"></i>Thông tin cấu hình Câu lạc bộ</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="settings-form">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="s-name" class="form-label">Tên Câu lạc bộ *</label>
+                                    <input type="text" id="s-name" class="form-control" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="s-slogan" class="form-label">Slogan của CLB *</label>
+                                    <input type="text" id="s-slogan" class="form-control" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="s-email" class="form-label">Email liên hệ hệ thống *</label>
+                                    <input type="email" id="s-email" class="form-control" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="s-phone" class="form-label">Số điện thoại liên hệ *</label>
+                                    <input type="text" id="s-phone" class="form-control" required>
+                                </div>
+                                <div class="col-md-12">
+                                    <label for="s-logo" class="form-label">URL Logo Câu lạc bộ *</label>
+                                    <input type="url" id="s-logo" class="form-control" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="s-theme" class="form-label">Màu chủ đạo giao diện (Giả lập)</label>
+                                    <select id="s-theme" class="form-select">
+                                        <option value="blue">Xanh Dương (Mặc định)</option>
+                                        <option value="emerald">Xanh Lá (Emerald)</option>
+                                        <option value="indigo">Tím Indigo</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Lưu cấu hình</button>
+                                <button type="button" onclick="resetSystemData()" class="btn btn-danger ms-2"><i class="bi bi-arrow-counterclockwise"></i> Reset Mock Data gốc</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script src="assets/js/storage.js"></script>
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/sidebar.js"></script>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            if (!ClubAuth.checkRouteGuard(["admin", "vice"])) return;
+
+            const settings = ClubStorage.getData("club_settings") || {};
+
+            document.getElementById("s-name").value = settings.clubName || "";
+            document.getElementById("s-slogan").value = settings.slogan || "";
+            document.getElementById("s-email").value = settings.contactEmail || "";
+            document.getElementById("s-phone").value = settings.contactPhone || "";
+            document.getElementById("s-logo").value = settings.logo || "";
+            document.getElementById("s-theme").value = settings.themeColor || "blue";
+
+            document.getElementById("settings-form").addEventListener("submit", (e) => {
+                e.preventDefault();
+                
+                const clubName = document.getElementById("s-name").value.trim();
+                const slogan = document.getElementById("s-slogan").value.trim();
+                const contactEmail = document.getElementById("s-email").value.trim();
+                const contactPhone = document.getElementById("s-phone").value.trim();
+                const logo = document.getElementById("s-logo").value.trim();
+                const themeColor = document.getElementById("s-theme").value;
+
+                const updated = {
+                    clubName, slogan, contactEmail, contactPhone, logo, themeColor
+                };
+
+                ClubStorage.saveData("club_settings", updated);
+                ClubUtils.addLog("Cập nhật cài đặt hệ thống CLB");
+                ClubUtils.showToast("Cập nhật thành công!", "Thông tin cấu hình CLB đã thay đổi.", "success");
+                
+                setTimeout(() => location.reload(), 1000);
+            });
+        });
+
+        function resetSystemData() {
+            ClubUtils.showConfirm(
+                "Khôi phục dữ liệu gốc?",
+                "Tất cả các thay đổi của bạn trên hệ thống sẽ bị xóa sạch và quay về dữ liệu giả lập ban đầu!",
+                "Đồng ý Reset",
+                "Hủy"
+            ).then((result) => {
+                if (result.isConfirmed) {
+                    ClubStorage.reset();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

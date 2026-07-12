@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nhật ký hệ thống - Hệ thống Quản lý CLB Sinh viên</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="assets/css/theme.css">
+    <link rel="stylesheet" href="assets/css/layout.css">
+    <link rel="stylesheet" href="assets/css/sidebar.css">
+    <link rel="stylesheet" href="assets/css/table.css">
+    <link rel="stylesheet" href="assets/css/form.css">
+    <link rel="stylesheet" href="assets/css/button.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+</head>
+<body>
+
+    <div class="app-wrapper">
+        <div id="sidebar-container"></div>
+        
+        <div class="main-content">
+            <div id="topbar-container"></div>
+            
+            <div class="content-container fade-in">
+                <div class="mb-4">
+                    <h4 class="mb-1 fw-bold">Nhật ký hoạt động hệ thống (Audit Logs)</h4>
+                    <p class="text-muted small mb-0">Theo dõi toàn bộ lịch sử thao tác tạo, sửa, xóa thành viên, công việc và các cấu hình trong CLB.</p>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="input-icon-group">
+                                    <i class="bi bi-search"></i>
+                                    <input type="text" id="search-log" class="form-control" placeholder="Tìm theo người thực hiện hoặc nội dung hành động...">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-danger w-100" onclick="clearLogs()" id="btn-clear-logs">
+                                    <i class="bi bi-trash"></i> Xóa toàn bộ nhật ký
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table Card -->
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Thời gian</th>
+                                        <th>Người thực hiện</th>
+                                        <th>Nội dung thao tác</th>
+                                        <th>Loại hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="logs-tbody">
+                                    <!-- Dynamic logs -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script src="assets/js/storage.js"></script>
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/sidebar.js"></script>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            if (!ClubAuth.checkRouteGuard(["admin", "vice"])) return;
+
+            renderLogsTable();
+            document.getElementById("search-log").addEventListener("input", renderLogsTable);
+        });
+
+        function renderLogsTable() {
+            const searchVal = document.getElementById("search-log").value.toLowerCase();
+            const logs = ClubStorage.getData("club_logs") || [];
+            const tbody = document.getElementById("logs-tbody");
+
+            const filtered = logs.filter(l => 
+                l.user.toLowerCase().includes(searchVal) || 
+                l.action.toLowerCase().includes(searchVal)
+            );
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-4">Không tìm thấy nhật ký hoạt động nào</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(l => {
+                let badgeColor = "bg-primary";
+                let actionType = "Truy cập";
+                
+                if (l.action.includes("Xóa")) {
+                    badgeColor = "bg-danger";
+                    actionType = "Xóa";
+                } else if (l.action.includes("Cập nhật") || l.action.includes("Sửa")) {
+                    badgeColor = "bg-warning";
+                    actionType = "Chỉnh sửa";
+                } else if (l.action.includes("Tạo") || l.action.includes("Giao")) {
+                    badgeColor = "bg-success";
+                    actionType = "Thêm mới";
+                }
+
+                return `
+                    <tr>
+                        <td class="text-muted">${l.time}</td>
+                        <td><strong>${l.user}</strong></td>
+                        <td>${l.action}</td>
+                        <td><span class="badge ${badgeColor}">${actionType}</span></td>
+                    </tr>
+                `;
+            }).join("");
+        }
+
+        function clearLogs() {
+            ClubUtils.showConfirm(
+                "Xác nhận xóa sạch lịch sử nhật ký?",
+                "Toàn bộ lịch sử hành động lưu trữ trong trình duyệt sẽ bị xóa hoàn toàn!",
+                "Xóa sạch",
+                "Hủy"
+            ).then((result) => {
+                if (result.isConfirmed) {
+                    ClubStorage.saveData("club_logs", []);
+                    ClubUtils.addLog("Xóa lịch sử hệ thống Audit Logs");
+                    renderLogsTable();
+                    ClubUtils.showToast("Đã xóa sạch", "Nhật ký hệ thống đã được dọn dẹp.", "success");
+                }
+            });
+        }
+    </script>
+</body>
+</html>

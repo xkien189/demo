@@ -1,0 +1,103 @@
+.metric-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background-color: var(--primary);
+}
+
+.metric-card.success::before { background-color: var(--success); }
+.metric-card.warning::before { background-color: var(--warning); }
+.metric-card.danger::before { background-color: var(--danger); }
+.metric-card.info::before { background-color: var(--info); }
+
+.metric-value {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 0.25rem;
+    color: var(--text-primary);
+}
+
+.metric-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.metric-icon {
+    font-size: 2.25rem;
+    opacity: 0.2;
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+
+.card:hover .metric-icon {
+    transform: translateY(-50%) scale(1.15);
+    opacity: 0.45;
+}
+
+.activity-feed {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.activity-item {
+    position: relative;
+    padding-left: 2rem;
+    padding-bottom: 1.5rem;
+}
+
+.activity-item::before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 20px;
+    width: 2px;
+    height: calc(100% - 10px);
+    background-color: var(--border-color);
+}
+
+.activity-item:last-child::before {
+    display: none;
+}
+
+.activity-dot {
+    position: absolute;
+    left: 0;
+    top: 4px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background-color: var(--primary);
+    border: 3px solid var(--bg-secondary);
+    box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+.activity-item.success .activity-dot { background-color: var(--success); box-shadow: 0 0 0 2px var(--success-light); }
+.activity-item.warning .activity-dot { background-color: var(--warning); box-shadow: 0 0 0 2px var(--warning-light); }
+.activity-item.danger .activity-dot { background-color: var(--danger); box-shadow: 0 0 0 2px var(--danger-light); }
+
+.activity-time {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.activity-text {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}

@@ -1,0 +1,95 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    --font-primary: 'Outfit', sans-serif;
+    
+    /* Light Theme (Default) */
+    --bg-primary: #f8fafc;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #f1f5f9;
+    --border-color: #e2e8f0;
+    
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --primary-light: #eff6ff;
+    
+    --success: #10b981;
+    --success-hover: #059669;
+    --success-light: #ecfdf5;
+    
+    --warning: #f59e0b;
+    --warning-hover: #d97706;
+    --warning-light: #fffbeb;
+    
+    --danger: #ef4444;
+    --danger-hover: #dc2626;
+    --danger-light: #fef2f2;
+    
+    --info: #06b6d4;
+    --info-hover: #0891b2;
+    --info-light: #ecfeff;
+    
+    --sidebar-bg: #0f172a;
+    --sidebar-text: #94a3b8;
+    --sidebar-text-active: #ffffff;
+    --sidebar-item-hover: #1e293b;
+    --sidebar-item-active: #2563eb;
+    
+    --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+    --card-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+    
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --border-radius: 12px;
+}
+
+[data-theme="dark"] {
+    --bg-primary: #0b0f19;
+    --bg-secondary: #111827;
+    --bg-tertiary: #1f2937;
+    --border-color: #374151;
+    
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+    --text-muted: #6b7280;
+    
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+    --primary-light: rgba(59, 130, 246, 0.1);
+    
+    --success: #10b981;
+    --success-hover: #059669;
+    --success-light: rgba(16, 185, 129, 0.1);
+    
+    --warning: #fbbf24;
+    --warning-hover: #f59e0b;
+    --warning-light: rgba(251, 191, 36, 0.1);
+    
+    --danger: #ef4444;
+    --danger-hover: #dc2626;
+    --danger-light: rgba(239, 68, 68, 0.1);
+    
+    --info: #22d3ee;
+    --info-hover: #06b6d4;
+    --info-light: rgba(34, 211, 238, 0.1);
+    
+    --sidebar-bg: #030712;
+    --sidebar-text: #9ca3af;
+    --sidebar-text-active: #ffffff;
+    --sidebar-item-hover: #111827;
+    --sidebar-item-active: #3b82f6;
+    
+    --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.2), 0 2px 4px -2px rgb(0 0 0 / 0.2);
+    --card-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.2), 0 4px 6px -4px rgb(0 0 0 / 0.2);
+}
+
+body {
+    font-family: var(--font-primary);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color var(--transition-normal), color var(--transition-normal);
+}

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Tài khoản - Hệ thống Quản lý CLB Sinh viên</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="assets/css/theme.css">
+    <link rel="stylesheet" href="assets/css/layout.css">
+    <link rel="stylesheet" href="assets/css/sidebar.css">
+    <link rel="stylesheet" href="assets/css/table.css">
+    <link rel="stylesheet" href="assets/css/form.css">
+    <link rel="stylesheet" href="assets/css/button.css">
+    <link rel="stylesheet" href="assets/css/modal.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+</head>
+<body>
+
+    <div class="app-wrapper">
+        <div id="sidebar-container"></div>
+        
+        <div class="main-content">
+            <div id="topbar-container"></div>
+            
+            <div class="content-container fade-in">
+                <div class="mb-4">
+                    <h4 class="mb-1 fw-bold">Quản lý Tài khoản Đăng nhập</h4>
+                    <p class="text-muted small mb-0">Quản lý phân quyền, kích hoạt, hoặc khóa quyền truy cập hệ thống của thành viên.</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Tên đăng nhập</th>
+                                        <th>Thành viên liên kết</th>
+                                        <th>Quyền hệ thống</th>
+                                        <th>Trạng thái đăng nhập</th>
+                                        <th class="text-end">Hành động quản trị</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="accounts-tbody">
+                                    <!-- Dynamic accounts -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Role Modal -->
+    <div class="modal fade" id="roleEditModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thay đổi quyền truy cập</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="role-edit-form">
+                    <input type="hidden" id="edit-username-key">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="a-role-select" class="form-label">Chọn quyền mới</label>
+                            <select id="a-role-select" class="form-select">
+                                <option value="admin">Chủ nhiệm (admin)</option>
+                                <option value="vice">Phó Chủ nhiệm (vice)</option>
+                                <option value="leader">Trưởng ban (leader)</option>
+                                <option value="assistant">Phó ban (assistant)</option>
+                                <option value="member">Thành viên (member)</option>
+                                <option value="guest">Cộng tác viên (guest)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary btn-sm">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script src="assets/js/storage.js"></script>
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/sidebar.js"></script>
+    <script src="assets/js/account.js"></script>
+</body>
+</html>

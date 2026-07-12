@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ sơ cá nhân - Hệ thống Quản lý CLB Sinh viên</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="assets/css/theme.css">
+    <link rel="stylesheet" href="assets/css/layout.css">
+    <link rel="stylesheet" href="assets/css/sidebar.css">
+    <link rel="stylesheet" href="assets/css/form.css">
+    <link rel="stylesheet" href="assets/css/button.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+</head>
+<body>
+
+    <div class="app-wrapper">
+        <div id="sidebar-container"></div>
+        
+        <div class="main-content">
+            <div id="topbar-container"></div>
+            
+            <div class="content-container fade-in">
+                <div class="mb-4">
+                    <h4 class="mb-1 fw-bold">Hồ sơ cá nhân</h4>
+                    <p class="text-muted small mb-0">Cập nhật thông tin liên hệ và mật khẩu tài khoản của bạn.</p>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-4 mb-4">
+                        <div class="card text-center py-4">
+                            <div class="card-body">
+                                <img src="" id="p-avatar-img" class="rounded-circle mb-3 border border-4 border-light shadow-sm" style="width: 120px; height: 120px; object-fit: cover;">
+                                <h5 class="fw-bold mb-1" id="p-name-txt">-</h5>
+                                <p class="text-muted small mb-3" id="p-role-txt">-</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-8">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="bi bi-person me-2"></i>Thay đổi thông tin liên hệ</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="profile-info-form">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label for="p-email" class="form-label">Email liên hệ *</label>
+                                            <input type="email" id="p-email" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="p-phone" class="form-label">Số điện thoại *</label>
+                                            <input type="tel" id="p-phone" class="form-control" required>
+                                        </div>
+                                        <div class="col-12">
+                                            <label for="p-avatar-url" class="form-label">URL ảnh đại diện mới</label>
+                                            <input type="url" id="p-avatar-url" class="form-control" placeholder="https://images.unsplash.com/...">
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary mt-3"><i class="bi bi-save"></i> Cập nhật thông tin</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="bi bi-shield-lock me-2"></i>Đổi mật khẩu tài khoản</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="profile-pass-form">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label for="p-old-pass" class="form-label">Mật khẩu hiện tại *</label>
+                                            <input type="password" id="p-old-pass" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="p-new-pass" class="form-label">Mật khẩu mới *</label>
+                                            <input type="password" id="p-new-pass" class="form-control" required>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-warning mt-3"><i class="bi bi-key"></i> Đổi mật khẩu</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script src="assets/js/storage.js"></script>
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/sidebar.js"></script>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            if (!ClubAuth.checkRouteGuard()) return;
+
+            const user = ClubAuth.getCurrentUser();
+            const member = ClubAuth.getCurrentMember();
+
+            // Populate Info
+            if (member) {
+                document.getElementById("p-avatar-img").src = member.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150";
+                document.getElementById("p-name-txt").innerText = member.name;
+                document.getElementById("p-role-txt").innerText = ClubAuth.ROLES[user.role]?.title || user.role;
+                
+                document.getElementById("p-email").value = member.email;
+                document.getElementById("p-phone").value = member.phone;
+                document.getElementById("p-avatar-url").value = member.avatar || "";
+            }
+
+            // Info submit
+            document.getElementById("profile-info-form").addEventListener("submit", (e) => {
+                e.preventDefault();
+                const email = document.getElementById("p-email").value.trim();
+                const phone = document.getElementById("p-phone").value.trim();
+                const avatar = document.getElementById("p-avatar-url").value.trim();
+
+                let members = ClubStorage.getData("club_members") || [];
+                const index = members.findIndex(m => m.id === user.memberId);
+
+                if (index !== -1) {
+                    members[index].email = email;
+                    members[index].phone = phone;
+                    members[index].avatar = avatar || members[index].avatar;
+
+                    ClubStorage.saveData("club_members", members);
+                    ClubUtils.addLog("Cập nhật thông tin hồ sơ cá nhân");
+                    ClubUtils.showToast("Cập nhật thành công!", "Dữ liệu liên hệ của bạn đã được thay đổi.", "success");
+                    
+                    setTimeout(() => location.reload(), 1000);
+                }
+            });
+
+            // Password submit
+            document.getElementById("profile-pass-form").addEventListener("submit", (e) => {
+                e.preventDefault();
+                const oldPass = document.getElementById("p-old-pass").value;
+                const newPass = document.getElementById("p-new-pass").value;
+
+                let users = ClubStorage.getData("club_users") || [];
+                const index = users.findIndex(u => u.username === user.username);
+
+                if (index !== -1) {
+                    if (users[index].password !== oldPass) {
+                        ClubUtils.showAlert("Lỗi mật khẩu", "Mật khẩu hiện tại không chính xác!", "error");
+                        return;
+                    }
+
+                    users[index].password = newPass;
+                    ClubStorage.saveData("club_users", users);
+                    
+                    // Session updates
+                    sessionStorage.setItem("club_current_user", JSON.stringify(users[index]));
+
+                    ClubUtils.addLog("Đổi mật khẩu tài khoản");
+                    ClubUtils.showToast("Đổi mật khẩu thành công!", "Mật khẩu của bạn đã được đổi.", "success");
+                    
+                    document.getElementById("p-old-pass").value = "";
+                    document.getElementById("p-new-pass").value = "";
+                }
+            });
+        });
+    </script>
+</body>
+</html>
