@@ -124,10 +124,9 @@
                     </div>
                 </div>
 
-                <!-- Grid Details: Activity Logs & Quick Notifications -->
+                <!-- Bottom: Latest Notifications -->
                 <div class="row">
-                    <!-- Notifications feed -->
-                    <div class="col-xl-6 mb-4">
+                    <div class="col-12 mb-4">
                         <div class="card h-100">
                             <div class="card-header">
                                 <h5 class="card-title"><i class="bi bi-bell me-2"></i>Thông báo Mới nhất</h5>
@@ -137,19 +136,6 @@
                                 <div id="notifications-container">
                                     <!-- Notifications -->
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Recent logs -->
-                    <div class="col-xl-6 mb-4">
-                        <div class="card h-100">
-                            <div class="card-header">
-                                <h5 class="card-title"><i class="bi bi-journal-text me-2"></i>Hoạt động Gần đây</h5>
-                            </div>
-                            <div class="card-body" style="max-height: 350px; overflow-y: auto;">
-                                <ul class="activity-feed" id="logs-container">
-                                    <!-- Dynamic Activity Logs -->
-                                </ul>
                             </div>
                         </div>
                     </div>
@@ -164,6 +150,13 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
+    <!-- Firebase SDK (v10 Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+    <script src="assets/js/firebase-config.js"></script>
+
     <script src="assets/js/storage.js"></script>
     <script src="assets/js/utils.js"></script>
     <script src="assets/js/auth.js"></script>

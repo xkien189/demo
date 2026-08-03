@@ -29,7 +29,6 @@ const ClubUtils = {
 
     // Toast Notification generator
     showToast: function(title, text, type = 'success') {
-        const toastColor = type === 'success' ? '#10b981' : type === 'danger' ? '#ef4444' : type === 'warning' ? '#f59e0b' : '#2563eb';
         Swal.fire({
             toast: true,
             position: 'top-end',
@@ -44,11 +43,49 @@ const ClubUtils = {
         });
     },
 
-    formatDate: function(dateStr) {
+    // Format: DD-MM-YYYY
+    formatDateOnly: function(dateStr) {
         if (!dateStr) return '';
         const d = new Date(dateStr);
         if (isNaN(d.getTime())) return dateStr;
-        return d.toLocaleDateString('vi-VN');
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yyyy = d.getFullYear();
+        return `${dd}-${mm}-${yyyy}`;
+    },
+
+    // Format: DD-MM-YYYY HH:mm:ss
+    formatDateTime: function(dateStr) {
+        if (!dateStr) return '';
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) {
+            // Handle strings like "2026-07-05 14:00" or "2026-07-05"
+            const parts = dateStr.split(' ');
+            const datePart = parts[0] ? parts[0].split('-') : [];
+            const timePart = parts[1] || '';
+            if (datePart.length === 3) {
+                const formatted = `${datePart[2]}-${datePart[1]}-${datePart[0]}`;
+                return timePart ? `${formatted} ${timePart}:00` : formatted;
+            }
+            return dateStr;
+        }
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yyyy = d.getFullYear();
+        const hh = String(d.getHours()).padStart(2, '0');
+        const min = String(d.getMinutes()).padStart(2, '0');
+        const ss = String(d.getSeconds()).padStart(2, '0');
+        return `${dd}-${mm}-${yyyy} ${hh}:${min}:${ss}`;
+    },
+
+    // Alias for backward compat
+    formatDate: function(dateStr) {
+        return this.formatDateOnly(dateStr);
+    },
+
+    // Current datetime string: DD-MM-YYYY HH:mm:ss
+    nowString: function() {
+        return this.formatDateTime(new Date().toISOString());
     },
 
     // Save action logging
@@ -56,9 +93,9 @@ const ClubUtils = {
         const currentUser = JSON.parse(sessionStorage.getItem("club_current_user"));
         const username = currentUser ? currentUser.username : "Ẩn danh";
         const logs = ClubStorage.getData("club_logs") || [];
-        const time = new Date().toISOString().replace('T', ' ').substring(0, 19);
+        const time = this.nowString();
         logs.unshift({ time, user: username, action });
-        ClubStorage.saveData("club_logs", logs.slice(0, 50));
+        ClubStorage.saveData("club_logs", logs.slice(0, 200));
     },
 
     // Theme state load

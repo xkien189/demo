@@ -23,8 +23,9 @@ function renderSidebar() {
     const menuItems = [
         { name: "Dashboard", icon: "bi-speedometer2", href: "dashboard.html", roles: ["admin", "vice", "leader", "assistant", "member", "guest"] },
         { name: "Không gian của tôi", icon: "bi-laptop", href: "workspace.html", roles: ["admin", "vice", "leader", "assistant", "member", "guest"] },
-        { name: "Quản lý Thành viên", icon: "bi-people", href: "members.html", roles: ["admin", "vice", "leader", "assistant"] },
-        { name: "Quản lý Ban", icon: "bi-building", href: "departments.html", roles: ["admin", "vice", "leader", "assistant", "member", "guest"] },
+        { name: "Giới thiệu CLB", icon: "bi-info-circle", href: "about.html", roles: ["admin", "vice", "leader", "assistant", "member", "guest"] },
+        { name: "Quản lý Thành viên", icon: "bi-people", href: "members.html", roles: ["admin", "vice", "leader"] },
+        { name: "Quản lý Ban", icon: "bi-building", href: "departments.html", roles: ["admin", "vice"] },
         { name: "Quản lý Công việc", icon: "bi-list-check", href: "tasks.html", roles: ["admin", "vice", "leader", "assistant", "member", "guest"] },
         { name: "Lịch công tác", icon: "bi-calendar3", href: "calendar.html", roles: ["admin", "vice", "leader", "assistant", "member", "guest"] },
         { name: "Quản lý Sự kiện", icon: "bi-calendar-event", href: "events.html", roles: ["admin", "vice", "leader", "assistant", "member", "guest"] },
@@ -202,6 +203,8 @@ function buildBreadcrumbs() {
         html += `<li class="breadcrumb-item active">Nhật ký hệ thống</li>`;
     } else if (path.includes("settings.html")) {
         html += `<li class="breadcrumb-item active">Cài đặt hệ thống</li>`;
+    } else if (path.includes("about.html")) {
+        html += `<li class="breadcrumb-item active">Giới thiệu CLB</li>`;
     }
     
     list.innerHTML = html;

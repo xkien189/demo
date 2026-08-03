@@ -21,9 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Render notifications
     renderRecentNotifications();
 
-    // Render activities
-    renderActivityLogs();
-
     // Initialize Chart.js
     initTasksChart();
 });
@@ -52,16 +49,12 @@ function renderQuickActions() {
 
     const user = ClubAuth.getCurrentUser();
     
-    // Check if user has management permissions (admin, vice, leader)
     if (["admin", "vice", "leader"].includes(user.role)) {
-        btnContainer.innerHTML = `
-            <a href="task-edit.html" class="btn btn-primary">
-                <i class="bi bi-plus-lg"></i> Giao việc mới
-            </a>
-            <a href="member-edit.html" class="btn btn-secondary ms-2">
-                <i class="bi bi-person-plus"></i> Thêm thành viên
-            </a>
-        `;
+        let html = `<a href="task-edit.html" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Giao việc mới</a>`;
+        if (["admin", "vice"].includes(user.role)) {
+            html += ` <a href="member-edit.html" class="btn btn-secondary ms-2"><i class="bi bi-person-plus"></i> Thêm thành viên</a>`;
+        }
+        btnContainer.innerHTML = html;
     }
 }
 

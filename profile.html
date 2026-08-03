@@ -14,6 +14,55 @@
     <link rel="stylesheet" href="assets/css/form.css">
     <link rel="stylesheet" href="assets/css/button.css">
     <link rel="stylesheet" href="assets/css/responsive.css">
+
+    <style>
+        .avatar-upload-wrap {
+            position: relative;
+            width: 130px;
+            height: 130px;
+            margin: 0 auto 1rem;
+        }
+        .avatar-upload-wrap img {
+            width: 130px;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid var(--border-color);
+            box-shadow: var(--card-shadow-lg);
+            transition: all var(--transition-normal);
+        }
+        .avatar-upload-btn {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            border: 2px solid var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background var(--transition-fast);
+            box-shadow: 0 2px 8px rgba(37,99,235,0.4);
+        }
+        .avatar-upload-btn:hover { background: var(--primary-hover); }
+        #avatar-file-input { display: none; }
+        .score-badge {
+            background: linear-gradient(135deg, var(--primary), var(--info));
+            color: #fff;
+            border-radius: 30px;
+            padding: 0.35rem 1rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+    </style>
 </head>
 <body>
 
@@ -26,20 +75,36 @@
             <div class="content-container fade-in">
                 <div class="mb-4">
                     <h4 class="mb-1 fw-bold">Hồ sơ cá nhân</h4>
-                    <p class="text-muted small mb-0">Cập nhật thông tin liên hệ và mật khẩu tài khoản của bạn.</p>
+                    <p class="text-muted small mb-0">Cập nhật thông tin liên hệ, ảnh đại diện và mật khẩu tài khoản của bạn.</p>
                 </div>
 
                 <div class="row">
+                    <!-- Left: Avatar card -->
                     <div class="col-lg-4 mb-4">
-                        <div class="card text-center py-4">
-                            <div class="card-body">
-                                <img src="" id="p-avatar-img" class="rounded-circle mb-3 border border-4 border-light shadow-sm" style="width: 120px; height: 120px; object-fit: cover;">
+                        <div class="card text-center py-4 h-100">
+                            <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                                <!-- Avatar with upload button -->
+                                <div class="avatar-upload-wrap">
+                                    <img src="" id="p-avatar-img" alt="Avatar">
+                                    <label class="avatar-upload-btn" for="avatar-file-input" title="Đổi ảnh đại diện">
+                                        <i class="bi bi-camera"></i>
+                                    </label>
+                                    <input type="file" id="avatar-file-input" accept="image/*">
+                                </div>
                                 <h5 class="fw-bold mb-1" id="p-name-txt">-</h5>
                                 <p class="text-muted small mb-3" id="p-role-txt">-</p>
+                                <div class="score-badge" id="p-score-badge">
+                                    <i class="bi bi-star-fill"></i>
+                                    <span id="p-score-txt">0</span> điểm
+                                </div>
+                                <p class="text-muted mt-3 mb-0" style="font-size:0.75rem;">
+                                    <i class="bi bi-info-circle me-1"></i>Click vào biểu tượng 📷 để đổi ảnh từ máy tính
+                                </p>
                             </div>
                         </div>
                     </div>
                     
+                    <!-- Right: Forms -->
                     <div class="col-lg-8">
                         <div class="card mb-4">
                             <div class="card-header">
@@ -56,10 +121,6 @@
                                             <label for="p-phone" class="form-label">Số điện thoại *</label>
                                             <input type="tel" id="p-phone" class="form-control" required>
                                         </div>
-                                        <div class="col-12">
-                                            <label for="p-avatar-url" class="form-label">URL ảnh đại diện mới</label>
-                                            <input type="url" id="p-avatar-url" class="form-control" placeholder="https://images.unsplash.com/...">
-                                        </div>
                                     </div>
                                     <button type="submit" class="btn btn-primary mt-3"><i class="bi bi-save"></i> Cập nhật thông tin</button>
                                 </form>
@@ -75,11 +136,17 @@
                                     <div class="row g-3">
                                         <div class="col-md-6">
                                             <label for="p-old-pass" class="form-label">Mật khẩu hiện tại *</label>
-                                            <input type="password" id="p-old-pass" class="form-control" required>
+                                            <div class="input-group">
+                                                <input type="password" id="p-old-pass" class="form-control" required>
+                                                <button class="btn btn-outline-secondary" type="button" onclick="togglePass('p-old-pass', this)"><i class="bi bi-eye"></i></button>
+                                            </div>
                                         </div>
                                         <div class="col-md-6">
                                             <label for="p-new-pass" class="form-label">Mật khẩu mới *</label>
-                                            <input type="password" id="p-new-pass" class="form-control" required>
+                                            <div class="input-group">
+                                                <input type="password" id="p-new-pass" class="form-control" required minlength="3">
+                                                <button class="btn btn-outline-secondary" type="button" onclick="togglePass('p-new-pass', this)"><i class="bi bi-eye"></i></button>
+                                            </div>
                                         </div>
                                     </div>
                                     <button type="submit" class="btn btn-warning mt-3"><i class="bi bi-key"></i> Đổi mật khẩu</button>
@@ -97,12 +164,30 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
+    <!-- Firebase SDK (v10 Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+    <script src="assets/js/firebase-config.js"></script>
     <script src="assets/js/storage.js"></script>
     <script src="assets/js/utils.js"></script>
     <script src="assets/js/auth.js"></script>
     <script src="assets/js/sidebar.js"></script>
     
     <script>
+        function togglePass(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'bi bi-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'bi bi-eye';
+            }
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
             if (!ClubAuth.checkRouteGuard()) return;
 
@@ -113,19 +198,43 @@
             if (member) {
                 document.getElementById("p-avatar-img").src = member.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150";
                 document.getElementById("p-name-txt").innerText = member.name;
-                document.getElementById("p-role-txt").innerText = ClubAuth.ROLES[user.role]?.title || user.role;
-                
+                document.getElementById("p-role-txt").innerText = (ClubAuth.ROLES[user.role]?.title || user.role) + " — " + member.department;
                 document.getElementById("p-email").value = member.email;
                 document.getElementById("p-phone").value = member.phone;
-                document.getElementById("p-avatar-url").value = member.avatar || "";
+                document.getElementById("p-score-txt").innerText = member.activityScore || 0;
             }
+
+            // Avatar file upload: read as base64
+            document.getElementById("avatar-file-input").addEventListener("change", function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                if (file.size > 3 * 1024 * 1024) {
+                    ClubUtils.showAlert("Ảnh quá lớn", "Vui lòng chọn ảnh nhỏ hơn 3MB.", "error");
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    const dataUrl = ev.target.result;
+                    // Preview immediately
+                    document.getElementById("p-avatar-img").src = dataUrl;
+                    // Auto-save avatar
+                    let members = ClubStorage.getData("club_members") || [];
+                    const idx = members.findIndex(m => m.id === user.memberId);
+                    if (idx !== -1) {
+                        members[idx].avatar = dataUrl;
+                        ClubStorage.saveData("club_members", members);
+                        ClubUtils.addLog("Cập nhật ảnh đại diện");
+                        ClubUtils.showToast("Cập nhật thành công!", "Ảnh đại diện đã được thay đổi.", "success");
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
 
             // Info submit
             document.getElementById("profile-info-form").addEventListener("submit", (e) => {
                 e.preventDefault();
                 const email = document.getElementById("p-email").value.trim();
                 const phone = document.getElementById("p-phone").value.trim();
-                const avatar = document.getElementById("p-avatar-url").value.trim();
 
                 let members = ClubStorage.getData("club_members") || [];
                 const index = members.findIndex(m => m.id === user.memberId);
@@ -133,13 +242,10 @@
                 if (index !== -1) {
                     members[index].email = email;
                     members[index].phone = phone;
-                    members[index].avatar = avatar || members[index].avatar;
-
                     ClubStorage.saveData("club_members", members);
                     ClubUtils.addLog("Cập nhật thông tin hồ sơ cá nhân");
                     ClubUtils.showToast("Cập nhật thành công!", "Dữ liệu liên hệ của bạn đã được thay đổi.", "success");
-                    
-                    setTimeout(() => location.reload(), 1000);
+                    setTimeout(() => location.reload(), 1200);
                 }
             });
 
@@ -157,16 +263,17 @@
                         ClubUtils.showAlert("Lỗi mật khẩu", "Mật khẩu hiện tại không chính xác!", "error");
                         return;
                     }
+                    if (newPass.length < 3) {
+                        ClubUtils.showAlert("Mật khẩu yếu", "Mật khẩu mới phải có ít nhất 3 ký tự.", "error");
+                        return;
+                    }
 
                     users[index].password = newPass;
                     ClubStorage.saveData("club_users", users);
-                    
-                    // Session updates
                     sessionStorage.setItem("club_current_user", JSON.stringify(users[index]));
 
                     ClubUtils.addLog("Đổi mật khẩu tài khoản");
                     ClubUtils.showToast("Đổi mật khẩu thành công!", "Mật khẩu của bạn đã được đổi.", "success");
-                    
                     document.getElementById("p-old-pass").value = "";
                     document.getElementById("p-new-pass").value = "";
                 }

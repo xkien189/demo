@@ -58,7 +58,11 @@ function renderTasksList() {
 
     // Role filtration rule: member & guest only view their assigned tasks. Others view all.
     let allowedTasks = tasks;
-    if (["member", "guest"].includes(user.role) && member) {
+    if (["admin", "vice"].includes(user.role)) {
+        allowedTasks = tasks;
+    } else if (["leader", "assistant"].includes(user.role) && member) {
+        allowedTasks = tasks.filter(t => t.department === member.department);
+    } else if (["member", "guest"].includes(user.role) && member) {
         allowedTasks = tasks.filter(t => t.assigneeId === member.id);
     }
 
@@ -263,18 +267,36 @@ function renderAttachments() {
         return;
     }
 
-    container.innerHTML = attachs.map((a, idx) => `
-        <div class="d-flex justify-content-between align-items-center p-2 mb-2 rounded border bg-light-primary" style="background-color: var(--primary-light);">
-            <div class="d-flex align-items-center gap-2">
-                <i class="bi bi-file-earmark-check text-success"></i>
-                <div>
-                    <div class="fw-bold text-dark small text-truncate" style="max-width: 150px;">${a.name}</div>
-                    <div class="text-muted" style="font-size: 0.7rem;">${a.size}</div>
+    container.innerHTML = attachs.map((a, idx) => {
+        const isImage = a.type && a.type.startsWith("image/");
+        const hasSrc = !!a.dataUrl;
+        let thumbHtml = "";
+        if (isImage && hasSrc) {
+            thumbHtml = `<img src="${a.dataUrl}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;margin-right:8px;" alt="${a.name}">`;
+        } else {
+            thumbHtml = `<i class="bi bi-file-earmark-check text-success me-2" style="font-size:1.3rem;"></i>`;
+        }
+
+        const downloadBtn = hasSrc
+            ? `<a href="${a.dataUrl}" download="${a.name}" class="btn btn-sm btn-icon btn-success me-1" style="width:28px;height:28px;font-size:0.75rem;" title="Tải về"><i class="bi bi-download"></i></a>`
+            : '';
+
+        return `
+        <div class="d-flex justify-content-between align-items-center p-2 mb-2 rounded border" style="background-color: var(--primary-light);">
+            <div class="d-flex align-items-center flex-grow-1 min-width-0">
+                ${thumbHtml}
+                <div class="min-width-0">
+                    <div class="fw-bold small text-truncate" style="max-width: 160px;" title="${a.name}">${a.name}</div>
+                    <div class="text-muted" style="font-size: 0.7rem;">${a.size}${a.uploadedAt ? ' · ' + a.uploadedAt : ''}</div>
                 </div>
             </div>
-            <button onclick="removeAttachment(${idx})" class="btn btn-sm btn-icon btn-danger" style="width: 24px; height: 24px; font-size: 0.6rem;"><i class="bi bi-trash"></i></button>
-        </div>
-    `).join("");
+            <div class="d-flex align-items-center">
+                ${downloadBtn}
+                <button onclick="removeAttachment(${idx})" class="btn btn-sm btn-icon btn-danger" style="width:28px;height:28px;font-size:0.7rem;" title="Xóa"><i class="bi bi-trash"></i></button>
+            </div>
+        </div>`;
+    }).join("");
+    container.scrollTop = container.scrollHeight;
 }
 
 function renderTaskHistory() {
@@ -297,7 +319,7 @@ function handleCommentSubmit(e) {
     const newComment = {
         author: authorName,
         text: textarea.value.trim(),
-        time: new Date().toISOString().replace('T', ' ').substring(0, 16)
+        time: ClubUtils.nowString()
     };
 
     activeTask.comments = activeTask.comments || [];
@@ -317,7 +339,7 @@ function handleProgressSubmit(e) {
     const selectVal = document.getElementById("status-select").value;
     const authorName = member ? member.name : user.username;
 
-    const time = new Date().toISOString().replace('T', ' ').substring(0, 16);
+    const time = ClubUtils.nowString();
     
     let historyLogs = [];
     if (activeTask.progress !== sliderVal) {
@@ -383,32 +405,46 @@ function handleProofSubmit(e) {
     if (!fileInput.files.length) return;
 
     const file = fileInput.files[0];
-    const newAttach = {
-        name: file.name,
-        size: (file.size / (1024 * 1024)).toFixed(1) + " MB",
-        url: "#"
+    const maxSizeMB = 5;
+    if (file.size > maxSizeMB * 1024 * 1024) {
+        ClubUtils.showAlert("File quá lớn", `Vui lòng chọn file nhỏ hơn ${maxSizeMB}MB.`, "error");
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        const newAttach = {
+            name: file.name,
+            size: (file.size / (1024 * 1024)).toFixed(2) + " MB",
+            type: file.type,
+            dataUrl: ev.target.result,
+            uploadedAt: ClubUtils.nowString()
+        };
+
+        activeTask.attachments = activeTask.attachments || [];
+        activeTask.attachments.push(newAttach);
+
+        const user = ClubAuth.getCurrentUser();
+        const member = ClubAuth.getCurrentMember();
+        const authorName = member ? member.name : user.username;
+        activeTask.history = activeTask.history || [];
+        activeTask.history.unshift({
+            user: authorName,
+            text: `Đã tải lên minh chứng: ${file.name} (${newAttach.size})`,
+            time: ClubUtils.nowString()
+        });
+
+        updateActiveTask();
+        fileInput.value = "";
+
+        renderAttachments();
+        renderTaskHistory();
+        ClubUtils.showToast("Thành công!", "Đã tải lên minh chứng công việc.", "success");
     };
-
-    activeTask.attachments = activeTask.attachments || [];
-    activeTask.attachments.push(newAttach);
-    
-    // Write in history
-    const user = ClubAuth.getCurrentUser();
-    const member = ClubAuth.getCurrentMember();
-    const authorName = member ? member.name : user.username;
-    activeTask.history = activeTask.history || [];
-    activeTask.history.unshift({
-        user: authorName,
-        text: `Đã upload tài liệu minh chứng: ${file.name}`,
-        time: new Date().toISOString().replace('T', ' ').substring(0, 16)
-    });
-
-    updateActiveTask();
-    fileInput.value = "";
-    
-    renderAttachments();
-    renderTaskHistory();
-    ClubUtils.showToast("Thành công!", "Đã tải lên minh chứng công việc.", "success");
+    reader.onerror = function() {
+        ClubUtils.showAlert("Lỗi", "Không thể đọc file. Vui lòng thử lại.", "error");
+    };
+    reader.readAsDataURL(file);
 }
 
 window.removeAttachment = function(idx) {
@@ -429,11 +465,22 @@ function updateActiveTask() {
 
 // Edit module control logic
 function initTaskEditPage() {
+    const user = ClubAuth.getCurrentUser();
+    const currentMember = ClubAuth.getCurrentMember();
     const params = new URLSearchParams(window.location.search);
     const id = params.get("id");
     const isEdit = id !== null;
 
     populateDeptDropdown("t-dept");
+
+    if (user && user.role === "leader" && currentMember) {
+        const deptSelect = document.getElementById("t-dept");
+        if (deptSelect) {
+            deptSelect.value = currentMember.department;
+            deptSelect.disabled = true; // Leader cannot change department
+            populateAssigneesDropdown(currentMember.department, "");
+        }
+    }
 
     // Dynamic selection of assigned members based on selected department
     document.getElementById("t-dept").addEventListener("change", (e) => {
@@ -522,7 +569,7 @@ function initTaskEditPage() {
                 history: [{
                     user: currentUser.username,
                     text: "Tạo công việc và phân công nhiệm vụ",
-                    time: new Date().toISOString().replace('T', ' ').substring(0, 16)
+                    time: ClubUtils.nowString()
                 }],
                 attachments: []
             };
@@ -542,7 +589,14 @@ function initTaskEditPage() {
 function populateDeptDropdown(elementId, selectedVal = "") {
     const dropdown = document.getElementById(elementId);
     if (!dropdown) return;
-    const depts = ClubStorage.getData("club_departments") || [];
+    const user = ClubAuth.getCurrentUser();
+    const member = ClubAuth.getCurrentMember();
+    let depts = ClubStorage.getData("club_departments") || [];
+    
+    // Leader can only see/use their own department
+    if (user && user.role === "leader" && member) {
+        depts = depts.filter(d => d.name === member.department);
+    }
     
     let html = elementId.includes("filter") ? '<option value="">Tất cả Ban</option>' : '<option value="">-- Chọn Ban --</option>';
     depts.forEach(d => {
@@ -556,9 +610,20 @@ function populateAssigneesDropdown(deptName, selectedId = "") {
     const dropdown = document.getElementById("t-assignee");
     if (!dropdown) return;
 
-    const members = ClubStorage.getData("club_members") || [];
-    // If deptName is empty or none selected, show all active members in the system
-    const filteredMembers = !deptName ? members : members.filter(m => m.department === deptName);
+    const user = ClubAuth.getCurrentUser();
+    const currentMember = ClubAuth.getCurrentMember();
+    let members = ClubStorage.getData("club_members") || [];
+    
+    // Exclude Chủ nhiệm (admin role) from assignee list
+    members = members.filter(m => m.role !== 'admin');
+    
+    // Leader can only assign to their own department
+    if (user && user.role === "leader" && currentMember) {
+        members = members.filter(m => m.department === currentMember.department);
+    }
+    
+    // If a dept is selected, further filter by dept
+    const filteredMembers = deptName ? members.filter(m => m.department === deptName) : members;
 
     let html = '<option value="">-- Chọn thành viên phụ trách --</option>';
     filteredMembers.forEach(m => {

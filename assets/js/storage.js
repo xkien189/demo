@@ -40,12 +40,12 @@
             status: "In Progress", 
             progress: 60,
             comments: [
-                { author: "Nguyễn Văn An", text: "Đã hoàn thành cấu trúc HTML thô.", time: "2026-07-05 14:00" },
-                { author: "Trần Thị Bình", text: "Cần chú ý màu sắc và typography giống hướng dẫn thương hiệu.", time: "2026-07-06 09:30" }
+                { author: "Nguyễn Văn An", text: "Đã hoàn thành cấu trúc HTML thô.", time: "05-07-2026 14:00:00" },
+                { author: "Trần Thị Bình", text: "Cần chú ý màu sắc và typography giống hướng dẫn thương hiệu.", time: "06-07-2026 09:30:00" }
             ],
             history: [
-                { user: "Nguyễn Văn An", text: "Tạo công việc", time: "2026-07-01 10:00" },
-                { user: "Nguyễn Văn An", text: "Cập nhật tiến độ lên 60%", time: "2026-07-05 14:00" }
+                { user: "Nguyễn Văn An", text: "Tạo công việc", time: "01-07-2026 10:00:00" },
+                { user: "Nguyễn Văn An", text: "Cập nhật tiến độ lên 60%", time: "05-07-2026 14:00:00" }
             ],
             attachments: [
                 { name: "wireframe_v1.png", size: "1.2 MB", url: "#" }
@@ -64,7 +64,7 @@
             status: "In Progress", 
             progress: 45,
             comments: [],
-            history: [{ user: "Nguyễn Văn An", text: "Tạo công việc", time: "2026-07-05 11:20" }],
+            history: [{ user: "Nguyễn Văn An", text: "Tạo công việc", time: "05-07-2026 11:20:00" }],
             attachments: []
         },
         { 
@@ -79,10 +79,10 @@
             priority: "Medium", 
             status: "Completed", 
             progress: 100,
-            comments: [{ author: "Phạm Thị Dung", text: "Đã gửi mail nháp cho doanh nghiệp phản hồi tích cực.", time: "2026-07-10 16:30" }],
+            comments: [{ author: "Phạm Thị Dung", text: "Đã gửi mail nháp cho doanh nghiệp phản hồi tích cực.", time: "10-07-2026 16:30:00" }],
             history: [
-                { user: "Trần Thị Bình", text: "Tạo công việc", time: "2026-07-02 08:30" },
-                { user: "Phạm Thị Dung", text: "Hoàn thành công việc", time: "2026-07-10 17:00" }
+                { user: "Trần Thị Bình", text: "Tạo công việc", time: "02-07-2026 08:30:00" },
+                { user: "Phạm Thị Dung", text: "Hoàn thành công việc", time: "10-07-2026 17:00:00" }
             ],
             attachments: [{ name: "Proposal_Gold_V2.pdf", size: "3.4 MB", url: "#" }]
         },
@@ -99,7 +99,7 @@
             status: "Pending", 
             progress: 0,
             comments: [],
-            history: [{ user: "Trần Thị Bình", text: "Tạo công việc", time: "2026-07-10 09:00" }],
+            history: [{ user: "Trần Thị Bình", text: "Tạo công việc", time: "10-07-2026 09:00:00" }],
             attachments: []
         }
     ];
@@ -110,8 +110,8 @@
     ];
 
     const DEFAULT_NOTIFICATIONS = [
-        { id: "N001", title: "Họp Ban chủ nhiệm bất thường", text: "Thông báo triệu tập cuộc họp ban chủ nhiệm vào lúc 19:30 tối nay thảo luận ngân sách tuyển sinh.", type: "General", target: "All", sender: "Nguyễn Văn An", date: "2026-07-12 08:00" },
-        { id: "N002", title: "Nộp báo cáo tiến độ tuần 2", text: "Tất cả các trưởng ban nộp báo cáo kết quả hoàn thành task về hòm thư CLB trước thứ 2.", type: "Department", target: "Ban Chuyên môn", sender: "Nguyễn Văn An", date: "2026-07-11 15:30" }
+        { id: "N001", title: "Họp Ban chủ nhiệm bất thường", text: "Thông báo triệu tập cuộc họp ban chủ nhiệm vào lúc 19:30 tối nay thảo luận ngân sách tuyển sinh.", type: "General", target: "All", sender: "Nguyễn Văn An", date: "12-07-2026 08:00:00" },
+        { id: "N002", title: "Nộp báo cáo tiến độ tuần 2", text: "Tất cả các trưởng ban nộp báo cáo kết quả hoàn thành task về hòm thư CLB trước thứ 2.", type: "Department", target: "Ban Chuyên môn", sender: "Nguyễn Văn An", date: "11-07-2026 15:30:00" }
     ];
 
     const DEFAULT_SETTINGS = {
@@ -124,9 +124,20 @@
     };
 
     const DEFAULT_LOGS = [
-        { time: "2026-07-12 09:10", user: "Nguyễn Văn An", action: "Đăng nhập hệ thống" },
-        { time: "2026-07-11 16:45", user: "Trần Thị Bình", action: "Cập nhật tài liệu Ban Chuyên môn" }
+        { time: "12-07-2026 09:10:00", user: "Nguyễn Văn An", action: "Đăng nhập hệ thống" },
+        { time: "11-07-2026 16:45:00", user: "Trần Thị Bình", action: "Cập nhật tài liệu Ban Chuyên môn" }
     ];
+
+    const DEFAULTS = {
+        club_members: DEFAULT_MEMBERS,
+        club_users: DEFAULT_USERS,
+        club_departments: DEFAULT_DEPARTMENTS,
+        club_tasks: DEFAULT_TASKS,
+        club_events: DEFAULT_EVENTS,
+        club_notifications: DEFAULT_NOTIFICATIONS,
+        club_settings: DEFAULT_SETTINGS,
+        club_logs: DEFAULT_LOGS
+    };
 
     function initStorage(key, defaultValue) {
         if (!localStorage.getItem(key)) {
@@ -134,25 +145,80 @@
         }
     }
 
-    // Initialize all datasets
-    initStorage("club_members", DEFAULT_MEMBERS);
-    initStorage("club_users", DEFAULT_USERS);
-    initStorage("club_departments", DEFAULT_DEPARTMENTS);
-    initStorage("club_tasks", DEFAULT_TASKS);
-    initStorage("club_events", DEFAULT_EVENTS);
-    initStorage("club_notifications", DEFAULT_NOTIFICATIONS);
-    initStorage("club_settings", DEFAULT_SETTINGS);
-    initStorage("club_logs", DEFAULT_LOGS);
+    // Initialize all datasets in LocalStorage
+    Object.keys(DEFAULTS).forEach(key => {
+        initStorage(key, DEFAULTS[key]);
+    });
+
+    // Cloud Firestore Sync Manager
+    function setupCloudSync() {
+        if (typeof firebase === "undefined" || !firebase.apps.length) return;
+        const db = firebase.firestore();
+
+        Object.keys(DEFAULTS).forEach(key => {
+            const docRef = db.collection("app_data").doc(key);
+
+            // Listen to real-time updates from Cloud Firestore
+            docRef.onSnapshot(doc => {
+                if (doc.exists) {
+                    const cloudData = doc.data().data;
+                    if (cloudData) {
+                        localStorage.setItem(key, JSON.stringify(cloudData));
+                    }
+                } else {
+                    // Initial Cloud Seed: Write default local data to Cloud Firestore if doc doesn't exist yet
+                    const localData = JSON.parse(localStorage.getItem(key)) || DEFAULTS[key];
+                    docRef.set({ data: localData, updatedAt: firebase.firestore.FieldValue.serverTimestamp() })
+                        .then(() => console.log(`☁️ Firestore seeded collection: ${key}`))
+                        .catch(err => console.error(`Firestore seed error for ${key}:`, err));
+                }
+            }, err => {
+                console.warn(`Firestore listener notice for ${key}:`, err.message);
+            });
+        });
+    }
+
+    // Attempt cloud sync on DOM load
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", setupCloudSync);
+    } else {
+        setupCloudSync();
+    }
 
     window.ClubStorage = {
         getData: function(key) {
             return JSON.parse(localStorage.getItem(key));
         },
         saveData: function(key, data) {
+            // Save to LocalStorage immediately
             localStorage.setItem(key, JSON.stringify(data));
+
+            // Sync to Firestore Cloud asynchronously
+            if (typeof firebase !== "undefined" && firebase.apps.length) {
+                try {
+                    const db = firebase.firestore();
+                    db.collection("app_data").doc(key).set({
+                        data: data,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }).catch(err => {
+                        console.warn("Firestore save async warning:", err.message);
+                    });
+                } catch (e) {
+                    console.warn("Firestore sync skipped:", e.message);
+                }
+            }
         },
         reset: function() {
             localStorage.clear();
+            if (typeof firebase !== "undefined" && firebase.apps.length) {
+                const db = firebase.firestore();
+                Object.keys(DEFAULTS).forEach(key => {
+                    db.collection("app_data").doc(key).set({
+                        data: DEFAULTS[key],
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                });
+            }
             location.reload();
         }
     };

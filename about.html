@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giới thiệu CLB - Hệ thống Quản lý CLB Sinh viên</title>
+    <meta name="description" content="Trang giới thiệu về câu lạc bộ, quá trình thành lập, sứ mệnh và các hoạt động nổi bật.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/theme.css">
+    <link rel="stylesheet" href="assets/css/layout.css">
+    <link rel="stylesheet" href="assets/css/sidebar.css">
+    <link rel="stylesheet" href="assets/css/button.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+    <style>
+        .about-hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+            border-radius: 20px;
+            padding: 3.5rem 2.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+        .about-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at center, rgba(37,99,235,0.25) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .about-hero-logo {
+            width: 90px;
+            height: 90px;
+            border-radius: 20px;
+            object-fit: cover;
+            box-shadow: 0 8px 32px rgba(37,99,235,0.5);
+            margin-bottom: 1.25rem;
+        }
+        .about-hero h1 { color: #fff; font-size: 2rem; font-weight: 800; }
+        .about-hero p { color: rgba(255,255,255,0.75); font-size: 1.05rem; }
+        .stat-counter-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stat-counter-card:hover { transform: translateY(-4px); box-shadow: var(--card-shadow-lg); }
+        .stat-counter-num { font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, var(--primary), var(--info)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .stat-counter-label { color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem; }
+        .timeline {
+            position: relative;
+            padding-left: 2.5rem;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0.75rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--primary), var(--info));
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+        .timeline-dot {
+            position: absolute;
+            left: -2rem;
+            top: 0.35rem;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 3px solid var(--bg-secondary);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
+        }
+        .timeline-year {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .timeline-title { font-weight: 700; color: var(--text-primary); margin: 0.1rem 0; }
+        .timeline-text { color: var(--text-secondary); font-size: 0.9rem; }
+        .value-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            height: 100%;
+            transition: border-color 0.2s;
+        }
+        .value-card:hover { border-color: var(--primary); }
+        .value-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+        }
+        .gallery-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.25s, box-shadow 0.25s;
+        }
+        .gallery-img:hover { transform: scale(1.04); box-shadow: 0 8px 30px rgba(0,0,0,0.25); }
+        .dept-leader-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.25rem;
+            text-align: center;
+            transition: box-shadow 0.2s;
+        }
+        .dept-leader-card:hover { box-shadow: var(--card-shadow-lg); }
+        .dept-leader-card img {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+            margin-bottom: 0.75rem;
+        }
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            position: relative;
+            padding-bottom: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 48px;
+            height: 4px;
+            border-radius: 2px;
+            background: linear-gradient(135deg, var(--primary), var(--info));
+        }
+        .activity-event-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+        .activity-event-card:hover { box-shadow: var(--card-shadow-lg); transform: translateY(-3px); }
+        .activity-event-card .event-header {
+            background: linear-gradient(135deg, var(--primary), var(--info));
+            padding: 1.25rem;
+            color: #fff;
+        }
+        [data-theme="dark"] .about-hero { background: linear-gradient(135deg, #030712 0%, #0f2240 50%, #030712 100%); }
+    </style>
+</head>
+<body>
+    <div class="app-wrapper">
+        <div id="sidebar-container"></div>
+        <div class="main-content">
+            <div id="topbar-container"></div>
+            <div class="content-container fade-in">
+
+                <!-- Hero Section -->
+                <div class="about-hero">
+                    <img id="about-logo" src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=120" class="about-hero-logo" alt="Logo CLB">
+                    <h1 id="about-club-name">Câu lạc bộ Sinh viên</h1>
+                    <p id="about-slogan" class="mb-4">Code your dream, build the future</p>
+                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+                        <a href="workspace.html" class="btn btn-primary px-4"><i class="bi bi-laptop me-2"></i>Không gian của tôi</a>
+                        <a href="tasks.html" class="btn btn-outline-light px-4"><i class="bi bi-list-check me-2"></i>Công việc</a>
+                    </div>
+                </div>
+
+                <!-- Stats Row -->
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-md-3">
+                        <div class="stat-counter-card">
+                            <div class="stat-counter-num" id="about-stat-members">0</div>
+                            <div class="stat-counter-label"><i class="bi bi-people me-1"></i>Thành viên</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="stat-counter-card">
+                            <div class="stat-counter-num" id="about-stat-depts">0</div>
+                            <div class="stat-counter-label"><i class="bi bi-building me-1"></i>Ban bộ phận</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="stat-counter-card">
+                            <div class="stat-counter-num" id="about-stat-events">0</div>
+                            <div class="stat-counter-label"><i class="bi bi-calendar-event me-1"></i>Sự kiện</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="stat-counter-card">
+                            <div class="stat-counter-num" id="about-stat-tasks">0</div>
+                            <div class="stat-counter-label"><i class="bi bi-check2-all me-1"></i>Hoạt động</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Left column: Timeline + Values -->
+                    <div class="col-lg-5">
+                        <!-- Foundation Timeline -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="bi bi-clock-history me-2"></i>Lịch sử thành lập</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="timeline">
+                                    <div class="timeline-item">
+                                        <div class="timeline-dot"></div>
+                                        <div class="timeline-year">Năm 2019</div>
+                                        <div class="timeline-title">🌱 Khởi đầu</div>
+                                        <div class="timeline-text">CLB được thành lập bởi nhóm sinh viên đam mê lập trình với 12 thành viên sáng lập.</div>
+                                    </div>
+                                    <div class="timeline-item">
+                                        <div class="timeline-dot"></div>
+                                        <div class="timeline-year">Năm 2020</div>
+                                        <div class="timeline-title">🚀 Hackathon đầu tiên</div>
+                                        <div class="timeline-text">Tổ chức Hackathon nội bộ đầu tiên với 50 thí sinh tham gia, mở đầu văn hoá đổi mới sáng tạo.</div>
+                                    </div>
+                                    <div class="timeline-item">
+                                        <div class="timeline-dot"></div>
+                                        <div class="timeline-year">Năm 2022</div>
+                                        <div class="timeline-title">🤝 Đối tác chiến lược</div>
+                                        <div class="timeline-text">Ký kết hợp tác với 5 doanh nghiệp công nghệ, tạo cầu nối việc làm cho sinh viên.</div>
+                                    </div>
+                                    <div class="timeline-item">
+                                        <div class="timeline-dot"></div>
+                                        <div class="timeline-year">Năm 2024</div>
+                                        <div class="timeline-title">🏆 100+ thành viên</div>
+                                        <div class="timeline-text">CLB chính thức vượt mốc 100 thành viên, trở thành một trong những CLB kỹ thuật lớn nhất trường.</div>
+                                    </div>
+                                    <div class="timeline-item" style="margin-bottom:0">
+                                        <div class="timeline-dot" style="background:var(--success);"></div>
+                                        <div class="timeline-year" style="color:var(--success)">Hiện tại</div>
+                                        <div class="timeline-title">✨ Hệ thống hoà toàn số hóa</div>
+                                        <div class="timeline-text">Triển khai nền tảng quản lý số hoàn chỉnh, hướng đến CLB chuyên nghiệp đầu tiên của trường.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Core Values -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="bi bi-gem me-2"></i>Giá trị cốt lõi</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-6">
+                                        <div class="value-card">
+                                            <div class="value-icon" style="background:rgba(37,99,235,0.1)">💡</div>
+                                            <div class="fw-bold mb-1">Sáng tạo</div>
+                                            <div class="text-muted small">Không ngừng đổi mới và tư duy đột phá</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="value-card">
+                                            <div class="value-icon" style="background:rgba(16,185,129,0.1)">🤝</div>
+                                            <div class="fw-bold mb-1">Hợp tác</div>
+                                            <div class="text-muted small">Cùng xây dựng, cùng phát triển</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="value-card">
+                                            <div class="value-icon" style="background:rgba(245,158,11,0.1)">🌟</div>
+                                            <div class="fw-bold mb-1">Xuất sắc</div>
+                                            <div class="text-muted small">Luôn hướng đến chất lượng cao nhất</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="value-card">
+                                            <div class="value-icon" style="background:rgba(239,68,68,0.1)">❤️</div>
+                                            <div class="fw-bold mb-1">Nhiệt huyết</div>
+                                            <div class="text-muted small">Trái tim có lửa với đam mê</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right column: Gallery + Departments -->
+                    <div class="col-lg-7">
+                        <!-- Photo Gallery -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="bi bi-images me-2"></i>Thư viện ảnh hoạt động</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-2" id="about-gallery">
+                                    <div class="col-6">
+                                        <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600" class="gallery-img" alt="Workshop lập trình" onclick="openGallery(this.src)">
+                                    </div>
+                                    <div class="col-6">
+                                        <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600" class="gallery-img" alt="Hackathon" onclick="openGallery(this.src)">
+                                    </div>
+                                    <div class="col-6">
+                                        <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600" class="gallery-img" alt="Sự kiện" onclick="openGallery(this.src)">
+                                    </div>
+                                    <div class="col-6">
+                                        <img src="https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=600" class="gallery-img" alt="Teambuilding" onclick="openGallery(this.src)">
+                                    </div>
+                                    <div class="col-4">
+                                        <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=400" class="gallery-img" alt="Họi nghị" onclick="openGallery(this.src)">
+                                    </div>
+                                    <div class="col-4">
+                                        <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400" class="gallery-img" alt="Trao giải" onclick="openGallery(this.src)">
+                                    </div>
+                                    <div class="col-4">
+                                        <img src="https://images.unsplash.com/photo-1560472355-536de3962603?w=400" class="gallery-img" alt="Dự án" onclick="openGallery(this.src)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Departments overview -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="bi bi-diagram-3 me-2"></i>Cơ cấu tổ chức</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3" id="about-depts-grid">
+                                    <!-- Dynamic -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Events Section -->
+                <div class="mt-4">
+                    <h5 class="section-title"><i class="bi bi-calendar-check me-2"></i>Hoạt động nổi bật</h5>
+                    <div class="row g-3" id="about-events-grid">
+                        <!-- Dynamic -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Gallery Lightbox Modal -->
+    <div class="modal fade" id="galleryModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content bg-dark">
+                <div class="modal-header border-0">
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center p-2">
+                    <img id="gallery-lightbox-img" src="" class="img-fluid rounded" style="max-height:80vh;" alt="">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Firebase SDK (v10 Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/storage.js"></script>
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/sidebar.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            if (!ClubAuth.checkRouteGuard()) return;
+
+            const settings = ClubStorage.getData("club_settings") || {};
+            const members = ClubStorage.getData("club_members") || [];
+            const depts = ClubStorage.getData("club_departments") || [];
+            const events = ClubStorage.getData("club_events") || [];
+            const tasks = ClubStorage.getData("club_tasks") || [];
+
+            // Hero section
+            if (settings.clubName) document.getElementById("about-club-name").innerText = settings.clubName;
+            if (settings.slogan) document.getElementById("about-slogan").innerText = settings.slogan;
+            if (settings.logo) document.getElementById("about-logo").src = settings.logo;
+
+            // Stats with animated counter
+            animateCounter("about-stat-members", members.filter(m => m.status === "Active").length);
+            animateCounter("about-stat-depts", depts.length);
+            animateCounter("about-stat-events", events.length);
+            animateCounter("about-stat-tasks", tasks.filter(t => t.status === "Completed").length);
+
+            // Departments grid
+            const deptsGrid = document.getElementById("about-depts-grid");
+            const colors = ["#2563eb","#10b981","#f59e0b","#ef4444","#8b5cf6"];
+            deptsGrid.innerHTML = depts.map((d, i) => {
+                const leaderM = members.find(m => m.id === d.leader);
+                const deptCount = members.filter(m => m.department === d.name).length;
+                return \`
+                <div class="col-md-6">
+                    <div class="dept-leader-card">
+                        <img src="\${leaderM ? (leaderM.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150') : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'}" alt="\${d.name}">
+                        <div class="fw-bold" style="color:\${colors[i % colors.length]}">\${d.code}</div>
+                        <div class="fw-semibold mt-1">\${d.name}</div>
+                        <div class="text-muted small">\${leaderM ? 'TB: ' + leaderM.name : 'Chưa phân nhiệm'}</div>
+                        <div class="mt-2"><span class="badge" style="background:\${colors[i % colors.length]}20;color:\${colors[i % colors.length]};">\${deptCount} thành viên</span></div>
+                    </div>
+                </div>\`;
+            }).join("");
+
+            // Events grid
+            const eventsGrid = document.getElementById("about-events-grid");
+            if (events.length === 0) {
+                eventsGrid.innerHTML = \`<div class="col-12 text-center text-muted py-4">Chưa có sự kiện nào</div>\`;
+            } else {
+                eventsGrid.innerHTML = events.map(ev => {
+                    const leader = members.find(m => m.id === ev.leaderId);
+                    return \`
+                    <div class="col-md-6 col-lg-4">
+                        <div class="activity-event-card">
+                            <div class="event-header">
+                                <div class="fw-bold mb-1">\${ev.title}</div>
+                                <small><i class="bi bi-calendar3 me-1"></i>\${ClubUtils.formatDateOnly(ev.date)}</small>
+                            </div>
+                            <div class="p-3">
+                                <div class="small text-muted mb-2"><i class="bi bi-geo-alt me-1"></i>\${ev.location}</div>
+                                <div class="small mb-2">\${ev.description}</div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted"><i class="bi bi-people me-1"></i>\${ev.attendeesCount || 0} người tham gia</small>
+                                    <small class="text-muted">\${leader ? leader.name : ''}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>\`;
+                }).join("");
+            }
+        });
+
+        function animateCounter(id, target) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            let current = 0;
+            const duration = 1200;
+            const step = target / (duration / 16);
+            const timer = setInterval(() => {
+                current = Math.min(current + step, target);
+                el.innerText = Math.floor(current);
+                if (current >= target) clearInterval(timer);
+            }, 16);
+        }
+
+        function openGallery(src) {
+            document.getElementById("gallery-lightbox-img").src = src;
+            new bootstrap.Modal(document.getElementById("galleryModal")).show();
+        }
+    </script>
+</body>
+</html>

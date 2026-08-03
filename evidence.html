@@ -7,114 +7,308 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-    
     <link rel="stylesheet" href="assets/css/theme.css">
     <link rel="stylesheet" href="assets/css/layout.css">
     <link rel="stylesheet" href="assets/css/sidebar.css">
     <link rel="stylesheet" href="assets/css/table.css">
-    <link rel="stylesheet" href="assets/css/form.css">
     <link rel="stylesheet" href="assets/css/button.css">
     <link rel="stylesheet" href="assets/css/responsive.css">
+    <style>
+        .evidence-card {
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            transition: box-shadow 0.2s, transform 0.2s;
+            overflow: hidden;
+        }
+        .evidence-card:hover {
+            box-shadow: var(--card-shadow-lg);
+            transform: translateY(-2px);
+        }
+        .evidence-thumb {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--text-muted);
+        }
+        .evidence-thumb img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+        }
+        .file-icon-placeholder {
+            width: 100%;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-tertiary);
+            font-size: 3.5rem;
+        }
+        .preview-modal-img {
+            max-width: 100%;
+            max-height: 75vh;
+            border-radius: 8px;
+        }
+        .preview-iframe {
+            width: 100%;
+            height: 70vh;
+            border: none;
+            border-radius: 8px;
+        }
+        .filter-bar { background: var(--bg-secondary); border-radius: 12px; padding: 1rem 1.25rem; border: 1px solid var(--border-color); margin-bottom: 1.5rem; }
+    </style>
 </head>
 <body>
-
     <div class="app-wrapper">
         <div id="sidebar-container"></div>
-        
         <div class="main-content">
             <div id="topbar-container"></div>
-            
             <div class="content-container fade-in">
-                <div class="mb-4">
-                    <h4 class="mb-1 fw-bold">Kho minh chứng công việc</h4>
-                    <p class="text-muted small mb-0">Nơi lưu trữ, tập hợp toàn bộ hồ sơ, hình ảnh, tài liệu báo cáo nghiệm thu công việc của CLB.</p>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="mb-1 fw-bold">Kho Minh chứng</h4>
+                        <p class="text-muted small mb-0">Tổng hợp tài liệu, ảnh và minh chứng đính kèm từ tất cả công việc.</p>
+                    </div>
+                    <div class="badge bg-primary fs-6 px-3 py-2" id="total-evidence-badge">0 tài liệu</div>
                 </div>
 
-                <!-- Central Table -->
-                <div class="card">
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead>
-                                    <tr>
-                                        <th>Tên tài liệu / Minh chứng</th>
-                                        <th>Liên kết Nhiệm vụ (Task)</th>
-                                        <th>Ban liên quan</th>
-                                        <th>Dung lượng</th>
-                                        <th>Trạng thái công việc</th>
-                                        <th class="text-end">Tải về (Giả lập)</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="evidence-tbody">
-                                    <!-- Dynamic -->
-                                </tbody>
-                            </table>
+                <!-- Filter bar -->
+                <div class="filter-bar">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold mb-1">Tìm kiếm</label>
+                            <input type="text" id="ev-search" class="form-control" placeholder="Tên file, tên task...">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-semibold mb-1">Ban bộ phận</label>
+                            <select id="ev-filter-dept" class="form-select">
+                                <option value="">Tất cả Ban</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-semibold mb-1">Loại file</label>
+                            <select id="ev-filter-type" class="form-select">
+                                <option value="">Tất cả</option>
+                                <option value="image">Hình ảnh</option>
+                                <option value="pdf">PDF</option>
+                                <option value="other">Khác</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-secondary w-100" onclick="renderEvidence()"><i class="bi bi-arrow-clockwise me-1"></i>Làm mới</button>
                         </div>
                     </div>
                 </div>
 
+                <!-- Evidence grid -->
+                <div class="row" id="evidence-grid">
+                    <div class="col-12 text-center text-muted py-5"><div class="spinner-border text-primary"></div></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- Preview Modal -->
+    <div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="preview-modal-title">Xem trước</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center" id="preview-modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Dóng</button>
+                    <a id="preview-download-btn" href="#" download class="btn btn-success"><i class="bi bi-download me-1"></i>Tải về</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+    <!-- Firebase SDK (v10 Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+    <script src="assets/js/firebase-config.js"></script>
+
     <script src="assets/js/storage.js"></script>
     <script src="assets/js/utils.js"></script>
     <script src="assets/js/auth.js"></script>
     <script src="assets/js/sidebar.js"></script>
-    
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             if (!ClubAuth.checkRouteGuard()) return;
 
-            const tasks = ClubStorage.getData("club_tasks") || [];
-            const tbody = document.getElementById("evidence-tbody");
-
-            const allAttachments = [];
-            tasks.forEach(t => {
-                if (t.attachments && t.attachments.length > 0) {
-                    t.attachments.forEach(a => {
-                        allAttachments.push({
-                            fileName: a.name,
-                            fileSize: a.size,
-                            taskTitle: t.title,
-                            taskId: t.id,
-                            dept: t.department,
-                            taskStatus: t.status
-                        });
-                    });
-                }
+            // Populate dept filter
+            const depts = ClubStorage.getData("club_departments") || [];
+            const deptSel = document.getElementById("ev-filter-dept");
+            depts.forEach(d => {
+                deptSel.innerHTML += `<option value="${d.name}">${d.name}</option>`;
             });
 
-            if (allAttachments.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Chưa có tài liệu minh chứng nào được tải lên</td></tr>`;
+            renderEvidence();
+
+            document.getElementById("ev-search").addEventListener("input", renderEvidence);
+            document.getElementById("ev-filter-dept").addEventListener("change", renderEvidence);
+            document.getElementById("ev-filter-type").addEventListener("change", renderEvidence);
+        });
+
+        function getFileCategory(attach) {
+            const name = (attach.name || "").toLowerCase();
+            const type = attach.type || "";
+            if (type.startsWith("image/") || /\.(png|jpg|jpeg|gif|webp|svg|bmp)$/.test(name)) return "image";
+            if (type === "application/pdf" || name.endsWith(".pdf")) return "pdf";
+            return "other";
+        }
+
+        function getFileIcon(category) {
+            if (category === "image") return "bi-file-earmark-image text-primary";
+            if (category === "pdf") return "bi-file-earmark-pdf text-danger";
+            return "bi-file-earmark-zip text-warning";
+        }
+
+        function renderEvidence() {
+            const user = ClubAuth.getCurrentUser();
+            const currentMember = ClubAuth.getCurrentMember();
+            const searchVal = document.getElementById("ev-search").value.toLowerCase();
+            const deptVal = document.getElementById("ev-filter-dept").value;
+            const typeVal = document.getElementById("ev-filter-type").value;
+
+            const tasks = ClubStorage.getData("club_tasks") || [];
+            const grid = document.getElementById("evidence-grid");
+
+            // Collect all attachments
+            let allItems = [];
+            tasks.forEach(task => {
+                // Permission filter
+                let canSee = false;
+                if (["admin", "vice"].includes(user.role)) canSee = true;
+                else if (["leader", "assistant"].includes(user.role) && currentMember && task.department === currentMember.department) canSee = true;
+                else if (["member", "guest"].includes(user.role) && currentMember && task.assigneeId === currentMember.id) canSee = true;
+
+                if (!canSee) return;
+
+                (task.attachments || []).forEach(a => {
+                    allItems.push({ ...a, taskId: task.id, taskTitle: task.title, department: task.department, taskStatus: task.status });
+                });
+            });
+
+            // Apply filters
+            let filtered = allItems.filter(item => {
+                const matchSearch = !searchVal || item.name.toLowerCase().includes(searchVal) || item.taskTitle.toLowerCase().includes(searchVal);
+                const matchDept = !deptVal || item.department === deptVal;
+                const matchType = !typeVal || getFileCategory(item) === typeVal;
+                return matchSearch && matchDept && matchType;
+            });
+
+            document.getElementById("total-evidence-badge").innerText = `${filtered.length} tài liệu`;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-12 text-center py-5 text-muted"><i class="bi bi-folder-x" style="font-size:3rem;"></i><div class="mt-2">Chưa có minh chứng nào</div></div>`;
                 return;
             }
 
-            tbody.innerHTML = allAttachments.map(a => {
-                let statusBadge = "bg-warning";
-                if (a.taskStatus === "Completed") statusBadge = "bg-success";
-                if (a.taskStatus === "In Progress") statusBadge = "bg-primary";
+            grid.innerHTML = filtered.map((item, idx) => {
+                const cat = getFileCategory(item);
+                const iconClass = getFileIcon(cat);
+                const hasPreview = !!item.dataUrl;
+
+                let thumbHtml = "";
+                if (cat === "image" && hasPreview) {
+                    thumbHtml = `<img src="${item.dataUrl}" alt="${item.name}" style="width:100%;height:140px;object-fit:cover;">`;
+                } else {
+                    thumbHtml = `<div class="file-icon-placeholder"><i class="bi ${iconClass}"></i></div>`;
+                }
+
+                const statusColors = { Completed: "bg-success", "In Progress": "bg-primary", Pending: "bg-warning", Cancelled: "bg-secondary" };
+                const statusColor = statusColors[item.taskStatus] || "bg-secondary";
 
                 return `
-                    <tr>
-                        <td><strong class="text-dark"><i class="bi bi-file-earmark-arrow-up text-primary me-2"></i>${a.fileName}</strong></td>
-                        <td><a href="task-detail.html?id=${a.taskId}" class="text-decoration-none fw-bold text-primary">${a.taskTitle}</a></td>
-                        <td>${a.dept}</td>
-                        <td><span class="badge bg-secondary">${a.fileSize}</span></td>
-                        <td><span class="badge ${statusBadge}">${a.taskStatus}</span></td>
-                        <td class="text-end">
-                            <a href="#" onclick="ClubUtils.showToast('Tải xuống thành công', 'Tệp tin ${a.fileName} đã được tải về máy của bạn.', 'success'); return false;" class="btn btn-secondary btn-sm btn-icon">
-                                <i class="bi bi-download"></i>
-                            </a>
-                        </td>
-                    </tr>
-                `;
+                <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+                    <div class="evidence-card h-100">
+                        <div style="cursor:pointer;" onclick="previewFile(${idx})" title="Xem trước">
+                            ${thumbHtml}
+                        </div>
+                        <div class="p-3">
+                            <div class="fw-bold text-truncate mb-1" title="${item.name}">${item.name}</div>
+                            <div class="small text-muted mb-2">${item.size || 'N/A'}</div>
+                            <div class="d-flex flex-wrap gap-1 mb-2">
+                                <span class="badge bg-light-primary text-primary"><i class="bi bi-list-task me-1"></i>${item.taskTitle.substring(0,22)}${item.taskTitle.length > 22 ? '...' : ''}</span>
+                                <span class="badge ${statusColor}">${item.taskStatus}</span>
+                            </div>
+                            <div class="small text-muted"><i class="bi bi-building me-1"></i>${item.department}</div>
+                        </div>
+                        <div class="d-flex border-top">
+                            <button class="btn btn-sm w-50 py-2 rounded-0" onclick="previewFile(${idx})" style="border-right:1px solid var(--border-color); color:var(--primary);">
+                                <i class="bi bi-eye me-1"></i>Xem
+                            </button>
+                            ${hasPreview
+                                ? `<a href="${item.dataUrl}" download="${item.name}" class="btn btn-sm w-50 py-2 rounded-0 text-success"><i class="bi bi-download me-1"></i>Tải về</a>`
+                                : `<button class="btn btn-sm w-50 py-2 rounded-0 text-muted" disabled title="File chưa có dữ liệu"><i class="bi bi-download me-1"></i>Tải về</button>`
+                            }
+                        </div>
+                    </div>
+                </div>`;
             }).join("");
-        });
+
+            // Store filtered for preview
+            window._evFiltered = filtered;
+        }
+
+        function previewFile(idx) {
+            const item = window._evFiltered[idx];
+            if (!item) return;
+
+            const cat = getFileCategory(item);
+            const modalTitle = document.getElementById("preview-modal-title");
+            const modalBody = document.getElementById("preview-modal-body");
+            const downloadBtn = document.getElementById("preview-download-btn");
+
+            modalTitle.innerText = item.name;
+
+            if (!item.dataUrl) {
+                modalBody.innerHTML = `
+                    <div class="py-5 text-muted">
+                        <i class="bi bi-file-earmark-x" style="font-size:4rem;"></i>
+                        <div class="mt-3">File này chưa có dữ liệu tải lên.<br>
+                        <small>Chỉ các file được upload sau khi cập nhật mới có thể xem trước.</small></div>
+                    </div>`;
+                downloadBtn.style.display = 'none';
+            } else if (cat === "image") {
+                modalBody.innerHTML = `<img src="${item.dataUrl}" class="preview-modal-img" alt="${item.name}">`;
+                downloadBtn.href = item.dataUrl;
+                downloadBtn.download = item.name;
+                downloadBtn.style.display = '';
+            } else if (cat === "pdf") {
+                modalBody.innerHTML = `<iframe src="${item.dataUrl}" class="preview-iframe"></iframe>`;
+                downloadBtn.href = item.dataUrl;
+                downloadBtn.download = item.name;
+                downloadBtn.style.display = '';
+            } else {
+                modalBody.innerHTML = `
+                    <div class="py-4">
+                        <i class="bi bi-file-earmark-arrow-down text-primary" style="font-size:4rem;"></i>
+                        <div class="mt-3 fw-bold">${item.name}</div>
+                        <div class="text-muted mt-1">${item.size || ''}</div>
+                        <div class="mt-3">Click Tải về để lưu file này.</div>
+                    </div>`;
+                downloadBtn.href = item.dataUrl;
+                downloadBtn.download = item.name;
+                downloadBtn.style.display = '';
+            }
+
+            new bootstrap.Modal(document.getElementById("previewModal")).show();
+        }
     </script>
 </body>
 </html>

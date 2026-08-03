@@ -135,7 +135,7 @@ function handleNotiFormSubmit(e) {
         type,
         target,
         sender: senderName,
-        date: new Date().toISOString().replace('T', ' ').substring(0, 16)
+        date: ClubUtils.nowString()
     };
 
     notis.unshift(newNoti);

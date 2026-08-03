@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     // Member module route restrictions
-    if (!ClubAuth.checkRouteGuard()) return;
+    if (!ClubAuth.checkRouteGuard(["admin", "vice", "leader"])) return;
 
     const path = window.location.pathname;
 
@@ -23,7 +23,7 @@ function initMembersListPage() {
     
     // Add Add-Member button if permissions match
     const addBtnArea = document.getElementById("add-member-btn-area");
-    if (addBtnArea && ["admin", "vice", "leader", "assistant"].includes(user.role)) {
+    if (addBtnArea && ["admin", "vice"].includes(user.role)) {
         addBtnArea.innerHTML = `
             <a href="member-edit.html" class="btn btn-primary">
                 <i class="bi bi-person-plus"></i> Thêm thành viên
@@ -52,9 +52,18 @@ function populateDeptDropdown(elementId, selectedVal = "") {
     const dropdown = document.getElementById(elementId);
     if (!dropdown) return;
     const depts = ClubStorage.getData("club_departments") || [];
+    const user = ClubAuth.getCurrentUser();
     
     let html = elementId.includes("filter") ? '<option value="">Tất cả Ban</option>' : '';
-    depts.forEach(d => {
+    let filteredDepts = depts;
+
+    if (user && user.role === "leader") {
+        const currentMember = ClubAuth.getCurrentMember();
+        filteredDepts = depts.filter(d => d.name === currentMember.department);
+        html = ''; // No "Tất cả Ban" option for leaders
+    }
+
+    filteredDepts.forEach(d => {
         const selected = d.name === selectedVal ? 'selected' : '';
         html += `<option value="${d.name}" ${selected}>${d.name}</option>`;
     });
@@ -62,7 +71,16 @@ function populateDeptDropdown(elementId, selectedVal = "") {
 }
 
 function loadMembersData() {
-    currentMembers = ClubStorage.getData("club_members") || [];
+    const user = ClubAuth.getCurrentUser();
+    let allMembers = ClubStorage.getData("club_members") || [];
+    
+    if (user && user.role === "leader") {
+        const currentMember = ClubAuth.getCurrentMember();
+        currentMembers = allMembers.filter(m => m.department === currentMember.department);
+    } else {
+        currentMembers = allMembers;
+    }
+
     filterAndRenderMembers();
     renderMembersLeaderboard();
 }
@@ -109,7 +127,15 @@ function filterAndRenderMembers() {
     const deptVal = document.getElementById("filter-dept").value;
     const statusVal = document.getElementById("filter-status").value;
 
+    const user = ClubAuth.getCurrentUser();
+    const currentMember = ClubAuth.getCurrentMember();
+
     const filtered = currentMembers.filter(m => {
+        // Pre-filter based on role
+        if (user && user.role === "leader" && m.department !== currentMember.department) {
+            return false;
+        }
+
         const matchesSearch = m.name.toLowerCase().includes(searchVal) || 
                               m.email.toLowerCase().includes(searchVal) || 
                               m.id.toLowerCase().includes(searchVal) ||
@@ -155,7 +181,17 @@ function renderMembersTable(list) {
             </a>
         `;
 
-        if (["admin", "vice", "leader", "assistant"].includes(currentUser.role)) {
+        let canEdit = false;
+        if (["admin", "vice"].includes(currentUser.role)) {
+            canEdit = true;
+        } else if (currentUser.role === "leader") {
+            const leaderMember = ClubAuth.getCurrentMember();
+            if (m.department === leaderMember.department) {
+                canEdit = true;
+            }
+        }
+
+        if (canEdit) {
             actionButtons += `
                 <a href="member-edit.html?id=${m.id}" class="btn btn-primary btn-sm ms-1" title="Sửa">
                     <i class="bi bi-pencil"></i>
@@ -305,12 +341,27 @@ function initMemberDetailPage() {
 
     // Edit permission setup
     const user = ClubAuth.getCurrentUser();
-    if (["admin", "vice", "leader", "assistant"].includes(user.role)) {
-        document.getElementById("edit-action-area").innerHTML = `
-            <a href="member-edit.html?id=${m.id}" class="btn btn-primary btn-sm">
-                <i class="bi bi-pencil"></i> Chỉnh sửa
-            </a>
-        `;
+    let canEdit = false;
+    if (["admin", "vice"].includes(user.role)) {
+        canEdit = true;
+    } else if (user.role === "leader") {
+        const currentMember = ClubAuth.getCurrentMember();
+        if (m.department === currentMember.department) {
+            canEdit = true;
+        }
+    }
+
+    const editActionArea = document.getElementById("edit-action-area");
+    if (editActionArea) {
+        if (canEdit) {
+            editActionArea.innerHTML = `
+                <a href="member-edit.html?id=${m.id}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-pencil"></i> Chỉnh sửa
+                </a>
+            `;
+        } else {
+            editActionArea.innerHTML = '';
+        }
     }
 
     // List assigned tasks
@@ -359,6 +410,17 @@ function initMemberEditPage() {
     const members = ClubStorage.getData("club_members") || [];
     const isEdit = id !== null;
 
+    const user = ClubAuth.getCurrentUser();
+    const currentMember = ClubAuth.getCurrentMember();
+
+    if (isEdit && user.role === "leader") {
+        const m = members.find(item => item.id === id);
+        if (m && m.department !== currentMember.department) {
+            window.location.href = "members.html";
+            return;
+        }
+    }
+
     // Populate department drop down
     populateDeptDropdown("m-dept");
 
@@ -384,6 +446,11 @@ function initMemberEditPage() {
         document.getElementById("form-title").innerText = "Thêm thành viên mới";
         // Auto fill today
         document.getElementById("m-joindate").value = new Date().toISOString().substring(0, 10);
+    }
+
+    if (user && user.role === "leader") {
+        document.getElementById("m-dept").disabled = true;
+        document.getElementById("m-role").disabled = true;
     }
 
     document.getElementById("member-form").addEventListener("submit", (e) => {
