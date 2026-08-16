@@ -120,12 +120,38 @@
         contactEmail: "contact@devclub.vn",
         contactPhone: "024.1234.5678",
         logo: "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=120",
-        themeColor: "blue"
+        themeColor: "blue",
+        geminiApiKey: ""
     };
 
     const DEFAULT_LOGS = [
         { time: "12-07-2026 09:10:00", user: "Nguyễn Văn An", action: "Đăng nhập hệ thống" },
         { time: "11-07-2026 16:45:00", user: "Trần Thị Bình", action: "Cập nhật tài liệu Ban Chuyên môn" }
+    ];
+
+    const DEFAULT_FUND_PERIODS = [
+        {
+            id: "FUND_2026_HK1",
+            title: "Quỹ CLB Học kỳ 1 (2026-2027)",
+            amountPerMember: 100000,
+            dueDate: "2026-09-30",
+            status: "Active",
+            description: "Đóng quỹ định kỳ Học kỳ 1 duy trì sinh hoạt, mua sắm vật tư và tổ chức sự kiện.",
+            memberRecords: [
+                { memberId: "M001", status: "Paid", transactionCode: "PAY-M001-HK1", proofUrl: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400", paidAt: "01-09-2026 09:30:00", confirmedBy: "Nguyễn Văn An" },
+                { memberId: "M002", status: "Paid", transactionCode: "PAY-M002-HK1", proofUrl: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400", paidAt: "02-09-2026 10:15:00", confirmedBy: "Nguyễn Văn An" },
+                { memberId: "M003", status: "Paid", transactionCode: "PAY-M003-HK1", proofUrl: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400", paidAt: "05-09-2026 14:20:00", confirmedBy: "Nguyễn Văn An" },
+                { memberId: "M004", status: "Unpaid", transactionCode: "", proofUrl: "", paidAt: "", confirmedBy: "" },
+                { memberId: "M005", status: "Unpaid", transactionCode: "", proofUrl: "", paidAt: "", confirmedBy: "" },
+                { memberId: "M006", status: "Unpaid", transactionCode: "", proofUrl: "", paidAt: "", confirmedBy: "" }
+            ]
+        }
+    ];
+
+    const DEFAULT_FUND_TRANSACTIONS = [
+        { id: "TX001", type: "Income", category: "Thu Quỹ Thành viên", amount: 300000, purpose: "Thu quỹ HK1 năm 2026 từ 3 thành viên M001, M002, M003", proofUrl: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400", createdBy: "Nguyễn Văn An", date: "05-09-2026 15:00:00" },
+        { id: "TX002", type: "Expense", category: "Mua sắm Thiết bị", amount: 150000, purpose: "Mua loa cầm tay và băng rôn cho Teambuilding Hè", proofUrl: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400", createdBy: "Trần Thị Bình", date: "10-09-2026 11:30:00" },
+        { id: "TX003", type: "Income", category: "Tài trợ Doanh nghiệp", amount: 2000000, purpose: "Nhà tài trợ Vàng chuyển khoản tài trợ sự kiện Welcome Gen 10", proofUrl: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400", createdBy: "Phạm Thị Dung", date: "15-09-2026 09:00:00" }
     ];
 
     const DEFAULTS = {
@@ -136,7 +162,9 @@
         club_events: DEFAULT_EVENTS,
         club_notifications: DEFAULT_NOTIFICATIONS,
         club_settings: DEFAULT_SETTINGS,
-        club_logs: DEFAULT_LOGS
+        club_logs: DEFAULT_LOGS,
+        club_fund_periods: DEFAULT_FUND_PERIODS,
+        club_fund_transactions: DEFAULT_FUND_TRANSACTIONS
     };
 
     function initStorage(key, defaultValue) {

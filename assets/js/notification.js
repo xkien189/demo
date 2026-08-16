@@ -5,12 +5,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Fill buttons
     const btnArea = document.getElementById("create-noti-area");
-    if (btnArea && ["admin", "vice", "leader"].includes(user.role)) {
-        btnArea.innerHTML = `
-            <button class="btn btn-primary" onclick="openCreateNotiModal()">
-                <i class="bi bi-bell-plus"></i> Đăng thông báo
-            </button>
-        `;
+    if (btnArea) {
+        let html = `<button class="btn btn-outline-primary me-2" onclick="openAIContentModal()"><i class="bi bi-magic me-1"></i>✨ AI Viết Nội Dung</button>`;
+        if (["admin", "vice", "leader"].includes(user.role)) {
+            html += `<button class="btn btn-primary" onclick="openCreateNotiModal()"><i class="bi bi-bell-plus"></i> Đăng thông báo</button>`;
+        }
+        btnArea.innerHTML = html;
     }
 
     // Bind dropdown toggle wrapper visibility
@@ -170,4 +170,49 @@ window.deleteNotification = function(notiId) {
             }
         }
     });
+};
+
+window.openAIContentModal = function() {
+    document.getElementById("ai-content-topic").value = "";
+    document.getElementById("ai-content-result").value = "";
+    new bootstrap.Modal(document.getElementById("aiContentModal")).show();
+};
+
+window.generateAIContent = async function() {
+    const type = document.getElementById("ai-content-type").value;
+    const topic = document.getElementById("ai-content-topic").value.trim();
+    const resultArea = document.getElementById("ai-content-result");
+
+    if (!topic) {
+        ClubUtils.showAlert("Lỗi", "Vui lòng nhập chủ đề bài viết cần tạo.", "error");
+        return;
+    }
+
+    resultArea.value = "⏳ AI đang suy nghĩ và sáng tạo nội dung...";
+    try {
+        const text = await AIService.generateContent(type, topic);
+        resultArea.value = text;
+    } catch (err) {
+        resultArea.value = "⚠️ Có lỗi xảy ra trong quá trình tạo bài viết.";
+    }
+};
+
+window.copyAIContent = function() {
+    const text = document.getElementById("ai-content-result").value;
+    if (!text) return;
+    navigator.clipboard.writeText(text);
+    ClubUtils.showToast("Đã sao chép!", "Nội dung bài viết đã lưu vào Clipboard.", "success");
+};
+
+window.useAIContentInNoti = function() {
+    const text = document.getElementById("ai-content-result").value;
+    const topic = document.getElementById("ai-content-topic").value;
+    if (!text) return;
+
+    bootstrap.Modal.getInstance(document.getElementById("aiContentModal")).hide();
+
+    // Open create notification modal and pre-fill
+    openCreateNotiModal();
+    document.getElementById("n-title").value = topic ? topic.substring(0, 50) : "Thông báo mới";
+    document.getElementById("n-text").value = text;
 };

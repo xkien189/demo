@@ -14,6 +14,26 @@
     <link rel="stylesheet" href="assets/css/form.css">
     <link rel="stylesheet" href="assets/css/button.css">
     <link rel="stylesheet" href="assets/css/responsive.css">
+
+    <style>
+        .logo-upload-wrap {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            padding: 1rem;
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            background: var(--bg-tertiary);
+        }
+        .logo-preview-img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 2px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+    </style>
 </head>
 <body>
 
@@ -26,10 +46,10 @@
             <div class="content-container fade-in">
                 <div class="mb-4">
                     <h4 class="mb-1 fw-bold">Cài đặt hệ thống</h4>
-                    <p class="text-muted small mb-0">Cập nhật thông tin chung và cấu hình hệ thống của Câu lạc bộ.</p>
+                    <p class="text-muted small mb-0">Cập nhật thông tin chung, biểu tượng Logo và cấu hình Trợ lý AI của Câu lạc bộ.</p>
                 </div>
 
-                <div class="card">
+                <div class="card mb-4">
                     <div class="card-header">
                         <h5 class="card-title mb-0"><i class="bi bi-gear-fill me-2"></i>Thông tin cấu hình Câu lạc bộ</h5>
                     </div>
@@ -52,12 +72,23 @@
                                     <label for="s-phone" class="form-label">Số điện thoại liên hệ *</label>
                                     <input type="text" id="s-phone" class="form-control" required>
                                 </div>
+                                
+                                <!-- Logo upload from computer -->
                                 <div class="col-md-12">
-                                    <label for="s-logo" class="form-label">URL Logo Câu lạc bộ *</label>
-                                    <input type="url" id="s-logo" class="form-control" required>
+                                    <label class="form-label">Logo Câu lạc bộ (Tải ảnh từ máy tính)</label>
+                                    <div class="logo-upload-wrap">
+                                        <img src="" id="s-logo-preview" class="logo-preview-img" alt="Logo preview">
+                                        <div class="flex-grow-1">
+                                            <input type="file" id="s-logo-file" class="form-control mb-2" accept="image/*">
+                                            <div class="text-muted small">
+                                                <i class="bi bi-info-circle me-1"></i>Chọn file ảnh từ máy (.png, .jpg, .svg). Ảnh sẽ được tự động lưu lên Cloud.
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
+
                                 <div class="col-md-6">
-                                    <label for="s-theme" class="form-label">Màu chủ đạo giao diện (Giả lập)</label>
+                                    <label for="s-theme" class="form-label">Màu chủ đạo giao diện</label>
                                     <select id="s-theme" class="form-select">
                                         <option value="blue">Xanh Dương (Mặc định)</option>
                                         <option value="emerald">Xanh Lá (Emerald)</option>
@@ -65,6 +96,28 @@
                                     </select>
                                 </div>
                             </div>
+
+                            <hr class="my-4">
+
+                            <!-- AI Configuration Section -->
+                            <div class="mb-3">
+                                <h6 class="fw-bold mb-1 text-primary"><i class="bi bi-robot me-2"></i>Cấu hình Trợ lý AI Thông minh (Google Gemini API - 0đ)</h6>
+                                <p class="text-muted small">Tùy chọn: Nhập Google Gemini API Key để mở khóa AI trả lời thông minh cao cấp. (Nếu trống, hệ thống sẽ sử dụng <b>Smart Rule Engine 0đ</b> thay thế mượt mà).</p>
+                                
+                                <div class="row g-3">
+                                    <div class="col-md-8">
+                                        <label for="s-ai-key" class="form-label">Google Gemini API Key (Miễn phí 100%)</label>
+                                        <div class="input-group">
+                                            <input type="password" id="s-ai-key" class="form-control" placeholder="Dán Gemini API Key dạng AIzaSy..." autocomplete="off">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePass('s-ai-key', this)">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                        </div>
+                                        <div class="form-text">Lấy API Key 0đ miễn phí tại: <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-decoration-underline">aistudio.google.com/app/apikey</a></div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="mt-4">
                                 <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Lưu cấu hình</button>
                                 <button type="button" onclick="resetSystemData()" class="btn btn-danger ms-2"><i class="bi bi-arrow-counterclockwise"></i> Reset Mock Data gốc</button>
@@ -93,6 +146,20 @@
     <script src="assets/js/sidebar.js"></script>
     
     <script>
+        function togglePass(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'bi bi-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'bi bi-eye';
+            }
+        }
+
+        let currentLogoBase64 = "";
+
         document.addEventListener("DOMContentLoaded", () => {
             if (!ClubAuth.checkRouteGuard(["admin", "vice"])) return;
 
@@ -102,8 +169,30 @@
             document.getElementById("s-slogan").value = settings.slogan || "";
             document.getElementById("s-email").value = settings.contactEmail || "";
             document.getElementById("s-phone").value = settings.contactPhone || "";
-            document.getElementById("s-logo").value = settings.logo || "";
             document.getElementById("s-theme").value = settings.themeColor || "blue";
+            document.getElementById("s-ai-key").value = settings.geminiApiKey || "";
+
+            currentLogoBase64 = settings.logo || "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=120";
+            document.getElementById("s-logo-preview").src = currentLogoBase64;
+
+            // Image file upload handler
+            document.getElementById("s-logo-file").addEventListener("change", function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                if (file.size > 3 * 1024 * 1024) {
+                    ClubUtils.showAlert("Lỗi chọn file", "Vui lòng chọn ảnh logo nhỏ hơn 3MB.", "error");
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    currentLogoBase64 = ev.target.result;
+                    document.getElementById("s-logo-preview").src = currentLogoBase64;
+                    ClubUtils.showToast("Đã tải ảnh lên!", "Ảnh logo mới đã được xem trước.", "info");
+                };
+                reader.readAsDataURL(file);
+            });
 
             document.getElementById("settings-form").addEventListener("submit", (e) => {
                 e.preventDefault();
@@ -112,16 +201,22 @@
                 const slogan = document.getElementById("s-slogan").value.trim();
                 const contactEmail = document.getElementById("s-email").value.trim();
                 const contactPhone = document.getElementById("s-phone").value.trim();
-                const logo = document.getElementById("s-logo").value.trim();
                 const themeColor = document.getElementById("s-theme").value;
+                const geminiApiKey = document.getElementById("s-ai-key").value.trim();
 
                 const updated = {
-                    clubName, slogan, contactEmail, contactPhone, logo, themeColor
+                    clubName,
+                    slogan,
+                    contactEmail,
+                    contactPhone,
+                    logo: currentLogoBase64,
+                    themeColor,
+                    geminiApiKey
                 };
 
                 ClubStorage.saveData("club_settings", updated);
-                ClubUtils.addLog("Cập nhật cài đặt hệ thống CLB");
-                ClubUtils.showToast("Cập nhật thành công!", "Thông tin cấu hình CLB đã thay đổi.", "success");
+                ClubUtils.addLog("Cập nhật cài đặt hệ thống CLB & AI Key");
+                ClubUtils.showToast("Cập nhật thành công!", "Thông tin cấu hình CLB & AI Key đã lưu.", "success");
                 
                 setTimeout(() => location.reload(), 1000);
             });

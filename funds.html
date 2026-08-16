@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Quỹ CLB - Hệ thống Quản lý CLB Sinh viên</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="assets/css/theme.css">
+    <link rel="stylesheet" href="assets/css/layout.css">
+    <link rel="stylesheet" href="assets/css/sidebar.css">
+    <link rel="stylesheet" href="assets/css/table.css">
+    <link rel="stylesheet" href="assets/css/form.css">
+    <link rel="stylesheet" href="assets/css/button.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+
+    <style>
+        .stat-card-fund {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.25rem 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stat-card-fund:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--card-shadow-lg);
+        }
+        .fund-amount-income { color: #10b981; font-weight: 800; }
+        .fund-amount-expense { color: #ef4444; font-weight: 800; }
+        .proof-thumb-sm {
+            width: 42px;
+            height: 42px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-wrapper">
+        <div id="sidebar-container"></div>
+        
+        <div class="main-content">
+            <div id="topbar-container"></div>
+            
+            <div class="content-container fade-in">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="mb-1 fw-bold">Quản lý Quỹ CLB</h4>
+                        <p class="text-muted small mb-0">Theo dõi tiến độ đóng quỹ theo kỳ, sổ thu chi và minh chứng chuyển khoản ngân hàng.</p>
+                    </div>
+                    <div id="fund-actions-top">
+                        <!-- Dynamic manager buttons -->
+                    </div>
+                </div>
+
+                <!-- Header Metric Cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3 col-6">
+                        <div class="stat-card-fund">
+                            <div class="text-muted small mb-1"><i class="bi bi-wallet2 me-1"></i>Số dư quỹ hiện tại</div>
+                            <div class="fs-4 fw-bold text-primary" id="f-stat-balance">0 VNĐ</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="stat-card-fund">
+                            <div class="text-muted small mb-1"><i class="bi bi-arrow-down-left-circle text-success me-1"></i>Đã thu kỳ này</div>
+                            <div class="fs-4 fw-bold text-success" id="f-stat-period-paid">0 VNĐ</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="stat-card-fund">
+                            <div class="text-muted small mb-1"><i class="bi bi-arrow-up-right-circle text-danger me-1"></i>Tổng chi tiêu</div>
+                            <div class="fs-4 fw-bold text-danger" id="f-stat-expense">0 VNĐ</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="stat-card-fund">
+                            <div class="text-muted small mb-1"><i class="bi bi-clock-history text-warning me-1"></i>Chưa đóng quỹ</div>
+                            <div class="fs-4 fw-bold text-warning" id="f-stat-unpaid-count">0 thành viên</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <ul class="nav nav-tabs custom-tabs mb-4" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-period-payments">
+                            <i class="bi bi-person-check me-2"></i>Đóng quỹ theo Kỳ
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-ledger">
+                            <i class="bi bi-journal-bookmark me-2"></i>Sổ Thu Chi CLB
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <!-- TAB 1: Period Payments -->
+                    <div class="tab-pane fade show active" id="tab-period-payments">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="row g-3 align-items-center mb-3">
+                                    <div class="col-md-5">
+                                        <label class="form-label small fw-semibold">Chọn Đợt / Kỳ Đóng Quỹ</label>
+                                        <select id="select-fund-period" class="form-select fw-bold">
+                                            <!-- Dynamic periods -->
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-semibold">Lọc theo trạng thái</label>
+                                        <select id="filter-payment-status" class="form-select">
+                                            <option value="">Tất cả trạng thái</option>
+                                            <option value="Paid">Đã nộp</option>
+                                            <option value="Unpaid">Chưa nộp</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3 text-end" id="period-info-badge">
+                                        <!-- Period metadata -->
+                                    </div>
+                                </div>
+
+                                <!-- Members payment table -->
+                                <div class="table-responsive">
+                                    <table class="table align-middle">
+                                        <thead>
+                                            <tr>
+                                                <th>Thành viên</th>
+                                                <th>Ban bộ phận</th>
+                                                <th>Mã đóng quỹ</th>
+                                                <th>Mức quỹ</th>
+                                                <th>Trạng thái</th>
+                                                <th>Minh chứng nộp</th>
+                                                <th>Ngày nộp</th>
+                                                <th class="text-end">Thao tác</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="period-members-tbody">
+                                            <!-- Dynamic -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: Ledger Transactions -->
+                    <div class="tab-pane fade" id="tab-ledger">
+                        <div class="card mb-4">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0"><i class="bi bi-list-columns-reverse me-2"></i>Lịch sử Thu / Chi CLB</h5>
+                                <button class="btn btn-primary btn-sm" onclick="openCreateTransactionModal()" id="btn-create-tx">
+                                    <i class="bi bi-plus-lg me-1"></i>Tạo phiếu Thu/Chi
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table align-middle">
+                                        <thead>
+                                            <tr>
+                                                <th>Mã</th>
+                                                <th>Loại</th>
+                                                <th>Danh mục</th>
+                                                <th>Số tiền</th>
+                                                <th>Mục đích chi tiết</th>
+                                                <th>Minh chứng</th>
+                                                <th>Người lập</th>
+                                                <th>Thời gian</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="ledger-tbody">
+                                            <!-- Dynamic -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Proof Modal -->
+    <div class="modal fade" id="uploadProofModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-cloud-upload me-2"></i>Nộp minh chứng đóng quỹ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="upload-proof-form">
+                    <div class="modal-body">
+                        <input type="hidden" id="proof-period-id">
+                        <input type="hidden" id="proof-member-id">
+
+                        <div class="mb-3">
+                            <label class="form-label">Mã đóng quỹ duy nhất</label>
+                            <input type="text" id="proof-tx-code" class="form-control fw-bold" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Chọn ảnh biên lai / Chuyển khoản *</label>
+                            <input type="file" id="proof-file-input" class="form-control" accept="image/*" required>
+                        </div>
+                        <div class="text-center my-2" id="proof-preview-wrap" style="display:none;">
+                            <img src="" id="proof-img-preview" style="max-height:180px; border-radius:8px; border:1px solid var(--border-color);" alt="Preview">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>Xác nhận nộp</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Proof Preview Lightbox Modal -->
+    <div class="modal fade" id="proofViewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="proof-view-title">Xem minh chứng nộp tiền</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="proof-view-img" src="" class="img-fluid rounded border" alt="Minh chứng">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <a id="proof-view-download" href="#" download class="btn btn-success"><i class="bi bi-download me-1"></i>Tải ảnh về</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Transaction Modal -->
+    <div class="modal fade" id="createTxModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Tạo phiếu Thu / Chi mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="create-tx-form">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Loại phiếu *</label>
+                            <select id="tx-type" class="form-select" required>
+                                <option value="Income">Phiếu Thu (+)</option>
+                                <option value="Expense">Phiếu Chi (-)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Số tiền (VNĐ) *</label>
+                            <input type="number" id="tx-amount" class="form-control" placeholder="Ví dụ: 150000" min="1000" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Danh mục *</label>
+                            <select id="tx-category" class="form-select" required>
+                                <option value="Thu Quỹ Thành viên">Thu Quỹ Thành viên</option>
+                                <option value="Tài trợ Doanh nghiệp">Tài trợ Doanh nghiệp</option>
+                                <option value="Tổ chức Sự kiện">Tổ chức Sự kiện</option>
+                                <option value="Mua sắm Thiết bị">Mua sắm Thiết bị</option>
+                                <option value="Sinh hoạt CLB">Sinh hoạt CLB</option>
+                                <option value="Khác">Khác</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mục đích chi tiết *</label>
+                            <textarea id="tx-purpose" class="form-control" rows="3" placeholder="Ghi rõ lý do thu/chi..." required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Ảnh hóa đơn / Biên lai (Tùy chọn)</label>
+                            <input type="file" id="tx-file-input" class="form-control" accept="image/*">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Lưu phiếu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Period Modal -->
+    <div class="modal fade" id="createPeriodModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-calendar-plus me-2"></i>Tạo Đợt thu Quỹ mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="create-period-form">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Tên đợt thu quỹ *</label>
+                            <input type="text" id="p-title" class="form-control" placeholder="Ví dụ: Quỹ Học kỳ 1 (2026-2027)" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Số tiền mỗi thành viên (VNĐ) *</label>
+                            <input type="number" id="p-amount" class="form-control" placeholder="Ví dụ: 100000" min="10000" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Hạn nộp *</label>
+                            <input type="date" id="p-duedate" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mô tả mục đích thu</label>
+                            <textarea id="p-desc" class="form-control" rows="2" placeholder="Ghi chú mục đích sử dụng đợt thu này..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-success"><i class="bi bi-plus-lg me-1"></i>Khởi tạo đợt thu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Firebase SDK (v10 Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/storage.js"></script>
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/sidebar.js"></script>
+    <script src="assets/js/fund.js"></script>
+</body>
+</html>

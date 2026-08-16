@@ -30,6 +30,7 @@ function initTasksListPage() {
     }
 
     renderTasksList();
+    renderAIWorkInsights();
 
     document.getElementById("search-task").addEventListener("input", renderTasksList);
     document.getElementById("filter-task-dept").addEventListener("change", renderTasksList);
@@ -630,6 +631,24 @@ function populateAssigneesDropdown(deptName, selectedId = "") {
         const selected = m.id === selectedId ? 'selected' : '';
         html += `<option value="${m.id}" ${selected}>${m.name} (${m.id}) - ${m.department}</option>`;
     });
-    dropdown.innerHTML = html;
-}
+
+window.renderAIWorkInsights = function() {
+    const container = document.getElementById("ai-work-insights-content");
+    if (!container) return;
+
+    if (typeof AIService === "undefined") {
+        container.innerHTML = `<div class="text-muted small">AI Service đang khởi động...</div>`;
+        setTimeout(renderAIWorkInsights, 500);
+        return;
+    }
+
+    const insights = AIService.getWorkInsights();
+    let html = `<ul class="mb-0 ps-3">`;
+    insights.insights.forEach(item => {
+        html += `<li class="mb-1">${item}</li>`;
+    });
+    html += `</ul>`;
+
+    container.innerHTML = html;
+};
 

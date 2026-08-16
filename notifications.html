@@ -110,6 +110,50 @@
         </div>
     </div>
 
+    <!-- AI Content Creator Modal -->
+    <div class="modal fade" id="aiContentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-magic me-2"></i>✨ AI Content Assistant (Sáng tạo Nội dung CLB)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Loại nội dung cần viết *</label>
+                            <select id="ai-content-type" class="form-select">
+                                <option value="Bài viết Facebook Fanpage">Bài viết Facebook Fanpage</option>
+                                <option value="Thông báo CLB chính thức">Thông báo CLB chính thức</option>
+                                <option value="Caption đăng ảnh Sự kiện">Caption đăng ảnh Sự kiện</option>
+                                <option value="Email kêu gọi Tài trợ">Email kêu gọi Tài trợ</option>
+                                <option value="Kịch bản chương trình Workshop">Kịch bản chương trình Workshop</option>
+                            </select>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Chủ đề / Yêu cầu chi tiết *</label>
+                            <input type="text" id="ai-content-topic" class="form-control" placeholder="Ví dụ: Giới thiệu giải bóng đá CLB CNTT 2026...">
+                        </div>
+                    </div>
+
+                    <div class="mb-3 text-end">
+                        <button type="button" class="btn btn-primary" onclick="generateAIContent()"><i class="bi bi-lightning-charge me-1"></i>Sáng tạo ngay (Generate)</button>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label font-monospace small">Kết quả nội dung do AI khởi tạo:</label>
+                        <textarea id="ai-content-result" class="form-control font-monospace" rows="8" placeholder="Kết quả bài viết sẽ hiển thị ở đây..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-outline-success" onclick="copyAIContent()"><i class="bi bi-clipboard me-1"></i>Sao chép bài</button>
+                    <button type="button" class="btn btn-success" onclick="useAIContentInNoti()"><i class="bi bi-box-arrow-in-right me-1"></i>Dán vào Form Đăng thông báo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

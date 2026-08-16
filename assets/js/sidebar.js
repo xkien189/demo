@@ -7,7 +7,27 @@ document.addEventListener("DOMContentLoaded", () => {
     
     renderSidebar();
     renderTopbar();
+    injectAIScripts();
 });
+
+// Auto load AI Scripts if missing on the page
+function injectAIScripts() {
+    if (window.location.pathname.includes("login.html")) return;
+
+    if (typeof AIService === "undefined") {
+        const s1 = document.createElement("script");
+        s1.src = "assets/js/ai-service.js";
+        document.body.appendChild(s1);
+    }
+    
+    setTimeout(() => {
+        if (!document.getElementById("ai-widget-floating-btn")) {
+            const s2 = document.createElement("script");
+            s2.src = "assets/js/ai-widget.js";
+            document.body.appendChild(s2);
+        }
+    }, 200);
+}
 
 function renderSidebar() {
     const container = document.getElementById("sidebar-container");
@@ -26,6 +46,7 @@ function renderSidebar() {
         { name: "Giới thiệu CLB", icon: "bi-info-circle", href: "about.html", roles: ["admin", "vice", "leader", "assistant", "member", "guest"] },
         { name: "Quản lý Thành viên", icon: "bi-people", href: "members.html", roles: ["admin", "vice", "leader"] },
         { name: "Quản lý Ban", icon: "bi-building", href: "departments.html", roles: ["admin", "vice"] },
+        { name: "Quản lý Quỹ CLB", icon: "bi-wallet2", href: "funds.html", roles: ["admin", "vice", "leader", "assistant", "member", "guest"] },
         { name: "Quản lý Công việc", icon: "bi-list-check", href: "tasks.html", roles: ["admin", "vice", "leader", "assistant", "member", "guest"] },
         { name: "Lịch công tác", icon: "bi-calendar3", href: "calendar.html", roles: ["admin", "vice", "leader", "assistant", "member", "guest"] },
         { name: "Quản lý Sự kiện", icon: "bi-calendar-event", href: "events.html", roles: ["admin", "vice", "leader", "assistant", "member", "guest"] },
@@ -185,6 +206,8 @@ function buildBreadcrumbs() {
         html += `<li class="breadcrumb-item"><a href="tasks.html" class="text-decoration-none">Công việc</a></li><li class="breadcrumb-item active">Chỉnh sửa</li>`;
     } else if (path.includes("departments.html")) {
         html += `<li class="breadcrumb-item active">Quản lý Ban</li>`;
+    } else if (path.includes("funds.html")) {
+        html += `<li class="breadcrumb-item active">Quản lý Quỹ CLB</li>`;
     } else if (path.includes("events.html")) {
         html += `<li class="breadcrumb-item active">Quản lý Sự kiện</li>`;
     } else if (path.includes("notifications.html")) {

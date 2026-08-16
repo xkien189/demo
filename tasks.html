@@ -35,6 +35,19 @@
                     </div>
                 </div>
 
+                <!-- AI Work Insights Panel -->
+                <div class="card mb-4 border-0 shadow-sm" style="background: linear-gradient(135deg, rgba(37,99,235,0.08), rgba(124,58,237,0.08)); border: 1px solid rgba(37,99,235,0.2) !important; border-radius: 16px;">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <h6 class="mb-0 fw-bold text-primary"><i class="bi bi-robot me-2"></i>🤖 AI Work Insights (Phân tích rủi ro & Tiến độ)</h6>
+                            <button class="btn btn-sm btn-outline-primary" onclick="renderAIWorkInsights()"><i class="bi bi-arrow-clockwise me-1"></i>Phân tích lại</button>
+                        </div>
+                        <div id="ai-work-insights-content" class="small text-muted">
+                            <div class="spinner-border spinner-border-sm text-primary"></div> Đang phân tích dữ liệu công việc...
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Filters -->
                 <div class="card mb-4">
                     <div class="card-body">

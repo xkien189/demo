@@ -339,6 +339,9 @@ function initMemberDetailPage() {
     const scoreEl = document.getElementById("member-score");
     if (scoreEl) scoreEl.innerText = `${m.activityScore || 0} điểm`;
 
+    // Render AI Member Insights
+    renderAIMemberInsights(m.id);
+
     // Edit permission setup
     const user = ClubAuth.getCurrentUser();
     let canEdit = false;
@@ -540,3 +543,35 @@ function initMemberEditPage() {
         }
     });
 }
+
+window.renderAIMemberInsights = function(memberId) {
+    const container = document.getElementById("ai-member-insights-content");
+    if (!container) return;
+
+    if (typeof AIService === "undefined") {
+        container.innerHTML = `<div class="text-muted small">AI Service đang khởi động...</div>`;
+        setTimeout(() => renderAIMemberInsights(memberId), 500);
+        return;
+    }
+
+    const insights = AIService.getMemberInsights(memberId);
+    if (!insights) {
+        container.innerHTML = `<div class="text-muted small">Chưa đủ dữ liệu phân tích thành viên.</div>`;
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="row g-2 align-items-center mb-2">
+            <div class="col-md-4">
+                <span class="badge bg-light-primary text-primary me-2">Tỷ lệ hoàn thành: ${insights.completionRate}%</span>
+                <span class="badge bg-success">${insights.rating}</span>
+            </div>
+            <div class="col-md-8 text-md-end text-muted small">
+                Tốc độ & Đúng hạn: <strong>${insights.completedTasks}/${insights.totalTasks} nhiệm vụ</strong> · Đóng góp: <strong>${insights.score} điểm</strong>
+            </div>
+        </div>
+        <div class="small text-dark">
+            <strong>🤖 Khuyến nghị AI:</strong> ${insights.recommendation}
+        </div>
+    `;
+};
