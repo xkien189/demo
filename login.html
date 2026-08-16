@@ -5,350 +5,350 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng nhập - Hệ thống Quản lý CLB Sinh viên</title>
     <meta name="description" content="Đăng nhập vào hệ thống quản lý Câu lạc bộ Sinh viên.">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/theme.css">
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&display=swap');
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        body {
+        html, body {
+            height: 100%;
             font-family: 'Be Vietnam Pro', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            background: #0f172a;
             overflow: hidden;
         }
 
-        /* ─── LEFT PANEL ─────────────────────────────────────────── */
-        .login-left {
-            flex: 1;
+        /* ── Full-screen Background ── */
+        .login-bg {
+            position: fixed;
+            inset: 0;
+            background-image: url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center 35%;
+            background-repeat: no-repeat;
+            z-index: 0;
+        }
+        /* Subtle dark overlay for readability */
+        .login-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                120deg,
+                rgba(10, 20, 50, 0.55) 0%,
+                rgba(10, 20, 50, 0.25) 50%,
+                rgba(10, 20, 50, 0.45) 100%
+            );
+        }
+
+        /* ── Main Layout ── */
+        .login-scene {
             position: relative;
+            z-index: 1;
+            height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 3rem 2.5rem;
-            background: linear-gradient(160deg, #0f172a 0%, #1e3a5f 40%, #0f2240 100%);
-            overflow: hidden;
+            padding: 1.5rem;
         }
 
-        /* Animated background orbs */
-        .login-left::before {
-            content: '';
-            position: absolute;
-            top: -120px; left: -120px;
-            width: 480px; height: 480px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(37,99,235,0.3) 0%, transparent 65%);
-            animation: floatOrb 8s ease-in-out infinite;
-        }
-        .login-left::after {
-            content: '';
-            position: absolute;
-            bottom: -80px; right: -80px;
-            width: 360px; height: 360px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(124,58,237,0.25) 0%, transparent 65%);
-            animation: floatOrb 10s ease-in-out infinite reverse;
-        }
-        @keyframes floatOrb {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(30px, -20px) scale(1.05); }
-        }
-
-        .left-content {
-            position: relative;
+        /* ── Left Branding (overlaid on bg) ── */
+        .brand-overlay {
+            position: fixed;
+            left: 3.5rem;
+            bottom: 5rem;
             z-index: 2;
-            text-align: center;
-            max-width: 440px;
+            color: #fff;
+            text-shadow: 0 2px 12px rgba(0,0,0,0.4);
         }
-
-        .left-logo-wrap {
-            display: inline-flex;
+        .brand-logo-row {
+            display: flex;
             align-items: center;
-            justify-content: center;
-            width: 100px; height: 100px;
-            border-radius: 28px;
-            background: rgba(255,255,255,0.07);
-            border: 1px solid rgba(255,255,255,0.12);
-            backdrop-filter: blur(10px);
-            margin-bottom: 2rem;
-            box-shadow: 0 8px 32px rgba(37,99,235,0.35);
-            overflow: hidden;
+            gap: 0.85rem;
+            margin-bottom: 0.5rem;
         }
-        .left-logo-wrap img {
-            width: 100%; height: 100%;
+        .brand-logo-img {
+            width: 54px;
+            height: 54px;
+            border-radius: 14px;
             object-fit: cover;
-            border-radius: 28px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.35);
+            border: 2px solid rgba(255,255,255,0.25);
+            display: none; /* show if logo loaded */
         }
-        .left-logo-icon {
-            font-size: 3rem;
-            color: #3b82f6;
+        .brand-logo-icon {
+            font-size: 2.5rem;
+            color: #fff;
+            filter: drop-shadow(0 2px 8px rgba(37,99,235,0.5));
         }
-
-        .left-club-name {
+        .brand-name {
             font-size: 1.75rem;
             font-weight: 800;
-            color: #ffffff;
-            line-height: 1.25;
-            margin-bottom: 0.75rem;
+            color: #fff;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
         }
-
-        .left-slogan {
-            font-size: 1rem;
-            color: rgba(255,255,255,0.6);
-            font-style: italic;
-            margin-bottom: 2.5rem;
+        .brand-slogan {
+            font-size: 0.95rem;
+            color: rgba(255,255,255,0.8);
             font-weight: 300;
+            font-style: italic;
         }
 
-        .left-feature-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.85rem;
-            text-align: left;
-        }
-        .left-feature-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            color: rgba(255,255,255,0.75);
-            font-size: 0.9rem;
-        }
-        .left-feature-icon {
-            width: 36px; height: 36px;
-            border-radius: 10px;
-            background: rgba(255,255,255,0.07);
-            border: 1px solid rgba(255,255,255,0.1);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1rem;
-            flex-shrink: 0;
-        }
-
-        .left-dots {
-            display: flex;
-            justify-content: center;
-            gap: 0.5rem;
-            margin-top: 2.5rem;
-        }
-        .left-dots span {
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.2);
-            transition: background 0.3s;
-        }
-        .left-dots span.active { background: #3b82f6; width: 24px; border-radius: 4px; }
-
-        /* ─── RIGHT PANEL ────────────────────────────────────────── */
-        .login-right {
-            width: 480px;
-            flex-shrink: 0;
-            background: #0f172a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2.5rem 2.5rem;
-            border-left: 1px solid rgba(255,255,255,0.06);
+        /* ── Login Card (Glass morphism) ── */
+        .login-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(24px) saturate(160%);
+            -webkit-backdrop-filter: blur(24px) saturate(160%);
+            border: 1px solid rgba(255,255,255,0.6);
+            border-radius: 20px;
+            padding: 2.5rem 2.25rem 2rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow:
+                0 32px 64px rgba(0,0,0,0.18),
+                0 8px 24px rgba(0,0,0,0.1),
+                inset 0 1px 0 rgba(255,255,255,0.9);
             position: relative;
         }
 
-        .login-form-wrap {
-            width: 100%;
-            max-width: 380px;
+        .card-logo-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.65rem;
+            margin-bottom: 0.35rem;
+        }
+        .card-logo-img {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            object-fit: cover;
+            display: none;
+        }
+        .card-logo-icon {
+            font-size: 1.75rem;
+            color: #2563eb;
         }
 
-        .login-form-title {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: #f1f5f9;
-            margin-bottom: 0.4rem;
+        .card-title {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.3rem;
         }
 
-        .login-form-subtitle {
-            font-size: 0.875rem;
-            color: #64748b;
-            margin-bottom: 2.25rem;
-        }
-
-        .form-group-custom {
-            margin-bottom: 1.25rem;
-        }
-        .form-group-custom label {
-            display: block;
+        .card-subtitle {
+            text-align: center;
             font-size: 0.8rem;
+            color: #64748b;
+            margin-bottom: 1.75rem;
+        }
+
+        /* Inputs */
+        .form-field {
+            margin-bottom: 1rem;
+        }
+        .form-field label {
+            display: block;
+            font-size: 0.78rem;
             font-weight: 600;
-            color: #94a3b8;
-            margin-bottom: 0.5rem;
+            color: #475569;
+            margin-bottom: 0.4rem;
             text-transform: uppercase;
             letter-spacing: 0.04em;
         }
-
         .input-wrap {
             position: relative;
         }
-        .input-wrap .input-icon {
+        .input-wrap .ico {
             position: absolute;
-            left: 1rem;
+            left: 0.9rem;
             top: 50%;
             transform: translateY(-50%);
-            color: #475569;
-            font-size: 1rem;
+            color: #94a3b8;
+            font-size: 0.95rem;
             pointer-events: none;
-            transition: color 0.2s;
         }
-        .input-wrap .input-toggle {
+        .input-wrap input {
+            width: 100%;
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            color: #0f172a;
+            padding: 0.72rem 0.9rem 0.72rem 2.6rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+        }
+        .input-wrap input::placeholder { color: #cbd5e1; }
+        .input-wrap input:focus {
+            border-color: #3b82f6;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+        }
+        .input-wrap .toggle-pass {
             position: absolute;
-            right: 1rem;
+            right: 0.75rem;
             top: 50%;
             transform: translateY(-50%);
             background: none;
             border: none;
-            color: #475569;
+            color: #94a3b8;
             cursor: pointer;
             padding: 0;
-            font-size: 1rem;
-            transition: color 0.2s;
+            font-size: 0.95rem;
+            line-height: 1;
         }
-        .input-wrap .input-toggle:hover { color: #3b82f6; }
+        .input-wrap .toggle-pass:hover { color: #3b82f6; }
 
-        .input-custom {
-            width: 100%;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 12px;
-            color: #f1f5f9;
-            font-size: 0.9rem;
-            padding: 0.75rem 1rem 0.75rem 2.85rem;
-            outline: none;
-            font-family: 'Be Vietnam Pro', sans-serif;
-            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-        }
-        .input-custom::placeholder { color: #334155; }
-        .input-custom:focus {
-            border-color: #3b82f6;
-            background: rgba(59,130,246,0.05);
-            box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
-        }
-        .input-wrap:focus-within .input-icon { color: #3b82f6; }
-
+        /* Login button */
         .btn-login {
             width: 100%;
-            padding: 0.875rem;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            padding: 0.8rem;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
             color: #fff;
             font-size: 0.95rem;
             font-weight: 700;
-            border: none;
+            font-family: 'Be Vietnam Pro', sans-serif;
             cursor: pointer;
             margin-top: 0.5rem;
-            font-family: 'Be Vietnam Pro', sans-serif;
-            transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
-            box-shadow: 0 6px 20px rgba(37,99,235,0.35);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
+            box-shadow: 0 4px 14px rgba(37,99,235,0.35);
+            transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
         }
         .btn-login:hover {
-            opacity: 0.9;
             transform: translateY(-1px);
-            box-shadow: 0 10px 28px rgba(37,99,235,0.45);
+            box-shadow: 0 8px 22px rgba(37,99,235,0.42);
         }
         .btn-login:active { transform: translateY(0); }
-        .btn-login:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-
-        .login-footer-note {
-            margin-top: 2rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid rgba(255,255,255,0.06);
-            text-align: center;
-            color: #334155;
-            font-size: 0.78rem;
+        .btn-login:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+        .btn-login.success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            box-shadow: 0 4px 14px rgba(16,185,129,0.35);
         }
 
-        /* ─── RESPONSIVE ─────────────────────────────────────────── */
-        @media (max-width: 768px) {
-            body { flex-direction: column; overflow: auto; }
-            .login-left {
-                min-height: 260px;
-                padding: 2rem 1.5rem;
-                flex: none;
-            }
-            .login-left::before, .login-left::after { display: none; }
-            .left-feature-list { display: none; }
-            .left-dots { margin-top: 1rem; }
-            .login-right {
-                width: 100%;
-                border-left: none;
-                border-top: 1px solid rgba(255,255,255,0.06);
-                padding: 2rem 1.25rem 2.5rem;
-            }
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin: 1.25rem 0 1rem;
+            color: #94a3b8;
+            font-size: 0.78rem;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e2e8f0;
+        }
+
+        /* Feature pills */
+        .feature-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            justify-content: center;
+        }
+        .feature-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: #f1f5f9;
+            border-radius: 20px;
+            padding: 0.3rem 0.65rem;
+            font-size: 0.72rem;
+            color: #475569;
+            font-weight: 500;
+        }
+
+        /* ── Footer bar ── */
+        .login-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 3;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.7rem 2rem;
+            background: rgba(10, 20, 50, 0.55);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+        .footer-left {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+        .footer-link {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.78rem;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .footer-link:hover { color: #fff; }
+        .footer-right {
+            color: rgba(255,255,255,0.45);
+            font-size: 0.75rem;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 600px) {
+            .brand-overlay { left: 1.5rem; bottom: 4.5rem; }
+            .brand-name { font-size: 1.4rem; }
+            .login-card { padding: 2rem 1.5rem 1.75rem; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ── LEFT PANEL ─────────────────────────────────────────── -->
-    <div class="login-left">
-        <div class="left-content">
+    <!-- Full-screen background -->
+    <div class="login-bg"></div>
 
-            <div class="left-logo-wrap" id="left-logo-wrap">
-                <!-- Filled by JS from settings or fallback to icon -->
-                <i class="bi bi-code-square left-logo-icon" id="left-logo-icon"></i>
-            </div>
-
-            <div class="left-club-name" id="left-club-name">CLB Sinh viên</div>
-            <div class="left-slogan" id="left-slogan">"Code your dream, build the future"</div>
-
-            <div class="left-feature-list">
-                <div class="left-feature-item">
-                    <div class="left-feature-icon">📋</div>
-                    <span>Quản lý công việc & phân công nhiệm vụ chuyên nghiệp</span>
-                </div>
-                <div class="left-feature-item">
-                    <div class="left-feature-icon">👥</div>
-                    <span>Theo dõi thành viên, ban bộ phận theo thời gian thực</span>
-                </div>
-                <div class="left-feature-item">
-                    <div class="left-feature-icon">💰</div>
-                    <span>Quản lý quỹ CLB minh bạch với minh chứng đính kèm</span>
-                </div>
-                <div class="left-feature-item">
-                    <div class="left-feature-icon">🤖</div>
-                    <span>Trợ lý AI thông minh hỗ trợ phân tích & sáng tạo nội dung</span>
-                </div>
-            </div>
-
-            <div class="left-dots">
-                <span class="active"></span>
-                <span></span>
-                <span></span>
+    <!-- Brand overlay (bottom-left like Bitrix24) -->
+    <div class="brand-overlay">
+        <div class="brand-logo-row">
+            <img src="" alt="Logo" class="brand-logo-img" id="brand-logo-img">
+            <i class="bi bi-code-square brand-logo-icon" id="brand-logo-icon"></i>
+            <div>
+                <div class="brand-name" id="brand-name">DevClub</div>
             </div>
         </div>
+        <div class="brand-slogan" id="brand-slogan">Hệ thống quản lý CLB Sinh viên</div>
     </div>
 
-    <!-- ── RIGHT PANEL ─────────────────────────────────────────── -->
-    <div class="login-right">
-        <div class="login-form-wrap">
+    <!-- Login scene -->
+    <div class="login-scene">
+        <div class="login-card">
 
-            <div class="login-form-title">Chào mừng trở lại 👋</div>
-            <div class="login-form-subtitle">Đăng nhập để tiếp tục vào hệ thống quản lý CLB</div>
+            <!-- Card top branding -->
+            <div class="card-logo-row">
+                <img src="" alt="Logo" class="card-logo-img" id="card-logo-img">
+                <i class="bi bi-code-square card-logo-icon" id="card-logo-icon"></i>
+            </div>
+            <div class="card-title" id="card-title">Đăng nhập vào hệ thống</div>
+            <div class="card-subtitle" id="card-subtitle">Nhập thông tin tài khoản được cấp để tiếp tục</div>
 
+            <!-- Form -->
             <form id="login-form" autocomplete="off">
-                <!-- Username -->
-                <div class="form-group-custom">
+                <div class="form-field">
                     <label for="username">Tên đăng nhập</label>
                     <div class="input-wrap">
-                        <i class="bi bi-person input-icon"></i>
+                        <i class="bi bi-person ico"></i>
                         <input
                             type="text"
                             id="username"
-                            class="input-custom"
                             placeholder="Nhập tên đăng nhập..."
                             required
                             autocomplete="off"
@@ -356,44 +356,53 @@
                     </div>
                 </div>
 
-                <!-- Password -->
-                <div class="form-group-custom">
+                <div class="form-field">
                     <label for="password">Mật khẩu</label>
                     <div class="input-wrap">
-                        <i class="bi bi-lock input-icon"></i>
+                        <i class="bi bi-lock ico"></i>
                         <input
                             type="password"
                             id="password"
-                            class="input-custom"
                             placeholder="Nhập mật khẩu..."
                             required
-                            style="padding-right: 3rem;"
+                            style="padding-right:2.5rem;"
                         >
-                        <button type="button" class="input-toggle" onclick="togglePassword()" id="toggle-pass-btn">
-                            <i class="bi bi-eye" id="toggle-pass-icon"></i>
+                        <button type="button" class="toggle-pass" onclick="togglePass()">
+                            <i class="bi bi-eye" id="pass-eye-icon"></i>
                         </button>
                     </div>
                 </div>
 
-                <!-- Submit -->
                 <button type="submit" class="btn-login" id="btn-login">
                     <i class="bi bi-box-arrow-in-right"></i>
-                    <span>Đăng nhập</span>
+                    <span id="btn-text">Đăng nhập</span>
                 </button>
             </form>
 
-            <div class="login-footer-note">
-                <i class="bi bi-shield-lock me-1"></i>
-                Hệ thống quản lý nội bộ CLB Sinh viên — Chỉ dành cho thành viên được cấp tài khoản.
+            <!-- Divider + feature pills -->
+            <div class="divider">Hệ thống quản lý CLB toàn diện</div>
+            <div class="feature-pills">
+                <div class="feature-pill"><i class="bi bi-list-check" style="color:#2563eb;"></i>Quản lý Công việc</div>
+                <div class="feature-pill"><i class="bi bi-people" style="color:#10b981;"></i>Thành viên</div>
+                <div class="feature-pill"><i class="bi bi-wallet2" style="color:#f59e0b;"></i>Quỹ CLB</div>
+                <div class="feature-pill"><i class="bi bi-robot" style="color:#8b5cf6;"></i>Trợ lý AI</div>
             </div>
-
         </div>
     </div>
 
+    <!-- Footer bar -->
+    <div class="login-footer">
+        <div class="footer-left">
+            <span class="footer-link">
+                <i class="bi bi-shield-lock me-1"></i>Hệ thống nội bộ
+            </span>
+            <a href="about.html" class="footer-link">Giới thiệu CLB</a>
+        </div>
+        <div class="footer-right">© 2026 CLB Sinh viên — All rights reserved</div>
+    </div>
+
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Firebase SDK (v10 Compat) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -407,72 +416,89 @@
         // Load club branding from settings
         (function loadBranding() {
             try {
-                const settings = JSON.parse(localStorage.getItem("club_settings") || "{}");
-                if (settings.clubName) document.getElementById("left-club-name").innerText = settings.clubName;
-                if (settings.slogan)   document.getElementById("left-slogan").innerText = '"' + settings.slogan + '"';
-                if (settings.logo) {
-                    const wrap = document.getElementById("left-logo-wrap");
-                    wrap.innerHTML = `<img src="${settings.logo}" alt="Logo CLB" onerror="this.style.display='none'">`;
+                const s = JSON.parse(localStorage.getItem("club_settings") || "{}");
+
+                // Brand overlay
+                if (s.clubName) {
+                    document.getElementById("brand-name").innerText = s.clubName.split(" ").slice(-1)[0] || s.clubName;
+                    document.getElementById("card-title").innerText = "Đăng nhập vào " + (s.clubName || "hệ thống");
+                }
+                if (s.slogan) {
+                    document.getElementById("brand-slogan").innerText = s.slogan;
+                }
+
+                // Logo
+                if (s.logo && s.logo.length > 20) {
+                    // Brand overlay
+                    const bImg = document.getElementById("brand-logo-img");
+                    bImg.src = s.logo;
+                    bImg.style.display = "block";
+                    document.getElementById("brand-logo-icon").style.display = "none";
+
+                    // Card top
+                    const cImg = document.getElementById("card-logo-img");
+                    cImg.src = s.logo;
+                    cImg.style.display = "block";
+                    document.getElementById("card-logo-icon").style.display = "none";
                 }
             } catch(e) { /* keep defaults */ }
         })();
 
-        // Toggle password visibility
-        function togglePassword() {
-            const input = document.getElementById("password");
-            const icon  = document.getElementById("toggle-pass-icon");
-            if (input.type === "password") {
-                input.type = "text";
+        // Toggle password
+        function togglePass() {
+            const inp  = document.getElementById("password");
+            const icon = document.getElementById("pass-eye-icon");
+            if (inp.type === "password") {
+                inp.type = "text";
                 icon.className = "bi bi-eye-slash";
             } else {
-                input.type = "password";
+                inp.type = "password";
                 icon.className = "bi bi-eye";
             }
         }
 
-        // Dot animation (decorative)
-        let dotIdx = 0;
-        setInterval(() => {
-            const dots = document.querySelectorAll(".left-dots span");
-            dots.forEach(d => d.classList.remove("active"));
-            dotIdx = (dotIdx + 1) % dots.length;
-            dots[dotIdx].classList.add("active");
-        }, 2500);
-
-        // Login form submit
+        // Form submit
         document.getElementById("login-form").addEventListener("submit", async (e) => {
             e.preventDefault();
-            const user = document.getElementById("username").value.trim();
-            const pass = document.getElementById("password").value;
-            const btn  = document.getElementById("btn-login");
+            const user   = document.getElementById("username").value.trim();
+            const pass   = document.getElementById("password").value;
+            const btn    = document.getElementById("btn-login");
+            const btnTxt = document.getElementById("btn-text");
 
             btn.disabled = true;
-            btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> Đang xác thực...`;
+            btn.innerHTML = `<span class="spinner-border spinner-border-sm" style="width:16px;height:16px;border-width:2px;"></span><span style="margin-left:8px;">Đang xác thực...</span>`;
 
             try {
                 const loginMethod = (ClubAuth.loginAsync || ClubAuth.login).bind(ClubAuth);
                 const result = await loginMethod(user, pass);
 
                 if (result && result.success) {
-                    btn.innerHTML = `<i class="bi bi-check-lg me-2"></i> Thành công!`;
-                    btn.style.background = "linear-gradient(135deg, #10b981, #059669)";
+                    btn.classList.add("success");
+                    btn.innerHTML = `<i class="bi bi-check2-circle"></i><span>Thành công! Đang chuyển hướng...</span>`;
                     setTimeout(() => { window.location.href = "dashboard.html"; }, 900);
                 } else {
                     btn.disabled = false;
-                    btn.innerHTML = `<i class="bi bi-box-arrow-in-right"></i> <span>Đăng nhập</span>`;
+                    btn.classList.remove("success");
+                    btn.innerHTML = `<i class="bi bi-box-arrow-in-right"></i><span>Đăng nhập</span>`;
                     Swal.fire({
                         icon: "error",
                         title: "Đăng nhập thất bại",
-                        text: result ? result.message : "Tên đăng nhập hoặc mật khẩu không chính xác!",
-                        background: "#1e293b",
-                        color: "#f1f5f9",
+                        text: (result && result.message) ? result.message : "Tên đăng nhập hoặc mật khẩu không chính xác!",
                         confirmButtonColor: "#2563eb",
                         confirmButtonText: "Thử lại"
                     });
                 }
             } catch (err) {
                 btn.disabled = false;
-                btn.innerHTML = `<i class="bi bi-box-arrow-in-right"></i> <span>Đăng nhập</span>`;
+                btn.innerHTML = `<i class="bi bi-box-arrow-in-right"></i><span>Đăng nhập</span>`;
+            }
+        });
+
+        // Enter key on username → focus password
+        document.getElementById("username").addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                document.getElementById("password").focus();
             }
         });
     </script>
