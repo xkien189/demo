@@ -26,16 +26,13 @@
         .about-hero::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
             background: radial-gradient(ellipse at center, rgba(37,99,235,0.25) 0%, transparent 60%);
             pointer-events: none;
         }
         .about-hero-logo {
-            width: 90px;
-            height: 90px;
+            width: 90px; height: 90px;
             border-radius: 20px;
             object-fit: cover;
             box-shadow: 0 8px 32px rgba(37,99,235,0.5);
@@ -43,6 +40,20 @@
         }
         .about-hero h1 { color: #fff; font-size: 2rem; font-weight: 800; }
         .about-hero p { color: rgba(255,255,255,0.75); font-size: 1.05rem; }
+        .about-contact-bar {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1.25rem;
+            margin-top: 1rem;
+        }
+        .about-contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9rem;
+        }
         .stat-counter-card {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
@@ -52,43 +63,31 @@
             transition: transform 0.2s, box-shadow 0.2s;
         }
         .stat-counter-card:hover { transform: translateY(-4px); box-shadow: var(--card-shadow-lg); }
-        .stat-counter-num { font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, var(--primary), var(--info)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .stat-counter-label { color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem; }
-        .timeline {
-            position: relative;
-            padding-left: 2.5rem;
+        .stat-counter-num {
+            font-size: 2.5rem; font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--info));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
         }
+        .stat-counter-label { color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem; }
+        .timeline { position: relative; padding-left: 2.5rem; }
         .timeline::before {
             content: '';
             position: absolute;
-            left: 0.75rem;
-            top: 0;
-            bottom: 0;
+            left: 0.75rem; top: 0; bottom: 0;
             width: 2px;
             background: linear-gradient(to bottom, var(--primary), var(--info));
         }
-        .timeline-item {
-            position: relative;
-            margin-bottom: 2rem;
-        }
+        .timeline-item { position: relative; margin-bottom: 2rem; }
         .timeline-dot {
             position: absolute;
-            left: -2rem;
-            top: 0.35rem;
-            width: 14px;
-            height: 14px;
+            left: -2rem; top: 0.35rem;
+            width: 14px; height: 14px;
             border-radius: 50%;
             background: var(--primary);
             border: 3px solid var(--bg-secondary);
             box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
         }
-        .timeline-year {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--primary);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
+        .timeline-year { font-size: 0.75rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; }
         .timeline-title { font-weight: 700; color: var(--text-primary); margin: 0.1rem 0; }
         .timeline-text { color: var(--text-secondary); font-size: 0.9rem; }
         .value-card {
@@ -100,19 +99,9 @@
             transition: border-color 0.2s;
         }
         .value-card:hover { border-color: var(--primary); }
-        .value-icon {
-            width: 52px;
-            height: 52px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-            margin-bottom: 1rem;
-        }
+        .value-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin-bottom: 1rem; }
         .gallery-img {
-            width: 100%;
-            height: 200px;
+            width: 100%; height: 200px;
             object-fit: cover;
             border-radius: 12px;
             cursor: pointer;
@@ -125,20 +114,18 @@
             border-radius: 16px;
             padding: 1.25rem;
             text-align: center;
-            transition: box-shadow 0.2s;
+            transition: box-shadow 0.2s, border-color 0.2s;
         }
-        .dept-leader-card:hover { box-shadow: var(--card-shadow-lg); }
+        .dept-leader-card:hover { box-shadow: var(--card-shadow-lg); border-color: var(--primary); }
         .dept-leader-card img {
-            width: 64px;
-            height: 64px;
+            width: 64px; height: 64px;
             border-radius: 50%;
             object-fit: cover;
             border: 3px solid var(--primary);
             margin-bottom: 0.75rem;
         }
         .section-title {
-            font-size: 1.5rem;
-            font-weight: 800;
+            font-size: 1.5rem; font-weight: 800;
             color: var(--text-primary);
             position: relative;
             padding-bottom: 0.75rem;
@@ -147,10 +134,8 @@
         .section-title::after {
             content: '';
             position: absolute;
-            left: 0;
-            bottom: 0;
-            width: 48px;
-            height: 4px;
+            left: 0; bottom: 0;
+            width: 48px; height: 4px;
             border-radius: 2px;
             background: linear-gradient(135deg, var(--primary), var(--info));
         }
@@ -167,6 +152,16 @@
             padding: 1.25rem;
             color: #fff;
         }
+        .dept-member-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.85rem;
+        }
+        .dept-member-row:last-child { border-bottom: none; }
+        .dept-member-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
         [data-theme="dark"] .about-hero { background: linear-gradient(135deg, #030712 0%, #0f2240 50%, #030712 100%); }
     </style>
 </head>
@@ -181,8 +176,12 @@
                 <div class="about-hero">
                     <img id="about-logo" src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=120" class="about-hero-logo" alt="Logo CLB">
                     <h1 id="about-club-name">Câu lạc bộ Sinh viên</h1>
-                    <p id="about-slogan" class="mb-4">Code your dream, build the future</p>
-                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+                    <p id="about-slogan" class="mb-3">Code your dream, build the future</p>
+                    <!-- Dynamic contact bar -->
+                    <div class="about-contact-bar" id="about-contact-bar">
+                        <!-- Filled by JS -->
+                    </div>
+                    <div class="d-flex justify-content-center gap-2 flex-wrap mt-3">
                         <a href="workspace.html" class="btn btn-primary px-4"><i class="bi bi-laptop me-2"></i>Không gian của tôi</a>
                         <a href="tasks.html" class="btn btn-outline-light px-4"><i class="bi bi-list-check me-2"></i>Công việc</a>
                     </div>
@@ -190,28 +189,40 @@
 
                 <!-- Stats Row -->
                 <div class="row g-3 mb-4">
-                    <div class="col-6 col-md-3">
+                    <div class="col-6 col-md-2">
                         <div class="stat-counter-card">
                             <div class="stat-counter-num" id="about-stat-members">0</div>
                             <div class="stat-counter-label"><i class="bi bi-people me-1"></i>Thành viên</div>
                         </div>
                     </div>
-                    <div class="col-6 col-md-3">
+                    <div class="col-6 col-md-2">
                         <div class="stat-counter-card">
                             <div class="stat-counter-num" id="about-stat-depts">0</div>
                             <div class="stat-counter-label"><i class="bi bi-building me-1"></i>Ban bộ phận</div>
                         </div>
                     </div>
-                    <div class="col-6 col-md-3">
+                    <div class="col-6 col-md-2">
                         <div class="stat-counter-card">
                             <div class="stat-counter-num" id="about-stat-events">0</div>
                             <div class="stat-counter-label"><i class="bi bi-calendar-event me-1"></i>Sự kiện</div>
                         </div>
                     </div>
-                    <div class="col-6 col-md-3">
+                    <div class="col-6 col-md-2">
                         <div class="stat-counter-card">
                             <div class="stat-counter-num" id="about-stat-tasks">0</div>
-                            <div class="stat-counter-label"><i class="bi bi-check2-all me-1"></i>Hoạt động</div>
+                            <div class="stat-counter-label"><i class="bi bi-check2-all me-1"></i>Hoàn thành</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <div class="stat-counter-card">
+                            <div class="stat-counter-num text-success" id="about-stat-fund-balance" style="-webkit-text-fill-color: unset; font-size: 1.4rem;">0đ</div>
+                            <div class="stat-counter-label"><i class="bi bi-wallet2 me-1"></i>Số dư Quỹ</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <div class="stat-counter-card">
+                            <div class="stat-counter-num" id="about-stat-paid-members">0</div>
+                            <div class="stat-counter-label"><i class="bi bi-cash-coin me-1"></i>Đã đóng quỹ</div>
                         </div>
                     </div>
                 </div>
@@ -236,7 +247,7 @@
                                         <div class="timeline-dot"></div>
                                         <div class="timeline-year">Năm 2020</div>
                                         <div class="timeline-title">🚀 Hackathon đầu tiên</div>
-                                        <div class="timeline-text">Tổ chức Hackathon nội bộ đầu tiên với 50 thí sinh tham gia, mở đầu văn hoá đổi mới sáng tạo.</div>
+                                        <div class="timeline-text">Tổ chức Hackathon nội bộ đầu tiên với 50 thí sinh, mở đầu văn hoá đổi mới sáng tạo.</div>
                                     </div>
                                     <div class="timeline-item">
                                         <div class="timeline-dot"></div>
@@ -248,20 +259,20 @@
                                         <div class="timeline-dot"></div>
                                         <div class="timeline-year">Năm 2024</div>
                                         <div class="timeline-title">🏆 100+ thành viên</div>
-                                        <div class="timeline-text">CLB chính thức vượt mốc 100 thành viên, trở thành một trong những CLB kỹ thuật lớn nhất trường.</div>
+                                        <div class="timeline-text">CLB vượt mốc 100 thành viên, trở thành một trong những CLB kỹ thuật lớn nhất trường.</div>
                                     </div>
                                     <div class="timeline-item" style="margin-bottom:0">
                                         <div class="timeline-dot" style="background:var(--success);"></div>
                                         <div class="timeline-year" style="color:var(--success)">Hiện tại</div>
-                                        <div class="timeline-title">✨ Hệ thống hoà toàn số hóa</div>
-                                        <div class="timeline-text">Triển khai nền tảng quản lý số hoàn chỉnh, hướng đến CLB chuyên nghiệp đầu tiên của trường.</div>
+                                        <div class="timeline-title">✨ Hệ thống số hoá hoàn chỉnh</div>
+                                        <div class="timeline-text">Triển khai nền tảng quản lý số tích hợp AI, hướng đến CLB chuyên nghiệp số 1 trường.</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Core Values -->
-                        <div class="card">
+                        <div class="card mb-4">
                             <div class="card-header">
                                 <h5 class="card-title mb-0"><i class="bi bi-gem me-2"></i>Giá trị cốt lõi</h5>
                             </div>
@@ -298,6 +309,38 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Contact Info Card -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="bi bi-telephone me-2"></i>Thông tin liên hệ CLB</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="about-contact-card">
+                                    <div class="d-flex align-items-center gap-3 mb-3">
+                                        <div style="width:40px;height:40px;border-radius:10px;background:rgba(37,99,235,0.1);display:flex;align-items:center;justify-content:center;font-size:1.2rem;"><i class="bi bi-envelope text-primary"></i></div>
+                                        <div>
+                                            <div class="small text-muted">Email liên hệ</div>
+                                            <div class="fw-bold" id="about-email">Đang tải...</div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-3 mb-3">
+                                        <div style="width:40px;height:40px;border-radius:10px;background:rgba(16,185,129,0.1);display:flex;align-items:center;justify-content:center;font-size:1.2rem;"><i class="bi bi-telephone text-success"></i></div>
+                                        <div>
+                                            <div class="small text-muted">Số điện thoại</div>
+                                            <div class="fw-bold" id="about-phone">Đang tải...</div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div style="width:40px;height:40px;border-radius:10px;background:rgba(245,158,11,0.1);display:flex;align-items:center;justify-content:center;font-size:1.2rem;"><i class="bi bi-palette text-warning"></i></div>
+                                        <div>
+                                            <div class="small text-muted">Slogan</div>
+                                            <div class="fw-bold fst-italic" id="about-slogan-detail">Đang tải...</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Right column: Gallery + Departments -->
@@ -322,7 +365,7 @@
                                         <img src="https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=600" class="gallery-img" alt="Teambuilding" onclick="openGallery(this.src)">
                                     </div>
                                     <div class="col-4">
-                                        <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=400" class="gallery-img" alt="Họi nghị" onclick="openGallery(this.src)">
+                                        <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=400" class="gallery-img" alt="Họp ban" onclick="openGallery(this.src)">
                                     </div>
                                     <div class="col-4">
                                         <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400" class="gallery-img" alt="Trao giải" onclick="openGallery(this.src)">
@@ -336,8 +379,9 @@
 
                         <!-- Departments overview -->
                         <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0"><i class="bi bi-diagram-3 me-2"></i>Cơ cấu tổ chức</h5>
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0"><i class="bi bi-diagram-3 me-2"></i>Cơ cấu tổ chức CLB</h5>
+                                <span class="badge bg-primary" id="about-total-active-badge">0 thành viên đang hoạt động</span>
                             </div>
                             <div class="card-body">
                                 <div class="row g-3" id="about-depts-grid">
@@ -350,7 +394,7 @@
 
                 <!-- Events Section -->
                 <div class="mt-4">
-                    <h5 class="section-title"><i class="bi bi-calendar-check me-2"></i>Hoạt động nổi bật</h5>
+                    <h5 class="section-title"><i class="bi bi-calendar-check me-2"></i>Hoạt động & Sự kiện nổi bật</h5>
                     <div class="row g-3" id="about-events-grid">
                         <!-- Dynamic -->
                     </div>
@@ -385,71 +429,147 @@
     <script src="assets/js/storage.js"></script>
     <script src="assets/js/utils.js"></script>
     <script src="assets/js/auth.js"></script>
+    <script src="assets/js/ai-service.js"></script>
+    <script src="assets/js/ai-widget.js"></script>
     <script src="assets/js/sidebar.js"></script>
+
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             if (!ClubAuth.checkRouteGuard()) return;
 
-            const settings = ClubStorage.getData("club_settings") || {};
-            const members = ClubStorage.getData("club_members") || [];
-            const depts = ClubStorage.getData("club_departments") || [];
-            const events = ClubStorage.getData("club_events") || [];
-            const tasks = ClubStorage.getData("club_tasks") || [];
+            // Load all data from ClubStorage (Firebase synced)
+            const settings        = ClubStorage.getData("club_settings") || {};
+            const members         = ClubStorage.getData("club_members") || [];
+            const depts           = ClubStorage.getData("club_departments") || [];
+            const events          = ClubStorage.getData("club_events") || [];
+            const tasks           = ClubStorage.getData("club_tasks") || [];
+            const fundPeriods     = ClubStorage.getData("club_fund_periods") || [];
+            const fundTransactions = ClubStorage.getData("club_fund_transactions") || [];
 
-            // Hero section
+            // ─── Hero Section ────────────────────────────────────────────────
             if (settings.clubName) document.getElementById("about-club-name").innerText = settings.clubName;
-            if (settings.slogan) document.getElementById("about-slogan").innerText = settings.slogan;
-            if (settings.logo) document.getElementById("about-logo").src = settings.logo;
+            if (settings.slogan)   document.getElementById("about-slogan").innerText = settings.slogan;
+            if (settings.logo)     document.getElementById("about-logo").src = settings.logo;
 
-            // Stats with animated counter
-            animateCounter("about-stat-members", members.filter(m => m.status === "Active").length);
+            // Contact bar inside hero
+            const contactBar = document.getElementById("about-contact-bar");
+            if (contactBar) {
+                contactBar.innerHTML = `
+                    ${settings.contactEmail ? `<div class="about-contact-item"><i class="bi bi-envelope-fill"></i>${settings.contactEmail}</div>` : ''}
+                    ${settings.contactPhone ? `<div class="about-contact-item"><i class="bi bi-telephone-fill"></i>${settings.contactPhone}</div>` : ''}
+                `;
+            }
+
+            // Contact card (left column)
+            const emailEl = document.getElementById("about-email");
+            const phoneEl = document.getElementById("about-phone");
+            const sloganDetailEl = document.getElementById("about-slogan-detail");
+            if (emailEl) emailEl.innerText = settings.contactEmail || "Chưa cập nhật";
+            if (phoneEl) phoneEl.innerText = settings.contactPhone || "Chưa cập nhật";
+            if (sloganDetailEl) sloganDetailEl.innerText = settings.slogan || "Chưa cập nhật";
+
+            // ─── Stats Counters ───────────────────────────────────────────────
+            const activeMembers = members.filter(m => m.status === "Active");
+            animateCounter("about-stat-members", activeMembers.length);
             animateCounter("about-stat-depts", depts.length);
             animateCounter("about-stat-events", events.length);
             animateCounter("about-stat-tasks", tasks.filter(t => t.status === "Completed").length);
 
-            // Departments grid
+            // Active badge
+            const activeBadge = document.getElementById("about-total-active-badge");
+            if (activeBadge) activeBadge.innerText = activeMembers.length + " thành viên đang hoạt động";
+
+            // Fund balance
+            let totalIncome = 0, totalExpense = 0;
+            fundTransactions.forEach(t => {
+                if (t.type === "Income")  totalIncome  += Number(t.amount || 0);
+                if (t.type === "Expense") totalExpense += Number(t.amount || 0);
+            });
+            const balance = totalIncome - totalExpense;
+            const balanceEl = document.getElementById("about-stat-fund-balance");
+            if (balanceEl) {
+                balanceEl.innerText = balance.toLocaleString('vi-VN') + "đ";
+                balanceEl.style.color = balance >= 0 ? "#10b981" : "#ef4444";
+            }
+
+            // Paid members count (latest active period)
+            const activePeriod = fundPeriods.find(p => p.status === "Active") || fundPeriods[0];
+            let paidCount = 0;
+            if (activePeriod) {
+                paidCount = (activePeriod.memberRecords || []).filter(r => r.status === "Paid").length;
+            }
+            animateCounter("about-stat-paid-members", paidCount);
+
+            // ─── Departments Grid ─────────────────────────────────────────────
             const deptsGrid = document.getElementById("about-depts-grid");
             const colors = ["#2563eb","#10b981","#f59e0b","#ef4444","#8b5cf6"];
-            deptsGrid.innerHTML = depts.map((d, i) => {
-                const leaderM = members.find(m => m.id === d.leader);
-                const deptCount = members.filter(m => m.department === d.name).length;
-                return \`
-                <div class="col-md-6">
-                    <div class="dept-leader-card">
-                        <img src="\${leaderM ? (leaderM.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150') : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'}" alt="\${d.name}">
-                        <div class="fw-bold" style="color:\${colors[i % colors.length]}">\${d.code}</div>
-                        <div class="fw-semibold mt-1">\${d.name}</div>
-                        <div class="text-muted small">\${leaderM ? 'TB: ' + leaderM.name : 'Chưa phân nhiệm'}</div>
-                        <div class="mt-2"><span class="badge" style="background:\${colors[i % colors.length]}20;color:\${colors[i % colors.length]};">\${deptCount} thành viên</span></div>
-                    </div>
-                </div>\`;
-            }).join("");
+            if (deptsGrid) {
+                if (depts.length === 0) {
+                    deptsGrid.innerHTML = `<div class="col-12 text-center text-muted py-3">Chưa có dữ liệu ban bộ phận</div>`;
+                } else {
+                    deptsGrid.innerHTML = depts.map((d, i) => {
+                        const leaderM = members.find(m => m.id === d.leader);
+                        const deptMembers = members.filter(m => m.department === d.name && m.status === "Active");
+                        const color = colors[i % colors.length];
 
-            // Events grid
-            const eventsGrid = document.getElementById("about-events-grid");
-            if (events.length === 0) {
-                eventsGrid.innerHTML = \`<div class="col-12 text-center text-muted py-4">Chưa có sự kiện nào</div>\`;
-            } else {
-                eventsGrid.innerHTML = events.map(ev => {
-                    const leader = members.find(m => m.id === ev.leaderId);
-                    return \`
-                    <div class="col-md-6 col-lg-4">
-                        <div class="activity-event-card">
-                            <div class="event-header">
-                                <div class="fw-bold mb-1">\${ev.title}</div>
-                                <small><i class="bi bi-calendar3 me-1"></i>\${ClubUtils.formatDateOnly(ev.date)}</small>
-                            </div>
-                            <div class="p-3">
-                                <div class="small text-muted mb-2"><i class="bi bi-geo-alt me-1"></i>\${ev.location}</div>
-                                <div class="small mb-2">\${ev.description}</div>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <small class="text-muted"><i class="bi bi-people me-1"></i>\${ev.attendeesCount || 0} người tham gia</small>
-                                    <small class="text-muted">\${leader ? leader.name : ''}</small>
+                        const memberAvatars = deptMembers.slice(0, 3).map(m =>
+                            `<img src="${m.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'}"
+                                  class="dept-member-avatar" title="${m.name}"
+                                  style="margin-left:-8px;border:2px solid var(--bg-secondary);z-index:1;">`
+                        ).join("");
+
+                        return `
+                        <div class="col-md-6">
+                            <div class="dept-leader-card">
+                                <img src="${leaderM ? (leaderM.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150') : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'}" alt="${d.name}">
+                                <div class="fw-bold fs-6" style="color:${color}">${d.code}</div>
+                                <div class="fw-semibold mt-1">${d.name}</div>
+                                <div class="text-muted small mb-2">${leaderM ? '👑 TB: ' + leaderM.name : 'Chưa phân nhiệm vụ'}</div>
+                                <div class="text-muted small mb-2" style="font-size:0.78rem;">${d.description || ''}</div>
+                                <div class="d-flex align-items-center justify-content-center gap-2 flex-wrap">
+                                    <div class="d-flex" style="margin-left:8px;">${memberAvatars}</div>
+                                    <span class="badge" style="background:${color}20;color:${color};">${deptMembers.length} thành viên</span>
                                 </div>
                             </div>
-                        </div>
-                    </div>\`;
-                }).join("");
+                        </div>`;
+                    }).join("");
+                }
+            }
+
+            // ─── Events Grid ──────────────────────────────────────────────────
+            const eventsGrid = document.getElementById("about-events-grid");
+            if (eventsGrid) {
+                if (events.length === 0) {
+                    eventsGrid.innerHTML = `<div class="col-12 text-center text-muted py-4">Chưa có sự kiện nào được lên lịch.</div>`;
+                } else {
+                    eventsGrid.innerHTML = events.map(ev => {
+                        const leader = members.find(m => m.id === ev.leaderId);
+                        const evDate = new Date(ev.date);
+                        const isPast = evDate < new Date();
+                        const statusBadge = isPast
+                            ? `<span class="badge bg-secondary">Đã kết thúc</span>`
+                            : `<span class="badge bg-success">Sắp diễn ra</span>`;
+
+                        return `
+                        <div class="col-md-6 col-lg-4">
+                            <div class="activity-event-card">
+                                <div class="event-header">
+                                    <div class="fw-bold mb-1">${ev.title}</div>
+                                    <small><i class="bi bi-calendar3 me-1"></i>${ClubUtils.formatDateOnly(ev.date)}</small>
+                                </div>
+                                <div class="p-3">
+                                    <div class="small text-muted mb-2"><i class="bi bi-geo-alt me-1"></i>${ev.location}</div>
+                                    <div class="small mb-2">${ev.description}</div>
+                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                        <small class="text-muted"><i class="bi bi-people me-1"></i>${ev.attendeesCount || 0} người tham gia</small>
+                                        ${statusBadge}
+                                    </div>
+                                    ${leader ? `<div class="mt-2 d-flex align-items-center gap-2"><img src="${leader.avatar || ''}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;"><small class="text-muted">${leader.name}</small></div>` : ''}
+                                </div>
+                            </div>
+                        </div>`;
+                    }).join("");
+                }
             }
         });
 
@@ -458,7 +578,7 @@
             if (!el) return;
             let current = 0;
             const duration = 1200;
-            const step = target / (duration / 16);
+            const step = Math.max(target / (duration / 16), 0.1);
             const timer = setInterval(() => {
                 current = Math.min(current + step, target);
                 el.innerText = Math.floor(current);
