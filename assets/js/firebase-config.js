@@ -26,22 +26,9 @@ if (typeof firebase !== "undefined") {
         // Enable offline persistence for Firestore
         db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
             if (err.code === 'failed-precondition') {
-                console.warn('Firestore persistence failed: Multiple tabs open');
+                console.warn('Firestore persistence notice: Multiple tabs open');
             } else if (err.code === 'unimplemented') {
-                console.warn('Firestore persistence not supported by browser');
-            }
-        });
-
-        // Ensure user is authenticated with Firebase (anonymously if not logged in) to pass Firestore Security Rules
-        auth.onAuthStateChanged((user) => {
-            if (!user) {
-                auth.signInAnonymously().then(() => {
-                    console.log("🔒 Authenticated anonymously with Firebase Cloud");
-                }).catch((err) => {
-                    console.warn("Firebase Anonymous Auth Notice (Ensure Anonymous sign-in is enabled in Firebase Console):", err.message);
-                });
-            } else {
-                console.log("🔐 Logged in to Firebase Auth as:", user.isAnonymous ? "Anonymous User" : user.email || user.uid);
+                console.warn('Firestore persistence notice: Not supported by browser');
             }
         });
 

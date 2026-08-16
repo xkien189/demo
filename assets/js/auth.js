@@ -20,7 +20,7 @@ const ClubAuth = {
         return members.find(m => m.id === user.memberId) || null;
     },
 
-    // Synchronous login for standard user array
+    // Synchronous login for standard user array (synced with Cloud Firestore)
     login: function(usernameOrEmail, password) {
         const users = ClubStorage.getData("club_users") || [];
         const input = (usernameOrEmail || "").trim().toLowerCase();
@@ -45,14 +45,14 @@ const ClubAuth = {
         return { success: true };
     },
 
-    // Asynchronous Hybrid Login (Supports Local/Firestore Users & Firebase Auth Email)
+    // Asynchronous Hybrid Login (Supports Local/Firestore Users & optional Firebase Auth Email)
     loginAsync: async function(usernameOrEmail, password) {
-        // First try synchronous local/synced Firestore check
+        // 1. First try local / Cloud Firestore synced users collection
         const res = this.login(usernameOrEmail, password);
         if (res.success) return res;
 
-        // Second, try Firebase Auth SDK if user entered email/password
-        if (typeof firebase !== "undefined" && firebase.auth) {
+        // 2. If user typed an email address and Firebase Auth SDK is available, try Firebase Auth
+        if (usernameOrEmail.includes("@") && typeof firebase !== "undefined" && firebase.auth) {
             try {
                 const userCred = await firebase.auth().signInWithEmailAndPassword(usernameOrEmail, password);
                 const fbUser = userCred.user;
@@ -76,7 +76,7 @@ const ClubAuth = {
                 ClubUtils.addLog("Đăng nhập qua Firebase Auth: " + fbUser.email);
                 return { success: true };
             } catch (fbErr) {
-                console.warn("Firebase Auth attempt notice:", fbErr.message);
+                // Ignore API key uninitialized notice if user entered wrong email/pass or Auth service is off
             }
         }
 
@@ -87,7 +87,9 @@ const ClubAuth = {
         ClubUtils.addLog("Đăng xuất khỏi hệ thống");
         sessionStorage.removeItem("club_current_user");
         if (typeof firebase !== "undefined" && firebase.auth) {
-            firebase.auth().signOut().catch(() => {});
+            try {
+                firebase.auth().signOut().catch(() => {});
+            } catch(e) {}
         }
         window.location.href = "login.html";
     },
