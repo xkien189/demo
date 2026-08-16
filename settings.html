@@ -72,6 +72,14 @@
                                     <label for="s-phone" class="form-label">Số điện thoại liên hệ *</label>
                                     <input type="text" id="s-phone" class="form-control" required>
                                 </div>
+                                <div class="col-md-6">
+                                    <label for="s-facebook" class="form-label"><i class="bi bi-facebook text-primary me-1"></i>Link Fanpage Facebook</label>
+                                    <input type="url" id="s-facebook" class="form-control" placeholder="https://facebook.com/clbsinhvien">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="s-tiktok" class="form-label"><i class="bi bi-tiktok me-1"></i>Link kênh TikTok</label>
+                                    <input type="url" id="s-tiktok" class="form-control" placeholder="https://tiktok.com/@clbsinhvien">
+                                </div>
                                 
                                 <!-- Logo upload from computer -->
                                 <div class="col-md-12">
@@ -169,6 +177,8 @@
             document.getElementById("s-slogan").value = settings.slogan || "";
             document.getElementById("s-email").value = settings.contactEmail || "";
             document.getElementById("s-phone").value = settings.contactPhone || "";
+            document.getElementById("s-facebook").value = settings.facebookUrl || "";
+            document.getElementById("s-tiktok").value = settings.tiktokUrl || "";
             document.getElementById("s-theme").value = settings.themeColor || "blue";
             document.getElementById("s-ai-key").value = settings.geminiApiKey || "";
 
@@ -201,6 +211,8 @@
                 const slogan = document.getElementById("s-slogan").value.trim();
                 const contactEmail = document.getElementById("s-email").value.trim();
                 const contactPhone = document.getElementById("s-phone").value.trim();
+                const facebookUrl = document.getElementById("s-facebook").value.trim();
+                const tiktokUrl = document.getElementById("s-tiktok").value.trim();
                 const themeColor = document.getElementById("s-theme").value;
                 const geminiApiKey = document.getElementById("s-ai-key").value.trim();
 
@@ -209,6 +221,8 @@
                     slogan,
                     contactEmail,
                     contactPhone,
+                    facebookUrl,
+                    tiktokUrl,
                     logo: currentLogoBase64,
                     themeColor,
                     geminiApiKey
