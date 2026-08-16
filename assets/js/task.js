@@ -631,6 +631,8 @@ function populateAssigneesDropdown(deptName, selectedId = "") {
         const selected = m.id === selectedId ? 'selected' : '';
         html += `<option value="${m.id}" ${selected}>${m.name} (${m.id}) - ${m.department}</option>`;
     });
+    dropdown.innerHTML = html;
+}
 
 window.renderAIWorkInsights = function(retryCount) {
     const container = document.getElementById("ai-work-insights-content");
