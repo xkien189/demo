@@ -31,6 +31,20 @@ if (typeof firebase !== "undefined") {
                 console.warn('Firestore persistence not supported by browser');
             }
         });
+
+        // Ensure user is authenticated with Firebase (anonymously if not logged in) to pass Firestore Security Rules
+        auth.onAuthStateChanged((user) => {
+            if (!user) {
+                auth.signInAnonymously().then(() => {
+                    console.log("🔒 Authenticated anonymously with Firebase Cloud");
+                }).catch((err) => {
+                    console.warn("Firebase Anonymous Auth Notice (Ensure Anonymous sign-in is enabled in Firebase Console):", err.message);
+                });
+            } else {
+                console.log("🔐 Logged in to Firebase Auth as:", user.isAnonymous ? "Anonymous User" : user.email || user.uid);
+            }
+        });
+
         console.log("🔥 Firebase initialized successfully for project:", firebaseConfig.projectId);
     } catch (e) {
         console.error("Firebase init error:", e);

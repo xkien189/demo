@@ -159,19 +159,19 @@
             document.getElementById("password").value = "123";
         }
         
-        document.getElementById("login-form").addEventListener("submit", (e) => {
+        document.getElementById("login-form").addEventListener("submit", async (e) => {
             e.preventDefault();
             const user = document.getElementById("username").value.trim();
             const pass = document.getElementById("password").value;
             
-            const result = ClubAuth.login(user, pass);
+            const result = await ClubAuth.loginAsync(user, pass);
             if (result.success) {
                 ClubUtils.showToast("Đăng nhập thành công!", "Chào mừng bạn quay trở lại.", "success");
                 setTimeout(() => {
                     window.location.href = "dashboard.html";
                 }, 1000);
             } else {
-                ClubUtils.showAlert("Lỗi đăng nhập", result.message, "error", "Thử lại");
+                ClubUtils.showAlert("Đăng nhập thất bại", result.message, "error");
             }
         });
     </script>
