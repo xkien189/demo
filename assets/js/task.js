@@ -632,23 +632,32 @@ function populateAssigneesDropdown(deptName, selectedId = "") {
         html += `<option value="${m.id}" ${selected}>${m.name} (${m.id}) - ${m.department}</option>`;
     });
 
-window.renderAIWorkInsights = function() {
+window.renderAIWorkInsights = function(retryCount) {
     const container = document.getElementById("ai-work-insights-content");
     if (!container) return;
 
+    retryCount = retryCount || 0;
+
+    // If AIService not loaded yet, retry up to 10 times (5 seconds total)
     if (typeof AIService === "undefined") {
-        container.innerHTML = `<div class="text-muted small">AI Service đang khởi động...</div>`;
-        setTimeout(renderAIWorkInsights, 500);
+        if (retryCount >= 10) {
+            container.innerHTML = `<span class="text-warning small"><i class="bi bi-exclamation-triangle me-1"></i>Không thể tải AI Service. Vui lòng tải lại trang.</span>`;
+            return;
+        }
+        setTimeout(() => window.renderAIWorkInsights(retryCount + 1), 500);
         return;
     }
 
-    const insights = AIService.getWorkInsights();
-    let html = `<ul class="mb-0 ps-3">`;
-    insights.insights.forEach(item => {
-        html += `<li class="mb-1">${item}</li>`;
-    });
-    html += `</ul>`;
-
-    container.innerHTML = html;
+    try {
+        const insights = AIService.getWorkInsights();
+        let html = `<ul class="mb-0 ps-3">`;
+        insights.insights.forEach(item => {
+            html += `<li class="mb-1">${item}</li>`;
+        });
+        html += `</ul>`;
+        container.innerHTML = html;
+    } catch (err) {
+        container.innerHTML = `<span class="text-danger small"><i class="bi bi-x-circle me-1"></i>Lỗi phân tích AI: ${err.message}</span>`;
+    }
 };
 
