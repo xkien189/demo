@@ -180,10 +180,10 @@
         div.innerHTML = widgetHtml;
         document.body.appendChild(div);
 
-        // Bind events
-        document.getElementById("ai-widget-floating-btn").addEventListener("click", toggleAIChatWindow);
+        // Bind events — use arrow wrapper so functions are resolved at call-time (not definition-time)
+        document.getElementById("ai-widget-floating-btn").addEventListener("click", () => window.toggleAIChatWindow());
         document.getElementById("ai-chat-input").addEventListener("keypress", (e) => {
-            if (e.key === "Enter") submitAIChat();
+            if (e.key === "Enter") window.submitAIChat();
         });
 
         // Load chat history
