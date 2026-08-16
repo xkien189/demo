@@ -164,14 +164,15 @@
             const user = document.getElementById("username").value.trim();
             const pass = document.getElementById("password").value;
             
-            const result = await ClubAuth.loginAsync(user, pass);
-            if (result.success) {
+            const loginMethod = (ClubAuth.loginAsync || ClubAuth.login).bind(ClubAuth);
+            const result = await loginMethod(user, pass);
+            if (result && result.success) {
                 ClubUtils.showToast("Đăng nhập thành công!", "Chào mừng bạn quay trở lại.", "success");
                 setTimeout(() => {
                     window.location.href = "dashboard.html";
                 }, 1000);
             } else {
-                ClubUtils.showAlert("Đăng nhập thất bại", result.message, "error");
+                ClubUtils.showAlert("Đăng nhập thất bại", result ? result.message : "Tên đăng nhập hoặc mật khẩu không chính xác!", "error");
             }
         });
     </script>

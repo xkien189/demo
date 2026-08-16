@@ -20,32 +20,44 @@ const ClubAuth = {
         return members.find(m => m.id === user.memberId) || null;
     },
 
-    // Hybrid Login (Supports Local/Firestore Users & Firebase Auth Email)
-    loginAsync: async function(usernameOrEmail, password) {
+    // Synchronous login for standard user array
+    login: function(usernameOrEmail, password) {
         const users = ClubStorage.getData("club_users") || [];
-        const input = usernameOrEmail.trim().toLowerCase();
+        const input = (usernameOrEmail || "").trim().toLowerCase();
 
-        // 1. Check local/synced users array first
-        let user = users.find(u => 
+        const user = users.find(u => 
             u.username.toLowerCase() === input || 
             (u.email && u.email.toLowerCase() === input)
         );
 
-        if (user && user.password === password) {
-            if (user.status === "Blocked") {
-                return { success: false, message: "Tài khoản của bạn đang bị khóa!" };
-            }
-            sessionStorage.setItem("club_current_user", JSON.stringify(user));
-            ClubUtils.addLog("Đăng nhập hệ thống: " + user.username);
-            return { success: true };
+        if (!user) {
+            return { success: false, message: "Tên đăng nhập hoặc mật khẩu không chính xác!" };
+        }
+        if (user.password !== password) {
+            return { success: false, message: "Tên đăng nhập hoặc mật khẩu không chính xác!" };
+        }
+        if (user.status === "Blocked") {
+            return { success: false, message: "Tài khoản của bạn đang bị khóa!" };
         }
 
-        // 2. Try Firebase Auth SDK if user entered email/password
+        sessionStorage.setItem("club_current_user", JSON.stringify(user));
+        ClubUtils.addLog("Đăng nhập hệ thống: " + user.username);
+        return { success: true };
+    },
+
+    // Asynchronous Hybrid Login (Supports Local/Firestore Users & Firebase Auth Email)
+    loginAsync: async function(usernameOrEmail, password) {
+        // First try synchronous local/synced Firestore check
+        const res = this.login(usernameOrEmail, password);
+        if (res.success) return res;
+
+        // Second, try Firebase Auth SDK if user entered email/password
         if (typeof firebase !== "undefined" && firebase.auth) {
             try {
                 const userCred = await firebase.auth().signInWithEmailAndPassword(usernameOrEmail, password);
                 const fbUser = userCred.user;
                 
+                let users = ClubStorage.getData("club_users") || [];
                 let existingUser = users.find(u => u.username.toLowerCase() === fbUser.email.toLowerCase() || u.memberId === fbUser.uid);
                 if (!existingUser) {
                     existingUser = {
@@ -69,23 +81,6 @@ const ClubAuth = {
         }
 
         return { success: false, message: "Tên đăng nhập hoặc mật khẩu không chính xác!" };
-    },
-
-    login: function(username, password) {
-        const users = ClubStorage.getData("club_users") || [];
-        const input = username.trim().toLowerCase();
-        const user = users.find(u => u.username.toLowerCase() === input && u.password === password);
-        
-        if (!user) {
-            return { success: false, message: "Tên đăng nhập hoặc mật khẩu không chính xác!" };
-        }
-        if (user.status === "Blocked") {
-            return { success: false, message: "Tài khoản của bạn đang bị khóa!" };
-        }
-        
-        sessionStorage.setItem("club_current_user", JSON.stringify(user));
-        ClubUtils.addLog("Đăng nhập vào hệ thống: " + user.username);
-        return { success: true };
     },
 
     logout: function() {
