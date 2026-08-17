@@ -53,16 +53,32 @@ const AIService = {
 
     // Main AI Query method (Natural Chatbot)
     query: async function(userPrompt) {
-        const apiKey = this.getApiKey();
+        const apiKey = this.getApiKey().trim();
         const context = this.buildContext();
 
-        // 1. If API Key is configured, call Google Gemini API for 100% natural AI response
+        // 1. If API Key is configured, call Google Gemini API
         if (apiKey) {
+            // Check if key starts with AIzaSy (Google AI Studio Key format)
+            if (!apiKey.startsWith("AIzaSy")) {
+                return `⚠️ **API Key Gemini hiện tại chưa đúng định dạng!**
+
+🔑 **Key bạn đã dán**: \`${apiKey.substring(0, 14)}...\`
+👉 **Hướng dẫn lấy lại Key chuẩn**:
+Google Gemini API Key miễn phí (tại [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)) **luôn luôn bắt đầu bằng chuỗi \`AIzaSy...\`** (gồm khoảng 39 ký tự).
+
+Chuỗi \`AQ.Ab8RN...\` bạn đang dán có vẻ là Token tài khoản hoặc Mã xác thực khác. Bạn hãy mở trang *Cài đặt*, bấm **aistudio.google.com/app/apikey**, tạo key mới và copy đúng mã \`AIzaSy...\` dán lại nhé!`;
+            }
+
             try {
                 const response = await this.callGemini(userPrompt, context, apiKey);
                 if (response) return response;
             } catch (err) {
-                console.warn("Gemini API call failed, falling back to Smart AI Engine:", err.message);
+                console.warn("Gemini API call failed:", err.message);
+                return `⚠️ **Không thể kết nối Gemini API**: ${err.message}
+
+Vui lòng kiểm tra lại:
+1. API Key Gemini bắt đầu bằng \`AIzaSy...\` (lấy tại [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)).
+2. Kết nối mạng internet của bạn.`;
             }
         }
 
@@ -105,6 +121,8 @@ Hãy trả lời bằng tiếng Việt ngắn gọn, hấp dẫn, dễ hiểu, d
             ]
         };
 
+        let lastError = "";
+
         for (const model of models) {
             try {
                 const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
@@ -119,13 +137,16 @@ Hãy trả lời bằng tiếng Việt ngắn gọn, hấp dẫn, dễ hiểu, d
                     if (data.candidates && data.candidates[0] && data.candidates[0].content) {
                         return data.candidates[0].content.parts[0].text;
                     }
+                } else {
+                    const errData = await res.json().catch(() => ({}));
+                    lastError = (errData.error && errData.error.message) ? errData.error.message : ("HTTP " + res.status);
                 }
             } catch (e) {
-                // Try next model
+                lastError = e.message;
             }
         }
 
-        throw new Error("All Gemini models failed");
+        throw new Error(lastError || "Tất cả các model Gemini đều báo lỗi");
     },
 
     // Advanced Natural Language Smart Engine (Natural & Dynamic Response)
@@ -267,13 +288,11 @@ Hãy nhập bất kỳ câu hỏi nào bạn đang thắc mắc nhé!`;
         }
 
         // 10. Generative Natural Fallback for ANY unknown question
-        return `🤖 **Trợ lý AI**: Về thắc mắc **"${prompt}"** của bạn:
+        return `🤖 **Trợ lý AI**: Tôi đã ghi nhận thắc mắc **"${prompt}"** của bạn!
 
-Đây là một chủ đề rất thú vị! Để có câu hỏi trả lời chính xác và cá nhân hóa nhất, bạn có thể:
-1. **Nhập Gemini API Key** tại trang *Cài đặt hệ thống* để kích hoạt chế độ AI trả lời tự nhiên 100% bằng Google Gemini API.
-2. Hoặc thử hỏi tôi về các chủ đề: *lập trình Python/Web, định hướng CNTT, deadline công việc, sự kiện sắp tới, quỹ CLB hay giới thiệu ban bộ phận*.
-
-Tôi luôn ở đây để đồng hành cùng bạn! 😊`;
+💡 **Gợi ý nhanh**:
+- Để hỏi đáp tự nhiên 100% bằng trí tuệ nhân tạo nâng cao, bạn có thể kiểm tra lại **API Key Gemini** dạng \`AIzaSy...\` tại trang *Cài đặt hệ thống*.
+- Bạn cũng có thể hỏi tôi về các chủ đề: *lập trình Python/Web, định hướng CNTT, công việc cá nhân, deadline, sự kiện sắp tới, quỹ CLB hay các Ban bộ phận!*`;
     },
 
     // AI Work Insights Function
