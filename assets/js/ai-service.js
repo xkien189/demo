@@ -62,7 +62,12 @@ const AIService = {
                 const response = await this.callGemini(userPrompt, context, apiKey);
                 if (response) return response;
             } catch (err) {
-                console.warn("Gemini API call failed, falling back to Smart Engine:", err.message);
+                console.warn("Gemini API call failed:", err.message);
+                return `⚠️ **Không thể gọi Google Gemini API** (Chi tiết: \`${err.message}\`).
+
+👉 **Kiểm tra**:
+1. Đảm bảo bạn đã bấm nút **💾 Lưu cấu hình** ở cuối trang Cài đặt.
+2. Kiểm tra lại Key đã copy đúng hay thử bấm **Create API key** mới tại [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey).`;
             }
         }
 
@@ -272,11 +277,14 @@ Hãy nhập bất kỳ câu hỏi nào bạn đang thắc mắc nhé!`;
         }
 
         // 10. Generative Natural Fallback for ANY unknown question
-        return `🤖 **Trợ lý AI**: Tôi đã ghi nhận thắc mắc **"${prompt}"** của bạn!
+        return `🤖 **Trợ lý AI**: Cảm ơn câu hỏi **"${prompt}"** của bạn! 
 
-💡 **Gợi ý nhanh**:
-- Để hỏi đáp tự nhiên 100% bằng trí tuệ nhân tạo nâng cao, bạn có thể kiểm tra lại **API Key Gemini** dạng \`AIzaSy...\` tại trang *Cài đặt hệ thống*.
-- Bạn cũng có thể hỏi tôi về các chủ đề: *lập trình Python/Web, định hướng CNTT, công việc cá nhân, deadline, sự kiện sắp tới, quỹ CLB hay các Ban bộ phận!*`;
+Tôi sẵn sàng hỗ trợ bạn bất kỳ điều gì:
+- 💻 **Tư vấn kỹ thuật & Học tập**: Lập trình Python, Web Dev, thuật toán, định hướng ngành CNTT.
+- 📋 **Quản lý công việc**: Tra cứu tiến độ task, deadline sắp tới, danh sách sự kiện.
+- 💰 **Tài chính CLB**: Kiểm tra đợt thu quỹ, số dư và hướng dẫn nộp biên lai.
+
+Bạn hãy chọn một trong các gợi ý hoặc gõ chủ đề chi tiết để tôi hỗ trợ nhé!`;
     },
 
     // AI Work Insights Function
