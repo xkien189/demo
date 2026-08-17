@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnArea = document.getElementById("create-noti-area");
     if (btnArea) {
         let html = `<button class="btn btn-outline-primary me-2" onclick="openAIContentModal()"><i class="bi bi-magic me-1"></i>✨ AI Viết Nội Dung</button>`;
-        if (["admin", "vice", "leader"].includes(user.role)) {
+        if (["admin", "leader"].includes(user.role)) {
             html += `<button class="btn btn-primary" onclick="openCreateNotiModal()"><i class="bi bi-bell-plus"></i> Đăng thông báo</button>`;
         }
         btnArea.innerHTML = html;
@@ -57,10 +57,18 @@ function renderNotificationsList(filterType) {
 
     const notis = ClubStorage.getData("club_notifications") || [];
     const user = ClubAuth.getCurrentUser();
+    const currentMember = ClubAuth.getCurrentMember();
 
-    let filtered = notis;
+    // Permission filter: Admin sees all; others see General notices or notices targeted to their department
+    let visibleNotis = notis.filter(n => {
+        if (user.role === "admin") return true;
+        if (!n.target || n.target === "All" || n.type === "General") return true;
+        return currentMember && currentMember.department === n.target;
+    });
+
+    let filtered = visibleNotis;
     if (filterType !== "All") {
-        filtered = notis.filter(n => n.type === filterType);
+        filtered = visibleNotis.filter(n => n.type === filterType);
     }
 
     if (filtered.length === 0) {

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng nhập - Hệ thống Quản lý CLB Sinh viên</title>
-    <meta name="description" content="Đăng nhập vào hệ thống quản lý Câu lạc bộ Sinh viên.">
+    <meta name="description" content="Đăng nhập vào hệ thống quản lý CLB CNTT UHL.">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 
@@ -332,16 +332,16 @@
                     </div>
                 </div>
 
-                <div class="brand-club-name" id="brand-club-name">Câu lạc bộ Sinh viên</div>
-                <div class="brand-slogan" id="brand-slogan">"Code your dream, build the future"</div>
+                <div class="brand-club-name" id="brand-club-name">Câu lạc bộ CNTT UHL</div>
+                <div class="brand-slogan" id="brand-slogan">"Tiên phong, sáng tạo, không ngừng học hỏi"</div>
 
                 <!-- Social media links (Facebook Fanpage & TikTok) -->
                 <div class="social-links-wrap">
-                    <a href="https://facebook.com" target="_blank" id="btn-facebook" class="social-btn facebook-btn">
+                    <a href="https://www.facebook.com/share/17Ps6fFU2g/" target="_blank" id="btn-facebook" class="social-btn facebook-btn">
                         <i class="bi bi-facebook"></i>
                         <span>Fanpage Facebook</span>
                     </a>
-                    <a href="https://tiktok.com" target="_blank" id="btn-tiktok" class="social-btn tiktok-btn">
+                    <a href="https://www.tiktok.com/@cnttclb" target="_blank" id="btn-tiktok" class="social-btn tiktok-btn">
                         <i class="bi bi-tiktok"></i>
                         <span>Kênh TikTok</span>
                     </a>
@@ -349,7 +349,7 @@
             </div>
 
             <div class="brand-bottom-note">
-                <i class="bi bi-shield-check me-1"></i>Hệ thống Quản lý CLB Số hoá Tích hợp AI
+                <i class="bi bi-shield-check me-1"></i>Hệ thống Quản lý CLB CNTT UHL
             </div>
         </div>
 
@@ -359,7 +359,7 @@
 
                 <div class="card-header-box">
                     <div class="card-title">Đăng nhập hệ thống</div>
-                    <div class="card-subtitle">Nhập tài khoản được cấp để tiếp tục</div>
+                    <div class="card-subtitle">Nhập tài khoản được cấp để truy cập</div>
                 </div>
 
                 <!-- Login Form -->
@@ -402,7 +402,7 @@
                 </form>
 
                 <div class="card-footer-note">
-                    <i class="bi bi-lock-fill me-1"></i>Bảo mật dữ liệu nội bộ CLB
+                    <i class="bi bi-lock-fill me-1"></i>Bảo mật dữ liệu nội bộ 
                 </div>
 
             </div>
@@ -481,12 +481,18 @@
 
                 if (result && result.success) {
                     btn.classList.add("success");
-                    btn.innerHTML = `<i class="bi bi-check2-circle"></i><span>Thành công! Đang chuyển hướng...</span>`;
+                    btn.innerHTML = `<i class="bi bi-check2-circle"></i><span>Thành công!</span>`;
                     setTimeout(() => { window.location.href = "dashboard.html"; }, 900);
                 } else {
                     btn.disabled = false;
                     btn.classList.remove("success");
                     btn.innerHTML = `<i class="bi bi-box-arrow-in-right"></i><span>Đăng nhập</span>`;
+                    
+                    // Clear both inputs on login failure
+                    document.getElementById("username").value = "";
+                    document.getElementById("password").value = "";
+                    document.getElementById("username").focus();
+
                     Swal.fire({
                         icon: "error",
                         title: "Đăng nhập thất bại",
@@ -498,6 +504,11 @@
             } catch (err) {
                 btn.disabled = false;
                 btn.innerHTML = `<i class="bi bi-box-arrow-in-right"></i><span>Đăng nhập</span>`;
+                
+                // Clear both inputs on error
+                document.getElementById("username").value = "";
+                document.getElementById("password").value = "";
+                document.getElementById("username").focus();
             }
         });
 

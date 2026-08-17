@@ -115,9 +115,9 @@
     ];
 
     const DEFAULT_SETTINGS = {
-        clubName: "CLB Lập Trình & Phát Triển Phần Mềm (DevClub)",
+        clubName: "CLB CNTT UHL",
         slogan: "Code your dream, build the future",
-        contactEmail: "contact@devclub.vn",
+        contactEmail: "contact@cnttuhl.vn",
         contactPhone: "024.1234.5678",
         logo: "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=120",
         themeColor: "blue",
@@ -170,6 +170,14 @@
     function initStorage(key, defaultValue) {
         if (!localStorage.getItem(key)) {
             localStorage.setItem(key, JSON.stringify(defaultValue));
+        } else if (key === "club_settings") {
+            try {
+                const s = JSON.parse(localStorage.getItem(key));
+                if (!s.clubName || s.clubName.includes("DevClub") || s.clubName.includes("Câu lạc bộ Sinh viên")) {
+                    s.clubName = "CLB CNTT UHL";
+                    localStorage.setItem(key, JSON.stringify(s));
+                }
+            } catch(e) {}
         }
     }
 

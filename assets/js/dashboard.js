@@ -101,7 +101,32 @@ function renderUrgentTasks() {
     const container = document.getElementById("urgent-tasks-container");
     if (!container) return;
 
-    const tasks = ClubStorage.getData("club_tasks") || [];
+    const user = ClubAuth.getCurrentUser();
+    const currentMember = ClubAuth.getCurrentMember();
+
+    // Hide Task Sắp Hạn widget completely for roles other than admin and leader
+    const cardCol = container.closest(".col-xl-3") || container.closest(".card");
+
+    if (!["admin", "leader"].includes(user.role)) {
+        if (cardCol) {
+            cardCol.style.display = "none";
+        } else {
+            container.innerHTML = "";
+        }
+        return;
+    }
+
+    if (cardCol) {
+        cardCol.style.display = "";
+    }
+
+    let tasks = ClubStorage.getData("club_tasks") || [];
+
+    // Leaders can only view tasks belonging to their department
+    if (user.role === "leader" && currentMember && currentMember.department) {
+        tasks = tasks.filter(t => t.department === currentMember.department);
+    }
+
     // Sort tasks by deadline (earliest first) and select non-completed tasks
     const pendingTasks = tasks
         .filter(t => t.status !== "Completed" && t.deadline)
@@ -136,13 +161,23 @@ function renderRecentNotifications() {
     const container = document.getElementById("notifications-container");
     if (!container) return;
 
+    const user = ClubAuth.getCurrentUser();
+    const currentMember = ClubAuth.getCurrentMember();
     const notifications = ClubStorage.getData("club_notifications") || [];
-    if (notifications.length === 0) {
+
+    // Filter notifications by user department target permission
+    const visibleNotis = notifications.filter(n => {
+        if (user.role === "admin") return true;
+        if (!n.target || n.target === "All" || n.type === "General") return true;
+        return currentMember && currentMember.department === n.target;
+    });
+
+    if (visibleNotis.length === 0) {
         container.innerHTML = `<div class="text-center text-muted py-3">Không có thông báo mới</div>`;
         return;
     }
 
-    container.innerHTML = notifications.slice(0, 3).map(n => `
+    container.innerHTML = visibleNotis.slice(0, 3).map(n => `
         <div class="p-3 mb-2 rounded border-start border-4 border-primary bg-light-primary" style="background-color: var(--primary-light);">
             <div class="d-flex justify-content-between align-items-center mb-1">
                 <span class="fw-bold text-dark" style="font-size: 0.9rem;">${n.title}</span>

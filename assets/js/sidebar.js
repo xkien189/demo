@@ -77,7 +77,7 @@ function renderSidebar() {
         <div class="sidebar">
             <a href="dashboard.html" class="sidebar-brand">
                 <i class="bi bi-code-square"></i>
-                <span>${settings.clubName ? settings.clubName.split(" ")[0] : "DevClub"}</span>
+                <span>${settings.clubName || "CLB CNTT UHL"}</span>
             </a>
             <ul class="sidebar-menu">
                 ${menuHtml}

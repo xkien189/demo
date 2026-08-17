@@ -10,14 +10,24 @@ function initFundPage() {
     const user = ClubAuth.getCurrentUser();
     const currentMember = ClubAuth.getCurrentMember();
 
-    // Render top management buttons for Admin/Vice/Finance Leader
+    // Render top management buttons for Admin ONLY
     const topActions = document.getElementById("fund-actions-top");
-    if (topActions && ["admin", "vice", "leader"].includes(user.role)) {
-        topActions.innerHTML = `
-            <button class="btn btn-success" onclick="openCreatePeriodModal()">
-                <i class="bi bi-calendar-plus me-1"></i>Tạo Đợt Thu Quỹ
-            </button>
-        `;
+    if (topActions) {
+        if (user.role === "admin") {
+            topActions.innerHTML = `
+                <button class="btn btn-success" onclick="openCreatePeriodModal()">
+                    <i class="bi bi-calendar-plus me-1"></i>Tạo Đợt Thu Quỹ
+                </button>
+            `;
+        } else {
+            topActions.innerHTML = "";
+        }
+    }
+
+    // Hide Create Transaction button for non-admin
+    const btnCreateTx = document.getElementById("btn-create-tx");
+    if (btnCreateTx) {
+        btnCreateTx.style.display = (user.role === "admin") ? "" : "none";
     }
 
     // Populate periods
@@ -145,7 +155,7 @@ function renderPeriodMembersTable() {
 
         // Action buttons based on role & record status
         let actionsHtml = "";
-        const canManage = ["admin", "vice", "leader"].includes(user.role);
+        const canManage = user.role === "admin";
         const isSelf = currentMember && currentMember.id === m.id;
 
         if (isPaid) {
