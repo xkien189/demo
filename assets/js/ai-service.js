@@ -58,27 +58,11 @@ const AIService = {
 
         // 1. If API Key is configured, call Google Gemini API
         if (apiKey) {
-            // Check if key starts with AIzaSy (Google AI Studio Key format)
-            if (!apiKey.startsWith("AIzaSy")) {
-                return `⚠️ **API Key Gemini hiện tại chưa đúng định dạng!**
-
-🔑 **Key bạn đã dán**: \`${apiKey.substring(0, 14)}...\`
-👉 **Hướng dẫn lấy lại Key chuẩn**:
-Google Gemini API Key miễn phí (tại [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)) **luôn luôn bắt đầu bằng chuỗi \`AIzaSy...\`** (gồm khoảng 39 ký tự).
-
-Chuỗi \`AQ.Ab8RN...\` bạn đang dán có vẻ là Token tài khoản hoặc Mã xác thực khác. Bạn hãy mở trang *Cài đặt*, bấm **aistudio.google.com/app/apikey**, tạo key mới và copy đúng mã \`AIzaSy...\` dán lại nhé!`;
-            }
-
             try {
                 const response = await this.callGemini(userPrompt, context, apiKey);
                 if (response) return response;
             } catch (err) {
-                console.warn("Gemini API call failed:", err.message);
-                return `⚠️ **Không thể kết nối Gemini API**: ${err.message}
-
-Vui lòng kiểm tra lại:
-1. API Key Gemini bắt đầu bằng \`AIzaSy...\` (lấy tại [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)).
-2. Kết nối mạng internet của bạn.`;
+                console.warn("Gemini API call failed, falling back to Smart Engine:", err.message);
             }
         }
 
@@ -125,7 +109,7 @@ Hãy trả lời bằng tiếng Việt ngắn gọn, hấp dẫn, dễ hiểu, d
 
         for (const model of models) {
             try {
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
                 const res = await fetch(url, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
