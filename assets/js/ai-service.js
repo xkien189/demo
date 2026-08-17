@@ -76,11 +76,8 @@ const AIService = {
     // Gemini API Call with full natural conversational system prompt
     callGemini: async function(userPrompt, context, apiKey) {
         const endpointUrls = [
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${encodeURIComponent(apiKey)}`,
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${encodeURIComponent(apiKey)}`,
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${encodeURIComponent(apiKey)}`,
-            `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
-            `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=${encodeURIComponent(apiKey)}`
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${encodeURIComponent(apiKey)}`
         ];
 
         const systemPrompt = `Bạn là Trợ lý AI Thông minh chuyên nghiệp, thân thiện và linh hoạt của ${context.settings.clubName || 'CLB CNTT UHL'}.
