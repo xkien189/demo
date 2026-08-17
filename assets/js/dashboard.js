@@ -87,8 +87,8 @@ function renderDashboardLeaderboard() {
                     ${rankBadge}
                     <img src="${m.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'}" class="rounded-circle" style="width: 28px; height: 28px; object-fit: cover;">
                     <div class="text-truncate">
-                        <div class="fw-bold text-dark small text-truncate" style="max-width: 110px;">${m.name}</div>
-                        <div class="text-muted text-truncate" style="font-size: 0.65rem; max-width: 110px;">${m.department}</div>
+                        <div class="fw-bold text-dark small text-truncate" style="max-width: 220px;">${m.name}</div>
+                        <div class="text-muted text-truncate" style="font-size: 0.68rem; max-width: 220px;">${m.department}</div>
                     </div>
                 </div>
                 <div class="badge bg-primary text-white" style="font-size: 0.75rem;">${m.activityScore || 0} đ</div>
@@ -104,21 +104,22 @@ function renderUrgentTasks() {
     const user = ClubAuth.getCurrentUser();
     const currentMember = ClubAuth.getCurrentMember();
 
-    // Hide Task Sắp Hạn widget completely for roles other than admin and leader
-    const cardCol = container.closest(".col-xl-3") || container.closest(".card");
+    const chartCol = document.getElementById("chart-col");
+    const leaderboardCol = document.getElementById("leaderboard-col");
+    const urgentTasksCol = document.getElementById("urgent-tasks-col") || container.closest(".col-xl-3");
 
+    // Hide Task Sắp Hạn widget completely for roles other than admin and leader
+    // And balance the middle row layout (Chart 7 cols, Leaderboard 5 cols = 12 cols total)
     if (!["admin", "leader"].includes(user.role)) {
-        if (cardCol) {
-            cardCol.style.display = "none";
-        } else {
-            container.innerHTML = "";
-        }
+        if (urgentTasksCol) urgentTasksCol.style.display = "none";
+        if (chartCol) chartCol.className = "col-xl-7 mb-4";
+        if (leaderboardCol) leaderboardCol.className = "col-xl-5 mb-4";
         return;
     }
 
-    if (cardCol) {
-        cardCol.style.display = "";
-    }
+    if (urgentTasksCol) urgentTasksCol.style.display = "";
+    if (chartCol) chartCol.className = "col-xl-6 mb-4";
+    if (leaderboardCol) leaderboardCol.className = "col-xl-3 mb-4";
 
     let tasks = ClubStorage.getData("club_tasks") || [];
 
