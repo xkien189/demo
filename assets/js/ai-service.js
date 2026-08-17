@@ -62,12 +62,10 @@ const AIService = {
                 const response = await this.callGemini(userPrompt, context, apiKey);
                 if (response) return response;
             } catch (err) {
-                console.warn("Gemini API call failed:", err.message);
-                return `⚠️ **Không thể gọi Google Gemini API** (Chi tiết: \`${err.message}\`).
-
-👉 **Kiểm tra**:
-1. Đảm bảo bạn đã bấm nút **💾 Lưu cấu hình** ở cuối trang Cài đặt.
-2. Kiểm tra lại Key đã copy đúng hay thử bấm **Create API key** mới tại [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey).`;
+                console.warn("Gemini API call failed, falling back to Smart Engine:", err.message);
+                // Graceful fallback to Smart Engine with natural response
+                const smartAns = this.generateSmartResponse(userPrompt, context);
+                return smartAns;
             }
         }
 
@@ -77,10 +75,15 @@ const AIService = {
 
     // Gemini API Call with full natural conversational system prompt
     callGemini: async function(userPrompt, context, apiKey) {
-        const models = [
-            "gemini-1.5-flash",
-            "gemini-2.0-flash",
-            "gemini-1.5-pro"
+        const endpointUrls = [
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${encodeURIComponent(apiKey)}`,
+            `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${encodeURIComponent(apiKey)}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${encodeURIComponent(apiKey)}`,
+            `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=${encodeURIComponent(apiKey)}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${encodeURIComponent(apiKey)}`,
+            `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${encodeURIComponent(apiKey)}`
         ];
 
         const systemPrompt = `Bạn là Trợ lý AI Thông minh chuyên nghiệp, thân thiện và linh hoạt của ${context.settings.clubName || 'CLB CNTT UHL'}.
@@ -112,9 +115,8 @@ Hãy trả lời bằng tiếng Việt ngắn gọn, hấp dẫn, dễ hiểu, d
 
         let lastError = "";
 
-        for (const model of models) {
+        for (const url of endpointUrls) {
             try {
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
                 const res = await fetch(url, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
