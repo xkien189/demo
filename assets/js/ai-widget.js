@@ -157,20 +157,21 @@
 
                 <div class="ai-chat-body" id="ai-chat-messages">
                     <div class="ai-msg-bubble ai-msg-assistant">
-                        Xin chào! Tôi là **Trợ lý AI của CLB**. 🤖
-                        Tôi có thể giúp bạn tra cứu tiến độ công việc, sự kiện sắp tới, đợt thu quỹ hay thông tin thành viên.
+                        Xin chào! Tôi là **Trợ lý AI Thông minh của CLB CNTT UHL**. 🤖
+                        
+                        Bạn có thể hỏi tôi **bất kỳ câu hỏi tự nhiên nào** (ví dụ: *lộ trình học lập trình, chọn ban bộ phận, tiến độ công việc, deadline, quỹ CLB...*):
                         
                         <div class="ai-quick-pills">
+                            <button class="ai-pill-btn" onclick="sendQuickPrompt('Học Python từ đâu?')">🐍 Lộ trình Python</button>
+                            <button class="ai-pill-btn" onclick="sendQuickPrompt('Nên chọn ban bộ phận nào?')">🏛️ Định hướng Ban</button>
                             <button class="ai-pill-btn" onclick="sendQuickPrompt('Công việc của tôi')">📋 Công việc của tôi</button>
                             <button class="ai-pill-btn" onclick="sendQuickPrompt('Deadline sắp tới')">⏳ Deadline sắp tới</button>
-                            <button class="ai-pill-btn" onclick="sendQuickPrompt('Sự kiện sắp tới')">🎉 Sự kiện sắp tới</button>
-                            <button class="ai-pill-btn" onclick="sendQuickPrompt('Tình hình Quỹ CLB')">💰 Quỹ CLB</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="ai-chat-footer">
-                    <input type="text" id="ai-chat-input" class="form-control form-control-sm" placeholder="Hỏi AI bất kỳ điều gì..." autocomplete="off">
+                    <input type="text" id="ai-chat-input" class="form-control form-control-sm" placeholder="Hỏi AI bất kỳ điều gì (lập trình, công việc...)..." autocomplete="off">
                     <button class="btn btn-primary btn-sm px-3" onclick="submitAIChat()"><i class="bi bi-send-fill"></i></button>
                 </div>
             </div>
@@ -223,7 +224,7 @@
             saveAIChatHistory();
         } catch (err) {
             removeTypingIndicator(typingId);
-            appendAIMessage("⚠️ Trợ lý AI đang bận. Các chức năng khác của website vẫn hoạt động bình thường.", "assistant");
+            appendAIMessage("⚠️ Trợ lý AI đang suy nghĩ... Hãy thử lại câu hỏi nhé!", "assistant");
         }
     };
 
@@ -234,10 +235,13 @@
         const bubble = document.createElement("div");
         bubble.className = `ai-msg-bubble ai-msg-${sender}`;
         
-        // Basic markdown formatting for bold and bullets
+        // Rich markdown formatting for bold, italic, code, bullets, links
         let formatted = text
+            .replace(/```([\s\S]*?)```/g, '<pre style="background:rgba(0,0,0,0.15);padding:8px;border-radius:6px;font-size:0.8rem;overflow-x:auto;"><code>$1</code></pre>')
+            .replace(/`([^`]+)`/g, '<code style="background:rgba(0,0,0,0.1);padding:2px 5px;border-radius:4px;">$1</code>')
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.*?)\*/g, '<em>$1</em>');
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/\n/g, '<br>');
         
         bubble.innerHTML = formatted;
         container.appendChild(bubble);

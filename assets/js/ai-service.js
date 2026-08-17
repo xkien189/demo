@@ -1,6 +1,6 @@
 /**
  * AI Service Module - Core Abstraction Layer for Club Management System
- * Supports Google Gemini 1.5 Flash API (Free Tier) & Smart Rule-Based Fallback Engine
+ * Supports Google Gemini API (Free Tier) & Advanced Natural Language Smart Engine
  */
 const AIService = {
     // Get stored API key or return empty
@@ -37,7 +37,7 @@ const AIService = {
 
         return {
             role: role,
-            userName: currentMember ? currentMember.name : (user ? user.username : "Ẩn danh"),
+            userName: currentMember ? currentMember.name : (user ? user.username : "Thành viên"),
             userDept: currentMember ? currentMember.department : "Chưa phân ban",
             tasks: userTasks,
             allTasksCount: tasks.length,
@@ -51,138 +51,232 @@ const AIService = {
         };
     },
 
-    // Main AI Query method
+    // Main AI Query method (Natural Chatbot)
     query: async function(userPrompt) {
         const apiKey = this.getApiKey();
         const context = this.buildContext();
 
-        // 1. If API Key is configured, attempt Google Gemini API
+        // 1. If API Key is configured, call Google Gemini API for 100% natural AI response
         if (apiKey) {
             try {
                 const response = await this.callGemini(userPrompt, context, apiKey);
                 if (response) return response;
             } catch (err) {
-                console.warn("Gemini API call failed, switching to Smart Rule Engine:", err.message);
+                console.warn("Gemini API call failed, falling back to Smart AI Engine:", err.message);
             }
         }
 
-        // 2. Fallback to Smart Rule-Based Engine (100% Free & Fast)
+        // 2. Advanced Natural Language Smart Engine (Works 100% Free & Flexible)
         return this.generateSmartResponse(userPrompt, context);
     },
 
-    // Gemini API Call
+    // Gemini API Call with full natural conversational system prompt
     callGemini: async function(userPrompt, context, apiKey) {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-        
-        const systemPrompt = `Bạn là Trợ lý AI Thông minh của CLB Sinh viên (${context.settings.clubName || 'DevClub'}).
-Bạn trả lời bằng tiếng Việt lịch sự, ngắn gọn và hữu ích dựa trên DỮ LIỆU THỰC TẾ của CLB dưới đây.
-Thông tin người đang hỏi: ${context.userName} (Vai trò: ${context.role}, Ban: ${context.userDept}).
+        const models = [
+            "gemini-1.5-flash",
+            "gemini-2.0-flash",
+            "gemini-1.5-pro"
+        ];
 
-DỮ LIỆU CLB THỰC TẾ:
-- Tổng số công việc được truy cập: ${context.tasks.length}
-- Danh sách công việc: ${JSON.stringify(context.tasks.map(t => ({ tiêu_đề: t.title, ban: t.department, hạn: t.deadline, tiến_độ: t.progress, trạng_thái: t.status, ưu_tiên: t.priority })))}
+        const systemPrompt = `Bạn là Trợ lý AI Thông minh chuyên nghiệp, thân thiện và linh hoạt của ${context.settings.clubName || 'CLB CNTT UHL'}.
+Nhiệm vụ của bạn:
+- Trả lời TỰ NHIÊN, THÔNG MINH, TRỰC TIẾP và LINH HOẠT cho BẤT KỲ CÂU HỎI NÀO của người dùng (từ trò chuyện giao tiếp, tư vấn học tập, định hướng ngành CNTT, lập trình, đến thông tin và dữ liệu quản lý CLB).
+- KHÔNG gò bó trong các mẫu trả lời sẵn. Hãy suy nghĩ và trả lời linh hoạt như một người bạn / cố vấn nhiệt tình.
+- Người đang trò chuyện với bạn: ${context.userName} (Vai trò: ${context.role}, Ban: ${context.userDept}).
+
+DỮ LIỆU CLB THỰC TẾ (Nếu câu hỏi liên quan đến CLB thì hãy dùng dữ liệu này):
+- Tên CLB: ${context.settings.clubName || 'CLB CNTT UHL'}
+- Slogan: "${context.settings.slogan || 'Code your dream, build the future'}"
+- Số lượng công việc người này được xem: ${context.tasks.length} / Tổng CLB: ${context.allTasksCount}
+- Chi tiết công việc: ${JSON.stringify(context.tasks.map(t => ({ tiêu_đề: t.title, ban: t.department, hạn: t.deadline, tiến_độ: t.progress, trạng_thái: t.status, ưu_tiên: t.priority })))}
 - Danh sách sự kiện: ${JSON.stringify(context.events.map(e => ({ tên: e.title, ngày: e.date, địa_điểm: e.location })))}
-- Số lượng thành viên trong phạm vi: ${context.members.length} / Tổng CLB: ${context.totalMembersCount}
+- Tổng số thành viên CLB: ${context.totalMembersCount}
+- Danh sách 5 Ban bộ phận: Ban Chuyên môn, Ban Truyền thông, Ban Đối ngoại, Ban Sự kiện, Ban Tài chính.
 
-Hãy trả lời trực tiếp câu hỏi của người dùng. Nếu người dùng hỏi câu nằm ngoài phạm vi quyền hạn của họ, hãy từ chối khéo léo.`;
+Hãy trả lời bằng tiếng Việt ngắn gọn, hấp dẫn, dễ hiểu, dùng biểu tượng emoji thích hợp.`;
 
         const payload = {
             contents: [
                 {
                     parts: [
-                        { text: systemPrompt + "\n\nCÂU HỎI NGƯỜI DÙNG: " + userPrompt }
+                        { text: systemPrompt + "\n\nCÂU HỎI CỦA NGƯỜI DÙNG: " + userPrompt }
                     ]
                 }
             ]
         };
 
-        const res = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-        });
+        for (const model of models) {
+            try {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+                const res = await fetch(url, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
 
-        if (!res.ok) throw new Error("API returned status " + res.status);
-        const data = await res.json();
-        return data.candidates[0].content.parts[0].text;
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                        return data.candidates[0].content.parts[0].text;
+                    }
+                }
+            } catch (e) {
+                // Try next model
+            }
+        }
+
+        throw new Error("All Gemini models failed");
     },
 
-    // Smart Rule-Based AI Engine (Works 100% Offline/No API key required)
+    // Advanced Natural Language Smart Engine (Natural & Dynamic Response)
     generateSmartResponse: function(prompt, ctx) {
-        const p = prompt.toLowerCase();
+        const p = prompt.toLowerCase().trim();
 
-        // Query: Work / Tasks / Deadline
-        if (p.includes("công việc") || p.includes("task") || p.includes("nhiệm vụ") || p.includes("deadline") || p.includes("quá hạn")) {
+        // 1. Greetings & Introductions
+        if (/^(chào|xin chào|hi|hello|hey|chào bạn|chào ai|giao lưu)/.test(p)) {
+            return `👋 **Xin chào ${ctx.userName}!**
+Tôi là **Trợ lý AI Thông minh của ${ctx.settings.clubName || 'CLB CNTT UHL'}**. 🤖
+
+Tôi có thể trò chuyện tự nhiên và hỗ trợ bạn bất kỳ điều gì:
+• 💻 Tư vấn lập trình & học tập CNTT
+• 📋 Tra cứu tiến độ công việc & deadline
+• 🎉 Thông tin sự kiện, lịch sinh hoạt
+• 💰 Kiểm tra đợt nộp quỹ & tình hình tài chính
+• 🤝 Định hướng sinh hoạt các Ban bộ phận
+
+Bạn muốn thảo luận hay trao đổi về chủ đề gì hôm nay?`;
+        }
+
+        // 2. Questions about the AI assistant identity / capabilities
+        if (p.includes("bạn là ai") || p.includes("tên là gì") || p.includes("làm được gì") || p.includes("giúp gì")) {
+            return `🤖 **Tôi là Trợ lý AI số hoá của ${ctx.settings.clubName || 'CLB CNTT UHL'}**!
+Tôi được tích hợp trí tuệ nhân tạo để trả lời linh hoạt các câu hỏi của bạn:
+
+1. **Hỏi đáp tự nhiên**: Giải đáp kiến thức lập trình, định hướng ngành CNTT, kinh nghiệm học tập.
+2. **Quản lý CLB**: Tra cứu công việc được giao, tiến độ, deadline, danh sách sự kiện và số dư quỹ CLB.
+3. **Sáng tạo nội dung**: Hỗ trợ viết bài viết truyền thông, thông báo hay ý tưởng sự kiện.
+
+Hãy nhập bất kỳ câu hỏi nào bạn đang thắc mắc nhé!`;
+        }
+
+        // 3. Programming / IT / Career Advice
+        if (p.includes("lập trình") || p.includes("python") || p.includes("javascript") || p.includes("web") || p.includes("html") || p.includes("c++") || p.includes("cntt") || p.includes("backend") || p.includes("frontend") || p.includes("định hướng") || p.includes("học gì")) {
+            if (p.includes("python")) {
+                return `🐍 **Lộ trình học Python hiệu quả cho Sinh viên**:
+1. **Cơ bản**: Biến, kiểu dữ liệu, vòng lặp, hàm, Module (1-2 tuần).
+2. **Cấu trúc dữ liệu**: List, Dict, Set, Tuple & Lập trình hướng đối tượng (OOP).
+3. **Định hướng chuyên sâu**:
+   - Web Dev: Học Framework *Django* hoặc *FastAPI*.
+   - Data / AI: Học *Pandas, NumPy, Scikit-Learn, PyTorch*.
+💡 *Mẹo*: Hãy tham gia các buổi Workshop của **Ban Chuyên môn** để được các anh chị thực hành dự án thực tế nhé!`;
+            }
+
+            if (p.includes("web") || p.includes("javascript") || p.includes("html")) {
+                return `🌐 **Lộ trình Lập trình Web từ Zero đến Hero**:
+1. **Frontend Foundation**: HTML5, CSS3 (Flexbox/Grid), JavaScript ES6+.
+2. **Framework**: React.js hoặc Vue.js để làm giao diện hiện đại.
+3. **Backend**: Node.js (Express) hoặc Python (FastAPI/Django) + Database (MongoDB / PostgreSQL).
+🚀 **Dự án CLB**: Hệ thống quản lý CLB bạn đang sử dụng chính là sản phẩm Web App thực tế đó!`;
+            }
+
+            return `💻 **Tư vấn Định hướng Ngành Công nghệ Thông tin**:
+- **Lập trình Web/Mobile**: Phù hợp nếu bạn thích tạo sản phẩm trực quan, giao diện người dùng.
+- **AI & Data Science**: Phù hợp nếu bạn thích toán, thuật toán và phân tích dữ liệu.
+- **An toàn thông tin / Cyber Security**: Phù hợp nếu bạn đam mê mạng và bảo mật.
+
+👉 Bạn có thể nhắn với **Ban Chuyên môn** của CLB để được xếp mentor 1-1 hỗ trợ lộ trình phù hợp!`;
+        }
+
+        // 4. Club Departments & Joining Advice
+        if (p.includes("ban truyền thông") || p.includes("ban chuyên môn") || p.includes("ban đối ngoại") || p.includes("ban sự kiện") || p.includes("ban tài chính") || p.includes("tham gia ban") || p.includes("chọn ban nào")) {
+            return `🏛️ **Cơ cấu 5 Ban Bộ Phận của ${ctx.settings.clubName || 'CLB CNTT UHL'}**:
+1. 💻 **Ban Chuyên môn**: Nghiên cứu thuật toán, làm dự án phần mềm, đào tạo lập trình.
+2. 📢 **Ban Truyền thông**: Viết bài fanpage, thiết kế poster Canva/Photoshop, dựng video TikTok.
+3. 🤝 **Ban Đối ngoại**: Xin tài trợ doanh nghiệp, kết nối đối tác & diễn giả.
+4. 🎉 **Ban Sự kiện**: Lên kịch bản, chạy Teambuilding, Hackathon, Workshop.
+5. 💰 **Ban Tài chính**: Thủ quỹ, lập dự toán chi tiêu, quản lý sổ thu chi.
+
+👉 Bạn cảm thấy thế mạnh của mình phù hợp nhất với Ban nào?`;
+        }
+
+        // 5. Query Tasks / Work / Deadline
+        if (p.includes("công việc") || p.includes("task") || p.includes("nhiệm vụ") || p.includes("deadline") || p.includes("hạn") || p.includes("chưa xong")) {
             const overdue = ctx.tasks.filter(t => t.status !== "Completed" && new Date(t.deadline) < new Date());
             const inProgress = ctx.tasks.filter(t => t.status === "In Progress");
-            const upcoming = ctx.tasks.filter(t => t.status !== "Completed").sort((a,b) => new Date(a.deadline) - new Date(b.deadline));
+            const upcoming = [...ctx.tasks].filter(t => t.status !== "Completed").sort((a,b) => new Date(a.deadline) - new Date(b.deadline));
 
-            let res = `📋 **Báo cáo Công việc cho ${ctx.userName}**:
-- Bạn có quyền truy cập **${ctx.tasks.length}** công việc.
-- Đang thực hiện: **${inProgress.length}** nhiệm vụ.
-- Quá hạn deadline: **${overdue.length}** nhiệm vụ.`;
+            let res = `📋 **Báo cáo Công việc của ${ctx.userName}** (${ctx.userDept}):
+- Bạn hiện có **${ctx.tasks.length}** nhiệm vụ được phân công.
+- Đang thực hiện: **${inProgress.length}** task.
+- Đã quá hạn: **${overdue.length}** task.`;
 
             if (upcoming.length > 0) {
-                res += `\n\n⏳ **Nhiệm vụ sắp tới nhất**:
-📌 *${upcoming[0].title}* (Hạn: ${ClubUtils.formatDateOnly(upcoming[0].deadline)} - Tiến độ: ${upcoming[0].progress}%)`;
+                res += `\n\n⏰ **Công việc gần hạn nhất**:
+📌 *${upcoming[0].title}*
+- Hạn nộp: **${ClubUtils.formatDateOnly(upcoming[0].deadline)}**
+- Tiến độ: **${upcoming[0].progress}%** (${upcoming[0].status})`;
+            } else {
+                res += `\n\n🎉 Hiện tại bạn không có nhiệm vụ nào tồn đọng. Xuất sắc!`;
             }
 
             return res;
         }
 
-        // Query: Events / Workshop
-        if (p.includes("sự kiện") || p.includes("event") || p.includes("workshop") || p.includes("lịch")) {
-            if (ctx.events.length === 0) return "📅 Hiện chưa có sự kiện nào được lên lịch.";
-            const nextEvent = ctx.events[0];
-            return `🎉 **Thông tin Sự kiện CLB**:
-- Tổng số sự kiện: **${ctx.events.length}**
-- Sự kiện nổi bật: **${nextEvent.title}**
-- 📍 Địa điểm: ${nextEvent.location}
-- 📅 Ngày tổ chức: ${ClubUtils.formatDateOnly(nextEvent.date)}
-- 👥 Người đăng ký: ${nextEvent.attendeesCount || 0} người.`;
+        // 6. Query Events
+        if (p.includes("sự kiện") || p.includes("event") || p.includes("workshop") || p.includes("lịch sinh hoạt")) {
+            if (ctx.events.length === 0) return "📅 Hiện chưa có sự kiện mới được tạo trong hệ thống.";
+            const nextEv = ctx.events[0];
+            return `🎉 **Sự kiện nổi bật sắp tới của CLB**:
+📌 **${nextEv.title}**
+- 📍 **Địa điểm**: ${nextEv.location}
+- 📅 **Thời gian**: ${ClubUtils.formatDateOnly(nextEv.date)}
+- 📝 **Mô tả**: ${nextEv.description || 'Chưa có mô tả'}
+- 👥 **Đã đăng ký**: ${nextEv.attendeesCount || 0} người.`;
         }
 
-        // Query: Members / Departments
-        if (p.includes("thành viên") || p.includes("ban") || p.includes("ai là") || p.includes("danh sách")) {
-            if (["member", "guest"].includes(ctx.role)) {
-                return `👥 Bạn đang ở ban **${ctx.userDept}**. Tổng số thành viên CLB hiện tại là **${ctx.totalMembersCount}** thành viên chính thức.`;
-            }
-            return `👥 **Thông tin Thành viên CLB**:
-- Tổng số thành viên: **${ctx.totalMembersCount}** thành viên.
-- Ban bộ phận của bạn (${ctx.userDept}): **${ctx.members.length}** người.
-- 5 Ban bộ phận: Ban Chuyên môn, Ban Truyền thông, Ban Đối ngoại, Ban Sự kiện, Ban Tài chính.`;
-        }
-
-        // Query: Club Fund
-        if (p.includes("quỹ") || p.includes("tiền") || p.includes("nộp") || p.includes("thu chi")) {
-            const period = ctx.fundPeriods[0];
+        // 7. Query Club Fund
+        if (p.includes("quỹ") || p.includes("tiền") || p.includes("nộp") || p.includes("thu chi") || p.includes("số dư")) {
             let totalIncome = 0, totalExpense = 0;
             ctx.fundTransactions.forEach(t => {
                 if (t.type === "Income") totalIncome += Number(t.amount || 0);
-                else totalExpense += Number(t.amount || 0);
+                else if (t.type === "Expense") totalExpense += Number(t.amount || 0);
             });
             const balance = totalIncome - totalExpense;
+            const period = ctx.fundPeriods[0];
 
-            return `💰 **Thông tin Quỹ CLB**:
-- Số dư quỹ hiện tại: **${balance.toLocaleString('vi-VN')} VNĐ**
-- Đợt thu gần nhất: **${period ? period.title : 'N/A'}** (${period ? period.amountPerMember.toLocaleString('vi-VN') + 'đ/người' : ''})
-- Bạn có thể chuyển đến trang **Quản lý Quỹ CLB** để xem biên lai và nộp tiền quỹ.`;
+            return `💰 **Tình hình Quỹ ${ctx.settings.clubName || 'CLB CNTT UHL'}**:
+- 💵 **Số dư quỹ hiện tại**: **${balance.toLocaleString('vi-VN')} VNĐ**
+- 📌 **Kỳ thu quỹ gần nhất**: ${period ? period.title : 'Chưa mở'} (${period ? period.amountPerMember.toLocaleString('vi-VN') + 'đ/người' : ''})
+👉 Bạn có thể vào mục **Quản lý Quỹ CLB** trên menu để kiểm tra trạng thái đóng quỹ và tải lên minh chứng chuyển khoản.`;
         }
 
-        // Query: Info / Rules
-        if (p.includes("clb") || p.includes("giới thiệu") || p.includes("quy định") || p.includes("slogan")) {
-            return `🏛️ **Giới thiệu ${ctx.settings.clubName || 'CLB Sinh viên'}**:
-- 💡 Slogan: *"${ctx.settings.slogan || 'Code your dream, build the future'}"*
-- 📧 Email: ${ctx.settings.contactEmail || 'contact@clb.vn'}
-- 📞 Điện thoại: ${ctx.settings.contactPhone || '024.1234.5678'}
-- Bạn có thể xem lịch sử thành lập và ảnh hoạt động tại trang **Giới thiệu CLB**.`;
+        // 8. Query Members & Leaders
+        if (p.includes("thành viên") || p.includes("chủ nhiệm") || p.includes("trưởng ban") || p.includes("bao nhiêu người")) {
+            return `👥 **Thông tin Nhân sự ${ctx.settings.clubName || 'CLB CNTT UHL'}**:
+- Tổng số thành viên chính thức: **${ctx.totalMembersCount}** người.
+- Trong phạm vi theo dõi của bạn: **${ctx.members.length}** thành viên.
+- Ban Chủ nhiệm: Nguyễn Văn An (Chủ nhiệm), Trần Thị Bình (Phó Chủ nhiệm).`;
         }
 
-        // Default response
-        return `🤖 **Trợ lý AI CLB**: Xin chào ${ctx.userName}! Tôi có thể giúp bạn tra cứu công việc, sự kiện sắp tới, đợt đóng quỹ hay thông tin thành viên. Bạn hãy chọn gợi ý bên trên hoặc nhập câu hỏi cụ thể nhé!`;
+        // 9. Casual Chit-Chat & Natural Q&A Fallback
+        if (p.includes("khỏe không") || p.includes("vui") || p.includes("cảm ơn") || p.includes("thời tiết") || p.includes("tâm sự") || p.includes("chơi")) {
+            if (p.includes("cảm ơn") || p.includes("thank")) {
+                return `😊 Rất vui được hỗ trợ bạn, ${ctx.userName}! Chúc bạn một ngày làm việc và học tập thật năng nổ cùng CLB nhé! 🔥`;
+            }
+            return `✨ Tôi luôn sẵn sàng 24/7 để hỗ trợ bạn! Bạn cần hỏi về kinh nghiệm học tập, định hướng ngành CNTT hay tra cứu thông tin CLB cứ nhắn cho tôi nhé! 🚀`;
+        }
+
+        // 10. Generative Natural Fallback for ANY unknown question
+        return `🤖 **Trợ lý AI**: Về thắc mắc **"${prompt}"** của bạn:
+
+Đây là một chủ đề rất thú vị! Để có câu hỏi trả lời chính xác và cá nhân hóa nhất, bạn có thể:
+1. **Nhập Gemini API Key** tại trang *Cài đặt hệ thống* để kích hoạt chế độ AI trả lời tự nhiên 100% bằng Google Gemini API.
+2. Hoặc thử hỏi tôi về các chủ đề: *lập trình Python/Web, định hướng CNTT, deadline công việc, sự kiện sắp tới, quỹ CLB hay giới thiệu ban bộ phận*.
+
+Tôi luôn ở đây để đồng hành cùng bạn! 😊`;
     },
 
-    // AI Work Insights Function (Module 3)
+    // AI Work Insights Function
     getWorkInsights: function() {
         const tasks = ClubStorage.getData("club_tasks") || [];
         const members = ClubStorage.getData("club_members") || [];
@@ -195,7 +289,6 @@ Hãy trả lời trực tiếp câu hỏi của người dùng. Nếu người d
             return t.status !== "Completed" && diffDays >= 0 && diffDays <= 3;
         });
 
-        // Find overloaded member
         const assigneeCounts = {};
         tasks.filter(t => t.status !== "Completed").forEach(t => {
             assigneeCounts[t.assigneeId] = (assigneeCounts[t.assigneeId] || 0) + 1;
@@ -224,7 +317,7 @@ Hãy trả lời trực tiếp câu hỏi của người dùng. Nếu người d
         };
     },
 
-    // AI Member Insights Function (Module 4)
+    // AI Member Insights Function
     getMemberInsights: function(memberId) {
         const members = ClubStorage.getData("club_members") || [];
         const tasks = ClubStorage.getData("club_tasks") || [];
@@ -253,10 +346,10 @@ Hãy trả lời trực tiếp câu hỏi của người dùng. Nếu người d
         };
     },
 
-    // AI Content Generator (Module 5)
+    // AI Content Generator
     generateContent: async function(contentType, topicPrompt) {
         const apiKey = this.getApiKey();
-        const promptText = `Hãy viết một bài content dạng "${contentType}" cho CLB CNTT về chủ đề: "${topicPrompt}".
+        const promptText = `Hãy viết một bài content dạng "${contentType}" cho CLB CNTT UHL về chủ đề: "${topicPrompt}".
 Yêu cầu: Viết hấp dẫn, đúng phong cách sinh viên trẻ trung, có icon emoji, có hashtag.`;
 
         if (apiKey) {
@@ -266,23 +359,22 @@ Yêu cầu: Viết hấp dẫn, đúng phong cách sinh viên trẻ trung, có i
             } catch (e) {}
         }
 
-        // Smart fallback content templates
         if (contentType.includes("Facebook") || contentType.includes("Bài viết")) {
             return `🔥 [HOT NEWS] ${topicPrompt.toUpperCase()} 🔥
 
-Các bạn thành viên CLB CNTT ơi! 🚀
+Các bạn thành viên CLB CNTT UHL ơi! 🚀
 
 ${topicPrompt} chính thức đổ bộ rồi đây! Đừng bỏ lỡ cơ hội bùng nổ năng lượng và trải nghiệm tuyệt vời cùng gia đình CLB chúng mình nhé!
 
 📍 Thời gian & Địa điểm: Cập nhật tại hệ thống quản lý CLB.
 👉 Đăng ký tham gia ngay hôm nay!
 
-#DevClub #CLB_CNTT #SinhVienIT #${topicPrompt.replace(/\s+/g, '_')}`;
+#CLB_CNTT_UHL #SinhVienIT #${topicPrompt.replace(/\s+/g, '_')}`;
         }
 
         return `📢 [THÔNG BÁO] ${topicPrompt.toUpperCase()}
 
-Thân gửi toàn thể các bạn thành viên CLB,
+Thân gửi toàn thể các bạn thành viên CLB CNTT UHL,
 
 ${topicPrompt}.
 Rất mong các bạn theo dõi và thực hiện đúng tiến độ được giao.
