@@ -33,14 +33,19 @@ const ClubAuth = {
         if (!user) {
             return { success: false, message: "Tên đăng nhập hoặc mật khẩu không chính xác!" };
         }
-        if (user.password !== password) {
+
+        const hashedInput = (typeof ClubUtils !== "undefined" && ClubUtils.sha256) ? ClubUtils.sha256(password) : password;
+        if (user.password !== password && user.password !== hashedInput) {
             return { success: false, message: "Tên đăng nhập hoặc mật khẩu không chính xác!" };
         }
         if (user.status === "Blocked") {
             return { success: false, message: "Tài khoản của bạn đang bị khóa!" };
         }
 
-        sessionStorage.setItem("club_current_user", JSON.stringify(user));
+        const userSession = { ...user };
+        delete userSession.password;
+
+        sessionStorage.setItem("club_current_user", JSON.stringify(userSession));
         ClubUtils.addLog("Đăng nhập hệ thống: " + user.username);
         return { success: true };
     },
@@ -76,7 +81,17 @@ const ClubAuth = {
                 ClubUtils.addLog("Đăng nhập qua Firebase Auth: " + fbUser.email);
                 return { success: true };
             } catch (fbErr) {
-                // Ignore API key uninitialized notice if user entered wrong email/pass or Auth service is off
+                console.error("🔥 Firebase Auth Login Error:", fbErr);
+                if (fbErr.code === "auth/operation-not-allowed") {
+                    return { success: false, message: "Phương thức Email/Password chưa được bật trong Firebase Console! (Vào tab Authentication -> Sign-in method -> Enable Email/Password)" };
+                }
+                if (fbErr.code === "auth/unauthorized-domain") {
+                    return { success: false, message: "Tên miền (Domain) trang web chưa được cấp quyền trong Firebase Console! (Vào Authentication -> Settings -> Authorized domains -> Add xkien189.github.io)" };
+                }
+                if (fbErr.code === "auth/user-not-found" || fbErr.code === "auth/wrong-password" || fbErr.code === "auth/invalid-credential") {
+                    return { success: false, message: "Email hoặc Mật khẩu Firebase không chính xác!" };
+                }
+                return { success: false, message: fbErr.message || "Đăng nhập Firebase thất bại!" };
             }
         }
 

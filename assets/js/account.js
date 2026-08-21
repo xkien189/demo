@@ -152,7 +152,7 @@ window.resetPassword = function(username) {
             const index = users.findIndex(u => u.username === username);
 
             if (index !== -1) {
-                users[index].password = "123";
+                users[index].password = typeof ClubUtils !== "undefined" && ClubUtils.sha256 ? ClubUtils.sha256("123") : "123";
                 ClubStorage.saveData("club_users", users);
                 ClubUtils.addLog(`Reset mật khẩu tài khoản: ${username}`);
                 ClubUtils.showToast("Thành công!", "Mật khẩu đã đặt lại về mặc định: 123", "success");
