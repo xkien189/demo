@@ -154,6 +154,64 @@
         { id: "TX003", type: "Income", category: "Tài trợ Doanh nghiệp", amount: 2000000, purpose: "Nhà tài trợ Vàng chuyển khoản tài trợ sự kiện Welcome Gen 10", proofUrl: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400", createdBy: "Phạm Thị Dung", date: "15-09-2026 09:00:00" }
     ];
 
+    const DEFAULT_TIMELINES = [
+        {
+            id: "TL001",
+            semester: "HK1_2026_2027",
+            title: "Tuyển chọn Thành viên Gen 10",
+            phase: "Đầu kỳ",
+            department: "Ban Truyền thông",
+            startDate: "2026-09-01",
+            endDate: "2026-09-15",
+            status: "Completed",
+            description: "Phát động chiến dịch truyền thông tuyển thành viên mới khóa Gen 10 và phỏng vấn chọn lọc."
+        },
+        {
+            id: "TL002",
+            semester: "HK1_2026_2027",
+            title: "Lễ ra mắt & Teambuilding Chào thành viên",
+            phase: "Đầu kỳ",
+            department: "Ban Sự kiện",
+            startDate: "2026-09-20",
+            endDate: "2026-09-21",
+            status: "Completed",
+            description: "Tổ chức sinh hoạt toàn CLB chào đón Gen 10 và kết nối giao lưu giữa các Ban bộ phận."
+        },
+        {
+            id: "TL003",
+            semester: "HK1_2026_2027",
+            title: "Chuỗi Workshop Lập trình Web & Git/GitHub",
+            phase: "Giữa kỳ",
+            department: "Ban Chuyên môn",
+            startDate: "2026-10-05",
+            endDate: "2026-10-25",
+            status: "In Progress",
+            description: "Đào tạo kiến thức nền tảng HTML/CSS/JS, quản lý nguồn mã với Git và triển khai sản phẩm thực tế."
+        },
+        {
+            id: "TL004",
+            semester: "HK1_2026_2027",
+            title: "Giải đấu Hackathon Nội bộ UHL CodeFest",
+            phase: "Giữa kỳ",
+            department: "Ban Chuyên môn",
+            startDate: "2026-11-10",
+            endDate: "2026-11-15",
+            status: "Upcoming",
+            description: "Sân chơi thi đấu lập trình 48 giờ liên tục dành cho tất cả thành viên trong CLB."
+        },
+        {
+            id: "TL005",
+            semester: "HK1_2026_2027",
+            title: "Hội nghị Tổng kết & Gala Year-End Party",
+            phase: "Cuối kỳ",
+            department: "Ban Chủ nhiệm",
+            startDate: "2026-12-25",
+            endDate: "2026-12-26",
+            status: "Upcoming",
+            description: "Báo cáo tổng kết hoạt động HK1, trao giải vinh danh thành viên xuất sắc và Tiệc cuối năm."
+        }
+    ];
+
     const DEFAULTS = {
         club_members: DEFAULT_MEMBERS,
         club_users: DEFAULT_USERS,
@@ -164,7 +222,8 @@
         club_settings: DEFAULT_SETTINGS,
         club_logs: DEFAULT_LOGS,
         club_fund_periods: DEFAULT_FUND_PERIODS,
-        club_fund_transactions: DEFAULT_FUND_TRANSACTIONS
+        club_fund_transactions: DEFAULT_FUND_TRANSACTIONS,
+        club_timelines: DEFAULT_TIMELINES
     };
 
     function initStorage(key, defaultValue) {

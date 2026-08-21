@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lộ trình & Timeline Học Kỳ - Hệ thống Quản lý CLB Sinh viên</title>
+    <meta name="description" content="Quản lý mốc hoạt động lộ trình học kỳ và trí tuệ nhân tạo AI tự động lập kế hoạch CLB.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/theme.css">
+    <link rel="stylesheet" href="assets/css/layout.css">
+    <link rel="stylesheet" href="assets/css/sidebar.css">
+    <link rel="stylesheet" href="assets/css/button.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+    <style>
+        .vertical-timeline {
+            position: relative;
+            padding-left: 2rem;
+            margin-top: 1rem;
+        }
+        .vertical-timeline::before {
+            content: '';
+            position: absolute;
+            left: 0.75rem;
+            top: 10px;
+            bottom: 10px;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--primary), var(--info), var(--success));
+            border-radius: 2px;
+        }
+        .timeline-node-item {
+            position: relative;
+        }
+        .timeline-marker {
+            position: absolute;
+            left: -2rem;
+            top: 1rem;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 3px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            box-shadow: 0 0 0 4px var(--bg-secondary);
+            transition: all 0.2s ease;
+        }
+        .timeline-node-item:hover .timeline-marker {
+            transform: scale(1.25);
+        }
+        .timeline-content-card {
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .timeline-content-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--card-shadow-lg);
+        }
+        .stat-card-mini {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 1.25rem;
+        }
+        .ai-plan-modal-body {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-wrapper">
+        <div id="sidebar-container"></div>
+        <div class="main-content">
+            <div id="topbar-container"></div>
+            <div class="content-container fade-in">
+                
+                <!-- Header Title & Action Buttons -->
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <div>
+                        <h4 class="mb-1 fw-bold"><i class="bi bi-diagram-3 me-2 text-primary"></i>Lộ trình & Timeline Học Kỳ</h4>
+                        <p class="text-muted small mb-0">Theo dõi tiến trình toàn khóa, mốc hoạt động và kế hoạch tự động từ AI.</p>
+                    </div>
+                    <div id="timeline-action-btns" class="d-flex align-items-center"></div>
+                </div>
+
+                <!-- Semester Stats Row -->
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-md-3">
+                        <div class="stat-card-mini d-flex align-items-center gap-3">
+                            <div class="p-3 bg-light-primary text-primary rounded-3">
+                                <i class="bi bi-flag fs-3"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted small">Tổng mốc hoạt động</div>
+                                <h4 class="fw-bold mb-0" id="stat-total">0</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="stat-card-mini d-flex align-items-center gap-3">
+                            <div class="p-3 bg-light-success text-success rounded-3">
+                                <i class="bi bi-check-circle fs-3"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted small">Đã hoàn thành</div>
+                                <h4 class="fw-bold mb-0 text-success" id="stat-completed">0</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="stat-card-mini d-flex align-items-center gap-3">
+                            <div class="p-3 bg-light-info text-info rounded-3">
+                                <i class="bi bi-arrow-repeat fs-3"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted small">Đang thực hiện</div>
+                                <h4 class="fw-bold mb-0 text-primary" id="stat-inprogress">0</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="stat-card-mini">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="text-muted small">Tiến độ học kỳ</span>
+                                <span class="fw-bold text-primary" id="stat-percent">0%</span>
+                            </div>
+                            <div class="progress mt-2" style="height: 10px; border-radius: 5px;">
+                                <div class="progress-bar bg-gradient-primary" id="stat-progress-bar" role="progressbar" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter & Search Bar -->
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="card-body p-3">
+                        <div class="row g-2 align-items-center">
+                            <div class="col-md-4">
+                                <label class="form-label small fw-semibold mb-1">Chọn Học kỳ</label>
+                                <select id="filter-semester" class="form-select">
+                                    <option value="HK1_2026_2027" selected>Học kỳ I (2026 - 2027)</option>
+                                    <option value="HK2_2026_2027">Học kỳ II (2026 - 2027)</option>
+                                    <option value="HK1_2027_2028">Học kỳ I (2027 - 2028)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-semibold mb-1">Trạng thái</label>
+                                <select id="filter-status" class="form-select">
+                                    <option value="">Tất cả trạng thái</option>
+                                    <option value="Upcoming">Sắp diễn ra</option>
+                                    <option value="In Progress">Đang thực hiện</option>
+                                    <option value="Completed">Hoàn thành</option>
+                                    <option value="Cancelled">Tạm hoãn</option>
+                                </select>
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label small fw-semibold mb-1">Tìm kiếm mốc lộ trình</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                    <input type="text" id="search-timeline" class="form-control" placeholder="Tên hoạt động, mô tả...">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual Vertical Timeline Flow -->
+                <div id="timeline-flow-container">
+                    <div class="text-center py-5 text-muted">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="mt-2 small">Đang tải dữ liệu lộ trình...</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 1: Add / Edit Timeline Node -->
+    <div class="modal fade" id="timelineModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="timelineModalTitle">Thêm mốc Timeline</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="timelineForm" onsubmit="saveTimelineItem(event)">
+                    <div class="modal-body">
+                        <input type="hidden" id="tl-id">
+                        
+                        <div class="mb-3">
+                            <label for="tl-title" class="form-label fw-semibold">Tên mốc hoạt động <span class="text-danger">*</span></label>
+                            <input type="text" id="tl-title" class="form-control" placeholder="Ví dụ: Chuỗi Workshop Lập trình Web" required>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="tl-semester" class="form-label fw-semibold">Học kỳ áp dụng</label>
+                                <select id="tl-semester" class="form-select">
+                                    <option value="HK1_2026_2027">Học kỳ I (2026 - 2027)</option>
+                                    <option value="HK2_2026_2027">Học kỳ II (2026 - 2027)</option>
+                                    <option value="HK1_2027_2028">Học kỳ I (2027 - 2028)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="tl-phase" class="form-label fw-semibold">Giai đoạn học kỳ</label>
+                                <select id="tl-phase" class="form-select">
+                                    <option value="Đầu kỳ">Đầu kỳ (Tuyển quân / Ra mắt)</option>
+                                    <option value="Giữa kỳ" selected>Giữa kỳ (Đào tạo / Hackathon / Events)</option>
+                                    <option value="Cuối kỳ">Cuối kỳ (Tổng kết / Gala / Tri ân)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="tl-department" class="form-label fw-semibold">Ban phụ trách chính</label>
+                                <select id="tl-department" class="form-select"></select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="tl-status" class="form-label fw-semibold">Trạng thái hiện tại</label>
+                                <select id="tl-status" class="form-select">
+                                    <option value="Upcoming">Sắp diễn ra</option>
+                                    <option value="In Progress">Đang thực hiện</option>
+                                    <option value="Completed">Hoàn thành</option>
+                                    <option value="Cancelled">Tạm hoãn</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="tl-startDate" class="form-label fw-semibold">Ngày bắt đầu <span class="text-danger">*</span></label>
+                                <input type="date" id="tl-startDate" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="tl-endDate" class="form-label fw-semibold">Ngày kết thúc</label>
+                                <input type="date" id="tl-endDate" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="tl-description" class="form-label fw-semibold">Mô tả mục tiêu hoạt động</label>
+                            <textarea id="tl-description" class="form-control" rows="3" placeholder="Chi tiết về nội dung công việc, đối tượng tham gia, sản phẩm cần đạt..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>Lưu mốc thời gian</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 2: AI Semester Plan Generator Modal -->
+    <div class="modal fade" id="aiGeneratorModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold text-primary"><i class="bi bi-stars me-2"></i>✨ Trợ lý AI Sinh Kế Hoạch Học Kỳ Trọn Gói</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small">Chọn định hướng hoạt động cho CLB, AI sẽ tự động sinh danh sách 4-6 mốc công việc chi tiết chuẩn hóa theo mốc thời gian học kỳ.</p>
+                    
+                    <div class="mb-3">
+                        <label for="ai-goal-select" class="form-label fw-semibold">Mục tiêu trọng tâm của CLB học kỳ này:</label>
+                        <select id="ai-goal-select" class="form-select">
+                            <option value="Đào tạo Chuyên môn Lập trình, Workshop & Hackathon" selected>💻 Tập trung Chuyên môn & Code (Workshop, Hackathon, Dự án phần mềm)</option>
+                            <option value="Truyền thông Thương hiệu, Sự kiện lớn & Media">📢 Tập trung Truyền thông & Sự kiện (Media, Talkshow, Gala)</option>
+                            <option value="Giao lưu Teambuilding & Kết nối Đối doanh nghiệp">🤝 Tập trung Teambuilding & Đối ngoại (Teambuilding, Tài trợ, Học bổng)</option>
+                            <option value="Cân bằng Toàn diện tất cả các mảng hoạt động">⚖️ Cân bằng Toàn diện (Tuyển quân, Đào tạo, Sự kiện, Gala)</option>
+                        </select>
+                    </div>
+
+                    <div class="text-end mb-3">
+                        <button id="ai-generate-submit-btn" class="btn btn-primary" onclick="handleAIGenerate()">
+                            <i class="bi bi-lightning-charge me-1"></i>Tạo Lộ Trình Ngay
+                        </button>
+                    </div>
+
+                    <div id="ai-loading-spinner" class="text-center py-4" style="display: none;">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="mt-2 small text-primary fw-semibold">AI đang phân tích và tính toán lộ trình tối ưu cho học kỳ...</p>
+                    </div>
+
+                    <!-- AI Preview Result Area -->
+                    <div id="ai-prompt-preview" style="display: none;" class="ai-plan-modal-body mt-3">
+                        <h6 class="fw-bold text-success mb-2"><i class="bi bi-check2-circle me-1"></i>Lộ trình AI đề xuất:</h6>
+                        <div id="ai-preview-list" style="max-height: 280px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" id="ai-apply-btn" class="btn btn-success" style="display: none;" onclick="applyAISuggestedTimeline()">
+                        <i class="bi bi-download me-1"></i>Áp dụng vào Timeline chính
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="assets/js/storage.js"></script>
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/ai-service.js"></script>
+    <script src="assets/js/sidebar.js"></script>
+    <script src="assets/js/timeline.js"></script>
+</body>
+</html>

@@ -388,5 +388,86 @@ Rất mong các bạn theo dõi và thực hiện đúng tiến độ được g
 
 Trân trọng,
 Ban Chủ Nhiệm CLB.`;
+    },
+
+    // AI Semester Timeline Roadmap Generator
+    generateSemesterTimeline: async function(semesterGoal, semesterName = "HK1_2026_2027") {
+        const apiKey = this.getApiKey();
+        const context = this.buildContext();
+
+        const promptText = `Bạn là Trợ lý AI Hoạch định Kế hoạch cho ${context.settings.clubName || 'CLB CNTT UHL'}.
+Hãy sinh ra một kế hoạch lộ trình học kỳ theo dạng danh sách JSON thuần (JSON array) dành cho mục tiêu: "${semesterGoal}".
+
+Yêu cầu JSON trả về phải gồm từ 4-6 mốc hoạt động (timeline nodes) sắp xếp theo thời gian, với các thuộc tính:
+- "title": Tên mốc hoạt động
+- "phase": Giai đoạn (chỉ nhận 1 trong 3 giá trị: "Đầu kỳ", "Giữa kỳ", "Cuối kỳ")
+- "department": Ban bộ phận phụ trách chính (nhận 1 trong các giá trị: "Ban Chuyên môn", "Ban Truyền thông", "Ban Đối ngoại", "Ban Sự kiện", "Ban Tài chính", "Ban Chủ nhiệm")
+- "startDate": Ngày bắt đầu (định dạng YYYY-MM-DD)
+- "endDate": Ngày kết thúc (định dạng YYYY-MM-DD)
+- "status": Trạng thái (chỉ nhận: "Upcoming", "In Progress", "Completed")
+- "description": Mô tả chi tiết 1-2 câu ngắn gọn về mục đích hoạt động.
+
+CHỈ TRẢ VỀ DUY NHẤT CHUỖI JSON MẢNG (JSON ARRAY), KHÔNG KÈM MÃ MARKDOWN VÀ KHÔNG KÈM LỜI GIẢI THÍCH NÀO KHÁC.`;
+
+        if (apiKey) {
+            try {
+                const resText = await this.callGemini(promptText, context, apiKey);
+                if (resText) {
+                    const cleanJson = resText.replace(/```json/gi, '').replace(/```/g, '').trim();
+                    const parsed = JSON.parse(cleanJson);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        return parsed.map((item, idx) => ({
+                            id: "TL_AI_" + Date.now() + "_" + idx,
+                            semester: semesterName,
+                            title: item.title || "Mốc hoạt động " + (idx + 1),
+                            phase: item.phase || "Giữa kỳ",
+                            department: item.department || "Ban Chuyên môn",
+                            startDate: item.startDate || "2026-10-01",
+                            endDate: item.endDate || "2026-10-15",
+                            status: item.status || "Upcoming",
+                            description: item.description || ""
+                        }));
+                    }
+                }
+            } catch (e) {
+                console.warn("Gemini API generateSemesterTimeline error, using Smart Generator fallback:", e);
+            }
+        }
+
+        // Smart Offline Fallback Generator based on goal
+        const goalLower = (semesterGoal || "").toLowerCase();
+        let planNodes = [];
+
+        if (goalLower.includes("chuyên môn") || goalLower.includes("code") || goalLower.includes("hackathon")) {
+            planNodes = [
+                { title: "Tuyển chọn Thành viên Ban Chuyên môn & Đánh giá năng lực", phase: "Đầu kỳ", department: "Ban Chuyên môn", startDate: "2026-09-05", endDate: "2026-09-18", status: "Completed", description: "Tổ chức phỏng vấn và test kỹ năng lập trình đầu vào cho Gen 10." },
+                { title: "Chuỗi Workshop: Git/GitHub & Web Architecture", phase: "Giữa kỳ", department: "Ban Chuyên môn", startDate: "2026-10-01", endDate: "2026-10-20", status: "In Progress", description: "Đào tạo thực chiến quy trình làm việc nhóm với Git/GitHub và kiến trúc Web hiện đại." },
+                { title: "Hackathon UHL CodeFest 2026", phase: "Giữa kỳ", department: "Ban Chuyên môn", startDate: "2026-11-12", endDate: "2026-11-15", status: "Upcoming", description: "Giải đấu lập trình 48 giờ giải quyết bài toán thực tế cho nhà trường và cộng đồng." },
+                { title: "Review Code & Triển khai Sản phẩm Thực tế", phase: "Cuối kỳ", department: "Ban Chuyên môn", startDate: "2026-12-05", endDate: "2026-12-20", status: "Upcoming", description: "Hoàn thiện các dự án phần mềm của CLB và đóng gói sản phẩm thương hiệu." },
+                { title: "Lễ Tuyên dương Dev của Năm & Gala Tổng kết", phase: "Cuối kỳ", department: "Ban Chủ nhiệm", startDate: "2026-12-28", endDate: "2026-12-29", status: "Upcoming", description: "Tuyên dương lập trình viên xuất sắc và vinh danh đóng góp học kỳ." }
+            ];
+        } else if (goalLower.includes("truyền thông") || goalLower.includes("sự kiện") || goalLower.includes("media")) {
+            planNodes = [
+                { title: "Chiến dịch Truyền thông Tuyển Gen 10: 'Code Your Future'", phase: "Đầu kỳ", department: "Ban Truyền thông", startDate: "2026-09-01", endDate: "2026-09-15", status: "Completed", description: "Tạo bộ nhận diện thương hiệu, thiết kế ấn phẩm Canva/Photoshop và chạy Reels/TikTok." },
+                { title: "Sự kiện Welcome Night & Teambuilding Gắn kết", phase: "Đầu kỳ", department: "Ban Sự kiện", startDate: "2026-09-22", endDate: "2026-09-23", status: "Completed", description: "Đêm hội chào tân thành viên với các trò chơi teambuilding và giao lưu âm nhạc." },
+                { title: "Workshop Media & Content Creation cho Sinh viên", phase: "Giữa kỳ", department: "Ban Truyền thông", startDate: "2026-10-10", endDate: "2026-10-24", status: "In Progress", description: "Hướng dẫn kỹ năng viết bài PR, chụp ảnh sự kiện và dựng video ngắn chuyên nghiệp." },
+                { title: "Talkshow: Bí kíp Săn Học bổng & Chinh phục Nhà tuyển dụng IT", phase: "Giữa kỳ", department: "Ban Đối ngoại", startDate: "2026-11-18", endDate: "2026-11-19", status: "Upcoming", description: "Mời các diễn giả doanh nghiệp và cựu sinh viên chia sẻ kinh nghiệm thực tế." },
+                { title: "Gala Prom & Year-End Party UHL Tech Night", phase: "Cuối kỳ", department: "Ban Sự kiện", startDate: "2026-12-26", endDate: "2026-12-27", status: "Upcoming", description: "Đêm tiệc tri ân, trình diễn nghệ thuật và vinh danh thành viên tiêu biểu." }
+            ];
+        } else {
+            planNodes = [
+                { title: "Tổ chức Phỏng vấn Tuyển thành viên mới khóa Gen 10", phase: "Đầu kỳ", department: "Ban Truyền thông", startDate: "2026-09-01", endDate: "2026-09-15", status: "Completed", description: "Chiến dịch chiêu mộ tân binh và phân bổ lực lượng vào 5 Ban chuyên trách." },
+                { title: "Lễ Ra mắt Tân Thành viên & Teambuilding Khởi động", phase: "Đầu kỳ", department: "Ban Sự kiện", startDate: "2026-09-20", endDate: "2026-09-21", status: "Completed", description: "Chào đón thành viên mới và phổ biến quy chế hoạt động của CLB." },
+                { title: "Chuỗi Workshop Kỹ năng Chuyên môn & Làm việc nhóm", phase: "Giữa kỳ", department: "Ban Chuyên môn", startDate: "2026-10-05", endDate: "2026-10-25", status: "In Progress", description: "Đào tạo kỹ năng mềm, tư duy dự án và kiến thức công nghệ cho thành viên." },
+                { title: "Sự kiện Hackathon & Ngày hội Công nghệ CLB", phase: "Giữa kỳ", department: "Ban Sự kiện", startDate: "2026-11-10", endDate: "2026-11-15", status: "Upcoming", description: "Sân chơi thi đấu công nghệ và giao lưu doanh nghiệp đối tác." },
+                { title: "Lễ Tổng kết Học kỳ & Vinh danh Thành viên Xuất sắc", phase: "Cuối kỳ", department: "Ban Chủ nhiệm", startDate: "2026-12-25", endDate: "2026-12-26", status: "Upcoming", description: "Đánh giá kết quả hoạt động toàn học kỳ và khen thưởng cá nhân, tập thể." }
+            ];
+        }
+
+        return planNodes.map((item, idx) => ({
+            id: "TL_AI_" + Date.now() + "_" + idx,
+            semester: semesterName,
+            ...item
+        }));
     }
 };

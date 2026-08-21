@@ -44,6 +44,7 @@ function renderSidebar() {
         { name: "Dashboard", icon: "bi-speedometer2", href: "dashboard.html", roles: ["admin", "vice", "leader", "assistant", "member", "guest"] },
         { name: "Không gian của tôi", icon: "bi-laptop", href: "workspace.html", roles: ["admin", "vice", "leader", "assistant", "member", "guest"] },
         { name: "Giới thiệu CLB", icon: "bi-info-circle", href: "about.html", roles: ["admin", "vice", "leader", "assistant", "member", "guest"] },
+        { name: "Lộ trình & Timeline", icon: "bi-diagram-3", href: "timeline.html", roles: ["admin", "vice", "leader", "assistant", "member", "guest"] },
         { name: "Quản lý Thành viên", icon: "bi-people", href: "members.html", roles: ["admin", "vice", "leader"] },
         { name: "Quản lý Ban", icon: "bi-building", href: "departments.html", roles: ["admin", "vice"] },
         { name: "Quản lý Quỹ CLB", icon: "bi-wallet2", href: "funds.html", roles: ["admin", "vice", "leader", "assistant", "member", "guest"] },
@@ -228,6 +229,8 @@ function buildBreadcrumbs() {
         html += `<li class="breadcrumb-item active">Cài đặt hệ thống</li>`;
     } else if (path.includes("about.html")) {
         html += `<li class="breadcrumb-item active">Giới thiệu CLB</li>`;
+    } else if (path.includes("timeline.html")) {
+        html += `<li class="breadcrumb-item active">Lộ trình & Timeline</li>`;
     }
     
     list.innerHTML = html;
