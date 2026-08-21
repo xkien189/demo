@@ -3,7 +3,18 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!ClubAuth.checkRouteGuard(["admin", "vice"])) return;
 
     renderAccountsList();
-    document.getElementById("role-edit-form").addEventListener("submit", handleRoleEditSubmit);
+    document.getElementById("role-edit-form")?.addEventListener("submit", handleRoleEditSubmit);
+    document.getElementById("add-account-form")?.addEventListener("submit", handleAddAccountSubmit);
+
+    // Render Add Account Button in header if placeholder exists
+    const btnArea = document.getElementById("add-account-btn-area");
+    if (btnArea) {
+        btnArea.innerHTML = `
+            <button class="btn btn-primary btn-sm" onclick="openAddAccountModal()">
+                <i class="bi bi-person-plus-fill me-1"></i> Thêm tài khoản mới
+            </button>
+        `;
+    }
 });
 
 function renderAccountsList() {
@@ -20,13 +31,11 @@ function renderAccountsList() {
         let statusBadge = "bg-success";
         if (u.status === "Blocked") statusBadge = "bg-danger";
 
-        const isSelf = currentAdmin.username === u.username;
-        const isCoreAdmin = u.username === "admin";
-        
+        const isSelf = currentAdmin && currentAdmin.username === u.username;
         let actionButtons = "";
         
-        // Prevent editing self or core admin account if not super-admin
-        if (!isSelf && !isCoreAdmin) {
+        // Admin can manage/delete any account EXCEPT their own active account
+        if (!isSelf) {
             const blockIcon = u.status === "Active" ? "bi-lock" : "bi-unlock";
             const blockColor = u.status === "Active" ? "btn-danger" : "btn-success";
             const blockTitle = u.status === "Active" ? "Khóa tài khoản" : "Mở khóa tài khoản";
@@ -41,9 +50,12 @@ function renderAccountsList() {
                 <button onclick="resetPassword('${u.username}')" class="btn btn-warning btn-sm ms-1" title="Reset mật khẩu">
                     <i class="bi bi-arrow-clockwise"></i> Reset Pass
                 </button>
+                <button onclick="deleteAccount('${u.username}')" class="btn btn-danger btn-sm ms-1" title="Xóa tài khoản">
+                    <i class="bi bi-trash"></i> Xóa
+                </button>
             `;
         } else {
-            actionButtons = `<span class="badge bg-secondary">System Secured</span>`;
+            actionButtons = `<span class="badge bg-secondary"><i class="bi bi-shield-check me-1"></i>Tài khoản của bạn</span>`;
         }
 
         return `
@@ -64,6 +76,104 @@ function renderAccountsList() {
             </tr>
         `;
     }).join("");
+}
+
+// Delete account logic (Self-deletion prohibited)
+window.deleteAccount = function(username) {
+    const currentAdmin = ClubAuth.getCurrentUser();
+    if (currentAdmin && currentAdmin.username === username) {
+        ClubUtils.showAlert("Không thể xóa", "Bạn không thể xóa tài khoản chính mình!", "error");
+        return;
+    }
+
+    ClubUtils.showConfirm(
+        `Xác nhận xóa tài khoản "${username}"?`,
+        "Tài khoản này sẽ bị xóa vĩnh viễn khỏi hệ thống và không thể đăng nhập nữa!",
+        "Đồng ý xóa",
+        "Hủy"
+    ).then((result) => {
+        if (result.isConfirmed) {
+            let users = ClubStorage.getData("club_users") || [];
+            users = users.filter(u => u.username !== username);
+            ClubStorage.saveData("club_users", users);
+
+            ClubUtils.addLog(`Xóa tài khoản đăng nhập: ${username}`);
+            ClubUtils.showToast("Đã xóa!", `Tài khoản ${username} đã bị xóa khỏi hệ thống.`, "success");
+            renderAccountsList();
+        }
+    });
+};
+
+// Add Account Modal
+window.openAddAccountModal = function() {
+    const modalEl = document.getElementById("addAccountModal");
+    if (!modalEl) return;
+
+    const memberSelect = document.getElementById("new-member-id");
+    if (memberSelect) {
+        const members = ClubStorage.getData("club_members") || [];
+        let html = `<option value="">-- Chọn thành viên liên kết --</option>`;
+        members.forEach(m => {
+            html += `<option value="${m.id}">${m.name} (${m.id}) - ${m.department}</option>`;
+        });
+        memberSelect.innerHTML = html;
+    }
+
+    document.getElementById("add-account-form")?.reset();
+    const bsModal = new bootstrap.Modal(modalEl);
+    bsModal.show();
+};
+
+function handleAddAccountSubmit(e) {
+    e.preventDefault();
+
+    const username = document.getElementById("new-username").value.trim().toLowerCase();
+    const password = document.getElementById("new-password").value.trim();
+    const memberId = document.getElementById("new-member-id").value;
+    const role = document.getElementById("new-role").value;
+
+    if (!username || !password || !memberId) {
+        ClubUtils.showAlert("Lỗi nhập liệu", "Vui lòng nhập đầy đủ thông tin tài khoản!", "warning");
+        return;
+    }
+
+    let users = ClubStorage.getData("club_users") || [];
+    if (users.some(u => u.username.toLowerCase() === username)) {
+        ClubUtils.showAlert("Lỗi trùng lặp", `Tên đăng nhập "${username}" đã tồn tại trên hệ thống!`, "warning");
+        return;
+    }
+
+    // SHA-256 Hash password
+    const hashedPassword = typeof ClubUtils !== "undefined" && ClubUtils.sha256 ? ClubUtils.sha256(password) : password;
+
+    const newUser = {
+        username: username,
+        password: hashedPassword,
+        memberId: memberId,
+        role: role,
+        status: "Active"
+    };
+
+    users.push(newUser);
+    ClubStorage.saveData("club_users", users);
+
+    // Update role in members list as well
+    let members = ClubStorage.getData("club_members") || [];
+    const mIdx = members.findIndex(m => m.id === memberId);
+    if (mIdx !== -1) {
+        members[mIdx].role = role;
+        ClubStorage.saveData("club_members", members);
+    }
+
+    const currentAdmin = ClubAuth.getCurrentUser();
+    ClubUtils.addLog(`Thêm tài khoản đăng nhập mới: ${username} (${role})`);
+    ClubUtils.showToast("Thành công!", `Tài khoản ${username} đã được tạo thành công!`, "success");
+
+    const modalEl = document.getElementById("addAccountModal");
+    const bsModal = bootstrap.Modal.getInstance(modalEl);
+    if (bsModal) bsModal.hide();
+
+    renderAccountsList();
 }
 
 window.openRoleModal = function(username, currentRole) {

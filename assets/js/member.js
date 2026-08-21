@@ -199,7 +199,18 @@ function renderMembersTable(list) {
             `;
         }
 
-        if (currentUser.role === "admin" || (currentUser.role === "vice" && m.role !== "admin")) {
+        const isSelfMember = (currentMember && m.id === currentMember.id) || (currentUser && currentUser.memberId === m.id);
+
+        let canDelete = false;
+        if (!isSelfMember) {
+            if (currentUser.role === "admin") {
+                canDelete = true;
+            } else if (currentUser.role === "vice" && m.role !== "admin" && m.role !== "vice") {
+                canDelete = true;
+            }
+        }
+
+        if (canDelete) {
             actionButtons += `
                 <button onclick="deleteMember('${m.id}')" class="btn btn-danger btn-sm ms-1" title="Xóa">
                     <i class="bi bi-trash"></i>
@@ -278,6 +289,13 @@ window.changePage = function(page) {
 };
 
 window.deleteMember = function(memberId) {
+    const currentUser = ClubAuth.getCurrentUser();
+    const currentMember = ClubAuth.getCurrentMember();
+    if ((currentMember && memberId === currentMember.id) || (currentUser && currentUser.memberId === memberId)) {
+        ClubUtils.showAlert("Không thể xóa", "Bạn không thể xóa hồ sơ thành viên chính mình!", "error");
+        return;
+    }
+
     ClubUtils.showConfirm(
         "Xác nhận xóa thành viên?",
         `Tất cả thông tin liên quan tới thành viên ${memberId} sẽ bị xóa vĩnh viễn!`,

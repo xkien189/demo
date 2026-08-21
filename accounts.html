@@ -26,15 +26,18 @@
             <div id="topbar-container"></div>
             
             <div class="content-container fade-in">
-                <div class="mb-4">
-                    <h4 class="mb-1 fw-bold">Quản lý Tài khoản Đăng nhập</h4>
-                    <p class="text-muted small mb-0">Quản lý phân quyền, kích hoạt, hoặc khóa quyền truy cập hệ thống của thành viên.</p>
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <div>
+                        <h4 class="mb-1 fw-bold">Quản lý Tài khoản Đăng nhập</h4>
+                        <p class="text-muted small mb-0">Quản lý phân quyền, kích hoạt, mở/khóa hoặc xóa tài khoản thành viên.</p>
+                    </div>
+                    <div id="add-account-btn-area"></div>
                 </div>
 
                 <div class="card">
                     <div class="card-body p-0">
                         <div class="table-responsive">
-                            <table class="table align-middle">
+                            <table class="table align-middle mb-0">
                                 <thead>
                                     <tr>
                                         <th>Tên đăng nhập</th>
@@ -56,19 +59,63 @@
         </div>
     </div>
 
-    <!-- Edit Role Modal -->
+    <!-- Modal 1: Add New Account -->
+    <div class="modal fade" id="addAccountModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Thêm tài khoản đăng nhập mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="add-account-form">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="new-username" class="form-label fw-semibold">Tên đăng nhập <span class="text-danger">*</span></label>
+                            <input type="text" id="new-username" class="form-control" placeholder="Ví dụ: phochunhiem, truongban_cm..." required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="new-password" class="form-label fw-semibold">Mật khẩu khởi tạo <span class="text-danger">*</span></label>
+                            <input type="password" id="new-password" class="form-control" placeholder="Nhập mật khẩu..." required>
+                            <div class="form-text small">Mật khẩu sẽ tự động được mã hóa bảo mật SHA-256 trước khi lưu.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="new-member-id" class="form-label fw-semibold">Thành viên sở hữu <span class="text-danger">*</span></label>
+                            <select id="new-member-id" class="form-select" required></select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="new-role" class="form-label fw-semibold">Quyền hệ thống</label>
+                            <select id="new-role" class="form-select">
+                                <option value="admin">Chủ nhiệm (admin)</option>
+                                <option value="vice">Phó Chủ nhiệm (vice)</option>
+                                <option value="leader">Trưởng ban (leader)</option>
+                                <option value="assistant">Phó ban (assistant)</option>
+                                <option value="member" selected>Thành viên (member)</option>
+                                <option value="guest">Cộng tác viên (guest)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-check-lg me-1"></i>Tạo tài khoản</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 2: Edit Role Modal -->
     <div class="modal fade" id="roleEditModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Thay đổi quyền truy cập</h5>
+                    <h5 class="modal-title fw-bold">Thay đổi quyền truy cập</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form id="role-edit-form">
                     <input type="hidden" id="edit-username-key">
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="a-role-select" class="form-label">Chọn quyền mới</label>
+                            <label for="a-role-select" class="form-label fw-semibold">Chọn quyền mới</label>
                             <select id="a-role-select" class="form-select">
                                 <option value="admin">Chủ nhiệm (admin)</option>
                                 <option value="vice">Phó Chủ nhiệm (vice)</option>
