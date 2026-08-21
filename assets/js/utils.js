@@ -193,10 +193,64 @@ const ClubUtils = {
             }
         }
         return result;
+    },
+
+    // Auto Form Unsaved Data Warning
+    initFormUnsavedWarning: function() {
+        window._isFormDirty = false;
+
+        document.addEventListener("input", (e) => {
+            if (e.target.closest("form") || e.target.closest(".modal")) {
+                window._isFormDirty = true;
+            }
+        });
+
+        document.addEventListener("change", (e) => {
+            if (e.target.closest("form") || e.target.closest(".modal")) {
+                window._isFormDirty = true;
+            }
+        });
+
+        document.addEventListener("submit", (e) => {
+            window._isFormDirty = false;
+        });
+
+        window.addEventListener("beforeunload", (e) => {
+            if (window._isFormDirty) {
+                e.preventDefault();
+                e.returnValue = "";
+            }
+        });
+
+        document.addEventListener("click", (e) => {
+            const link = e.target.closest("a");
+            if (link && link.href && !link.href.startsWith("javascript:") && !link.href.endsWith("#") && window._isFormDirty) {
+                const targetUrl = link.href;
+                if (targetUrl === window.location.href || targetUrl === window.location.href + "#") return;
+
+                e.preventDefault();
+                Swal.fire({
+                    title: "Cảnh báo chưa lưu dữ liệu!",
+                    text: "Bạn đang có thông tin nhập dở. Rời khỏi trang lúc này sẽ làm mất toàn bộ dữ liệu vừa nhập. Bạn có chắc chắn muốn thoát?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#ef4444",
+                    cancelButtonColor: "#6b7280",
+                    confirmButtonText: "Rời khỏi trang",
+                    cancelButtonText: "Ở lại tiếp tục"
+                }).then((res) => {
+                    if (res.isConfirmed) {
+                        window._isFormDirty = false;
+                        window.location.href = targetUrl;
+                    }
+                });
+            }
+        });
     }
 };
 
-// Auto run theme setup
+// Auto run theme & form warning setup
 document.addEventListener("DOMContentLoaded", () => {
     ClubUtils.initTheme();
+    ClubUtils.initFormUnsavedWarning();
 });

@@ -17,6 +17,28 @@ document.addEventListener("DOMContentLoaded", () => {
     populateLeadersDropdown();
 
     document.getElementById("event-edit-form").addEventListener("submit", handleEventFormSubmit);
+
+    // Event image file upload handler
+    const fileInput = document.getElementById("e-image-file");
+    if (fileInput) {
+        fileInput.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const dataUrl = evt.target.result;
+                    const preview = document.getElementById("e-image-preview");
+                    const hidden = document.getElementById("e-image");
+                    if (preview) {
+                        preview.src = dataUrl;
+                        preview.style.display = "block";
+                    }
+                    if (hidden) hidden.value = dataUrl;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
 });
 
 function renderEventsGrid() {
@@ -111,6 +133,9 @@ window.openCreateModal = function() {
     document.getElementById("e-location").value = "";
     document.getElementById("e-leader").value = "";
     document.getElementById("e-desc").value = "";
+    document.getElementById("e-image").value = "";
+    const preview = document.getElementById("e-image-preview");
+    if (preview) preview.style.display = "none";
 
     const modal = new bootstrap.Modal(document.getElementById("eventEditModal"));
     modal.show();
@@ -128,6 +153,13 @@ window.openEditModal = function(eventId) {
     document.getElementById("e-location").value = e.location;
     document.getElementById("e-leader").value = e.leaderId;
     document.getElementById("e-desc").value = e.description;
+    document.getElementById("e-image").value = e.image || "";
+    
+    const preview = document.getElementById("e-image-preview");
+    if (preview && e.image) {
+        preview.src = e.image;
+        preview.style.display = "block";
+    }
 
     const modal = new bootstrap.Modal(document.getElementById("eventEditModal"));
     modal.show();
@@ -142,6 +174,7 @@ function handleEventFormSubmit(eventObj) {
     const location = document.getElementById("e-location").value.trim();
     const leaderId = document.getElementById("e-leader").value;
     const desc = document.getElementById("e-desc").value.trim();
+    const imgVal = document.getElementById("e-image").value.trim();
 
     let events = ClubStorage.getData("club_events") || [];
 
@@ -156,7 +189,8 @@ function handleEventFormSubmit(eventObj) {
                 date,
                 location,
                 leaderId,
-                description: desc
+                description: desc,
+                image: imgVal || events[index].image
             };
             ClubStorage.saveData("club_events", events);
             ClubUtils.addLog(`Cập nhật sự kiện: ${title}`);
@@ -171,6 +205,7 @@ function handleEventFormSubmit(eventObj) {
             location,
             leaderId,
             description: desc,
+            image: imgVal || "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600",
             attendeesCount: Math.floor(Math.random() * 40) + 10 // Mock attendee counts
         };
         events.push(newEvent);

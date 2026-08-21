@@ -463,10 +463,31 @@ function initMemberEditPage() {
         document.getElementById("m-joindate").value = m.joinDate;
         document.getElementById("m-status").value = m.status;
         document.getElementById("m-avatar").value = m.avatar || "";
+        const preview = document.getElementById("m-avatar-preview");
+        if (preview && m.avatar) preview.src = m.avatar;
     } else {
         document.getElementById("form-title").innerText = "Thêm thành viên mới";
         // Auto fill today
         document.getElementById("m-joindate").value = new Date().toISOString().substring(0, 10);
+    }
+
+    // Avatar file upload handler
+    const fileInput = document.getElementById("m-avatar-file");
+    if (fileInput) {
+        fileInput.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const dataUrl = evt.target.result;
+                    const preview = document.getElementById("m-avatar-preview");
+                    const hidden = document.getElementById("m-avatar");
+                    if (preview) preview.src = dataUrl;
+                    if (hidden) hidden.value = dataUrl;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
     }
 
     if (user && user.role === "leader") {

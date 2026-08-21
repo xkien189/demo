@@ -110,6 +110,16 @@
                             <label for="e-desc" class="form-label">Mô tả chi tiết *</label>
                             <textarea id="e-desc" class="form-control" rows="3" placeholder="Nội dung tóm tắt sự kiện..." required></textarea>
                         </div>
+                        <div class="mb-3">
+                            <label for="e-image-file" class="form-label fw-semibold">Tải ảnh bìa sự kiện từ thiết bị</label>
+                            <div class="d-flex align-items-center gap-3">
+                                <img id="e-image-preview" src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600" class="rounded border" style="width: 80px; height: 60px; object-fit: cover; display: none;">
+                                <div class="flex-grow-1">
+                                    <input type="file" id="e-image-file" class="form-control" accept="image/*">
+                                    <input type="hidden" id="e-image">
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
