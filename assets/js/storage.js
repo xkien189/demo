@@ -10,12 +10,7 @@
     ];
 
     const DEFAULT_USERS = [
-        { username: "admin", password: "123", memberId: "M001", role: "admin", status: "Active" },
-        { username: "vice", password: "123", memberId: "M002", role: "vice", status: "Active" },
-        { username: "leader", password: "123", memberId: "M003", role: "leader", status: "Active" },
-        { username: "assistant", password: "123", memberId: "M004", role: "assistant", status: "Active" },
-        { username: "member", password: "123", memberId: "M005", role: "member", status: "Active" },
-        { username: "guest", password: "123", memberId: "M006", role: "guest", status: "Active" }
+        { username: "admin", password: "123", memberId: "M001", role: "admin", status: "Active" }
     ];
 
     const DEFAULT_DEPARTMENTS = [
@@ -235,6 +230,18 @@
                 if (!s.clubName || s.clubName.includes("DevClub") || s.clubName.includes("Câu lạc bộ Sinh viên")) {
                     s.clubName = "CLB CNTT UHL";
                     localStorage.setItem(key, JSON.stringify(s));
+                }
+            } catch(e) {}
+        } else if (key === "club_users") {
+            try {
+                const users = JSON.parse(localStorage.getItem(key));
+                if (Array.isArray(users)) {
+                    const demoUsernames = ["vice", "leader", "assistant", "member", "guest"];
+                    const filtered = users.filter(u => !demoUsernames.includes(u.username));
+                    if (!filtered.some(u => u.username === "admin")) {
+                        filtered.unshift({ username: "admin", password: "123", memberId: "M001", role: "admin", status: "Active" });
+                    }
+                    localStorage.setItem(key, JSON.stringify(filtered));
                 }
             } catch(e) {}
         }
