@@ -35,7 +35,7 @@ const ClubAuth = {
         }
 
         const hashedInput = (typeof ClubUtils !== "undefined" && ClubUtils.sha256) ? ClubUtils.sha256(password) : password;
-        if (user.password !== password && user.password !== hashedInput) {
+        if (user.password !== hashedInput) {
             return { success: false, message: "Tên đăng nhập hoặc mật khẩu không chính xác!" };
         }
         if (user.status === "Blocked") {
