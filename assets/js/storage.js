@@ -245,6 +245,16 @@
                         filtered.unshift({ username: "admin", password: "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3", memberId: "M001", role: "admin", status: "Active" });
                     }
                     localStorage.setItem(key, JSON.stringify(filtered));
+                    
+                    // Sync cleaned data to Firestore Cloud immediately
+                    if (typeof firebase !== "undefined" && firebase.apps.length) {
+                        try {
+                            firebase.firestore().collection("app_data").doc(key).set({
+                                data: filtered,
+                                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        } catch(e) {}
+                    }
                 }
             } catch(e) {}
         }
@@ -266,9 +276,20 @@
             // Listen to real-time updates from Cloud Firestore
             docRef.onSnapshot(doc => {
                 if (doc.exists) {
-                    const cloudData = doc.data().data;
+                    let cloudData = doc.data().data;
                     if (cloudData) {
+                        if (key === "club_users" && Array.isArray(cloudData)) {
+                            const demoUsernames = ["vice", "leader", "assistant", "member", "guest"];
+                            const hasDemo = cloudData.some(u => demoUsernames.includes(u.username));
+                            if (hasDemo) {
+                                cloudData = cloudData.filter(u => !demoUsernames.includes(u.username));
+                                docRef.set({ data: cloudData, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+                            }
+                        }
                         localStorage.setItem(key, JSON.stringify(cloudData));
+                        if (window.location.pathname.includes("accounts.html") && typeof renderAccountsList === "function") {
+                            renderAccountsList();
+                        }
                     }
                 } else {
                     // Initial Cloud Seed: Write default local data to Cloud Firestore if doc doesn't exist yet
