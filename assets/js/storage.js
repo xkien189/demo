@@ -10,7 +10,7 @@
     ];
 
     const DEFAULT_USERS = [
-        { username: "admin", password: "123", memberId: "M001", role: "admin", status: "Active" }
+        { username: "admin", password: "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3", memberId: "M001", role: "admin", status: "Active" }
     ];
 
     const DEFAULT_DEPARTMENTS = [
@@ -238,8 +238,11 @@
                 if (Array.isArray(users)) {
                     const demoUsernames = ["vice", "leader", "assistant", "member", "guest"];
                     const filtered = users.filter(u => !demoUsernames.includes(u.username));
+                    filtered.forEach(u => {
+                        if (u.password === "123") u.password = "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3";
+                    });
                     if (!filtered.some(u => u.username === "admin")) {
-                        filtered.unshift({ username: "admin", password: "123", memberId: "M001", role: "admin", status: "Active" });
+                        filtered.unshift({ username: "admin", password: "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3", memberId: "M001", role: "admin", status: "Active" });
                     }
                     localStorage.setItem(key, JSON.stringify(filtered));
                 }
