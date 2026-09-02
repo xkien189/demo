@@ -99,11 +99,21 @@ window.deleteAccount = function(username) {
     ).then((result) => {
         if (result.isConfirmed) {
             let users = ClubStorage.getData("club_users") || [];
+            const userToDelete = users.find(u => u.username === username);
+            const memberId = userToDelete ? userToDelete.memberId : null;
+
             users = users.filter(u => u.username !== username);
             ClubStorage.saveData("club_users", users);
 
-            ClubUtils.addLog(`Xóa tài khoản đăng nhập: ${username}`);
-            ClubUtils.showToast("Đã xóa!", `Tài khoản ${username} đã bị xóa khỏi hệ thống.`, "success");
+            // Also delete the linked member profile
+            if (memberId) {
+                let members = ClubStorage.getData("club_members") || [];
+                members = members.filter(m => m.id !== memberId);
+                ClubStorage.saveData("club_members", members);
+            }
+
+            ClubUtils.addLog(`Xóa tài khoản đăng nhập và hồ sơ: ${username}`);
+            ClubUtils.showToast("Đã xóa!", `Tài khoản ${username} và hồ sơ thành viên liên kết đã bị xóa.`, "success");
             renderAccountsList();
         }
     });
