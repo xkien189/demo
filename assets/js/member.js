@@ -36,6 +36,12 @@ function initMembersListPage() {
 
     // Fetch and bind actions
     loadMembersData();
+
+    // Register Firestore real-time sync refresh
+    if (typeof ClubStorage.registerUIRefresh === "function") {
+        ClubStorage.registerUIRefresh("club_members", () => loadMembersData());
+        ClubStorage.registerUIRefresh("club_departments", () => populateDeptDropdown("filter-dept"));
+    }
     
     document.getElementById("search-input").addEventListener("input", filterAndRenderMembers);
     document.getElementById("filter-dept").addEventListener("change", filterAndRenderMembers);

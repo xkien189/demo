@@ -29,6 +29,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     renderNotificationsList("All");
     document.getElementById("noti-form").addEventListener("submit", handleNotiFormSubmit);
+
+    // Register Firestore real-time sync refresh
+    if (typeof ClubStorage.registerUIRefresh === "function") {
+        ClubStorage.registerUIRefresh("club_notifications", () => renderNotificationsList(activeFilter || "All"));
+    }
 });
 
 function populateDeptOptions() {

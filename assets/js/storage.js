@@ -265,6 +265,9 @@
         initStorage(key, DEFAULTS[key]);
     });
 
+    // UI Refresh Registry — modules register refresh callbacks here
+    const _uiRefreshRegistry = {};
+
     // Cloud Firestore Sync Manager
     function setupCloudSync() {
         if (typeof firebase === "undefined" || !firebase.apps.length) return;
@@ -272,31 +275,68 @@
 
         Object.keys(DEFAULTS).forEach(key => {
             const docRef = db.collection("app_data").doc(key);
+            let _localWriteTimestamp = 0;
 
-            // Listen to real-time updates from Cloud Firestore
-            docRef.onSnapshot(doc => {
+            // Expose per-key write timestamp setter for saveData
+            if (!window._firestoreLocalWrite) window._firestoreLocalWrite = {};
+            window._firestoreLocalWrite[key] = () => { _localWriteTimestamp = Date.now(); };
+
+            docRef.onSnapshot((doc, opts) => {
+                // Suppress snapshot triggered by OWN local write (within 3 seconds)
+                if (Date.now() - _localWriteTimestamp < 3000) return;
+
                 if (doc.exists) {
                     let cloudData = doc.data().data;
-                    if (cloudData) {
-                        if (key === "club_users" && Array.isArray(cloudData)) {
-                            const demoUsernames = ["vice", "leader", "assistant", "member", "guest"];
-                            const hasDemo = cloudData.some(u => demoUsernames.includes(u.username));
-                            if (hasDemo) {
-                                cloudData = cloudData.filter(u => !demoUsernames.includes(u.username));
-                                docRef.set({ data: cloudData, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-                            }
-                        }
-                        localStorage.setItem(key, JSON.stringify(cloudData));
-                        if (window.location.pathname.includes("accounts.html") && typeof renderAccountsList === "function") {
-                            renderAccountsList();
+                    if (!cloudData) return;
+
+                    // Clean up legacy demo accounts from cloud
+                    if (key === "club_users" && Array.isArray(cloudData)) {
+                        const demoUsernames = ["vice", "leader", "assistant", "member", "guest"];
+                        const hasDemo = cloudData.some(u => demoUsernames.includes(u.username));
+                        if (hasDemo) {
+                            cloudData = cloudData.filter(u => !demoUsernames.includes(u.username));
+                            docRef.set({ data: cloudData, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
                         }
                     }
+
+                    // Write cloud data to localStorage
+                    localStorage.setItem(key, JSON.stringify(cloudData));
+
+                    // Trigger registered UI refresh callbacks for this key
+                    if (_uiRefreshRegistry[key]) {
+                        _uiRefreshRegistry[key].forEach(fn => {
+                            try { fn(cloudData); } catch(e) {}
+                        });
+                    }
+
+                    // Fallback page-specific refresh (for pages not yet registered)
+                    const path = window.location.pathname;
+                    if (key === "club_members" && path.includes("members.html") && typeof loadMembersData === "function") {
+                        loadMembersData();
+                    } else if (key === "club_events" && path.includes("events.html") && typeof renderEventsGrid === "function") {
+                        renderEventsGrid();
+                    } else if (key === "club_tasks" && path.includes("tasks.html") && typeof renderTasksList === "function") {
+                        renderTasksList();
+                    } else if (key === "club_users" && path.includes("accounts.html") && typeof renderAccountsList === "function") {
+                        renderAccountsList();
+                    } else if (key === "club_timelines" && path.includes("timeline.html") && typeof renderTimeline === "function") {
+                        renderTimeline();
+                    } else if ((key === "club_members" || key === "club_tasks") && path.includes("dashboard.html") && typeof renderMetrics === "function") {
+                        renderMetrics();
+                        if (typeof renderUrgentTasks === "function") renderUrgentTasks();
+                        if (typeof renderDashboardLeaderboard === "function") renderDashboardLeaderboard();
+                    } else if (key === "club_notifications" && path.includes("notifications.html") && typeof renderNotificationsList === "function") {
+                        renderNotificationsList();
+                    } else if ((key === "club_fund_periods" || key === "club_fund_transactions") && path.includes("fund.html") && typeof renderFundMetrics === "function") {
+                        renderFundMetrics();
+                        if (typeof renderLedgerTable === "function") renderLedgerTable();
+                    }
                 } else {
-                    // Initial Cloud Seed: Write default local data to Cloud Firestore if doc doesn't exist yet
+                    // Initial Cloud Seed
                     const localData = JSON.parse(localStorage.getItem(key)) || DEFAULTS[key];
                     docRef.set({ data: localData, updatedAt: firebase.firestore.FieldValue.serverTimestamp() })
-                        .then(() => console.log(`☁️ Firestore seeded collection: ${key}`))
-                        .catch(err => console.error(`Firestore seed error for ${key}:`, err));
+                        .then(() => console.log(`☁️ Firestore seeded: ${key}`))
+                        .catch(err => console.error(`Firestore seed error ${key}:`, err));
                 }
             }, err => {
                 console.warn(`Firestore listener notice for ${key}:`, err.message);
@@ -322,6 +362,10 @@
             // Sync to Firestore Cloud asynchronously
             if (typeof firebase !== "undefined" && firebase.apps.length) {
                 try {
+                    // Mark local write to suppress own snapshot re-render
+                    if (window._firestoreLocalWrite && window._firestoreLocalWrite[key]) {
+                        window._firestoreLocalWrite[key]();
+                    }
                     const db = firebase.firestore();
                     db.collection("app_data").doc(key).set({
                         data: data,
@@ -333,6 +377,10 @@
                     console.warn("Firestore sync skipped:", e.message);
                 }
             }
+        },
+        registerUIRefresh: function(key, fn) {
+            if (!_uiRefreshRegistry[key]) _uiRefreshRegistry[key] = [];
+            _uiRefreshRegistry[key].push(fn);
         },
         reset: function() {
             localStorage.clear();

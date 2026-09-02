@@ -62,6 +62,20 @@ function initFundPage() {
     renderFundMetrics();
     renderPeriodMembersTable();
     renderLedgerTable();
+
+    // Register Firestore real-time sync refresh
+    if (typeof ClubStorage.registerUIRefresh === "function") {
+        const refreshFund = () => {
+            renderFundMetrics();
+            renderPeriodMembersTable();
+            renderLedgerTable();
+        };
+        ClubStorage.registerUIRefresh("club_fund_periods", () => {
+            populatePeriodDropdown();
+            refreshFund();
+        });
+        ClubStorage.registerUIRefresh("club_fund_transactions", refreshFund);
+    }
 }
 
 function populatePeriodDropdown() {

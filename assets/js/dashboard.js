@@ -23,6 +23,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Initialize Chart.js
     initTasksChart();
+
+    // Register Firestore real-time sync refresh for all dashboard data
+    if (typeof ClubStorage.registerUIRefresh === "function") {
+        const refreshAll = () => {
+            renderMetrics();
+            renderDashboardLeaderboard();
+            renderUrgentTasks();
+            renderRecentNotifications();
+        };
+        ClubStorage.registerUIRefresh("club_members", refreshAll);
+        ClubStorage.registerUIRefresh("club_tasks", refreshAll);
+        ClubStorage.registerUIRefresh("club_notifications", refreshAll);
+    }
 });
 
 function renderMetrics() {

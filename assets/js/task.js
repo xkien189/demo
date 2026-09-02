@@ -32,6 +32,12 @@ function initTasksListPage() {
     renderTasksList();
     renderAIWorkInsights();
 
+    // Register Firestore real-time sync refresh
+    if (typeof ClubStorage.registerUIRefresh === "function") {
+        ClubStorage.registerUIRefresh("club_tasks", () => renderTasksList());
+        ClubStorage.registerUIRefresh("club_members", () => renderTasksList());
+    }
+
     document.getElementById("search-task").addEventListener("input", renderTasksList);
     document.getElementById("filter-task-dept").addEventListener("change", renderTasksList);
     document.getElementById("filter-task-status").addEventListener("change", renderTasksList);

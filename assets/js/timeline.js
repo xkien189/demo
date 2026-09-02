@@ -38,6 +38,11 @@ function initTimelinePage() {
     document.getElementById("search-timeline")?.addEventListener("input", renderTimeline);
 
     loadTimelinesData();
+
+    // Register Firestore real-time sync refresh
+    if (typeof ClubStorage.registerUIRefresh === "function") {
+        ClubStorage.registerUIRefresh("club_timelines", () => loadTimelinesData());
+    }
 }
 
 function populateDeptOptions(selectId) {

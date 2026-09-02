@@ -83,12 +83,12 @@
     <script src="assets/js/sidebar.js"></script>
     
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            if (!ClubAuth.checkRouteGuard(["admin", "vice"])) return;
-
+        window.renderDepartmentsGrid = function() {
             const depts = ClubStorage.getData("club_departments") || [];
             const members = ClubStorage.getData("club_members") || [];
             const container = document.getElementById("departments-list");
+
+            if (!container) return;
 
             container.innerHTML = depts.map(d => {
                 const leaderMember = members.find(m => m.id === d.leader);
@@ -126,6 +126,17 @@
                     </div>
                 `;
             }).join("");
+        };
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (!ClubAuth.checkRouteGuard(["admin", "vice"])) return;
+
+            renderDepartmentsGrid();
+
+            if (typeof ClubStorage.registerUIRefresh === "function") {
+                ClubStorage.registerUIRefresh("club_departments", renderDepartmentsGrid);
+                ClubStorage.registerUIRefresh("club_members", renderDepartmentsGrid);
+            }
         });
 
         function showDeptMembers(deptName) {

@@ -16,6 +16,11 @@ document.addEventListener("DOMContentLoaded", () => {
     renderEventsGrid();
     populateLeadersDropdown();
 
+    // Register Firestore real-time sync refresh
+    if (typeof ClubStorage.registerUIRefresh === "function") {
+        ClubStorage.registerUIRefresh("club_events", () => renderEventsGrid());
+    }
+
     document.getElementById("event-edit-form").addEventListener("submit", handleEventFormSubmit);
 
     // Event image file upload handler
