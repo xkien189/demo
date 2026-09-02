@@ -205,6 +205,7 @@ function renderMembersTable(list) {
             `;
         }
 
+        const currentMember = ClubAuth.getCurrentMember();
         const isSelfMember = (currentMember && m.id === currentMember.id) || (currentUser && currentUser.memberId === m.id);
 
         let canDelete = false;
