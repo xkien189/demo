@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Register Firestore real-time sync refresh
     if (typeof ClubStorage.registerUIRefresh === "function") {
         ClubStorage.registerUIRefresh("club_users", () => renderAccountsList());
+        ClubStorage.registerUIRefresh("club_members", () => renderAccountsList());
     }
 });
 

@@ -40,6 +40,7 @@ function initMembersListPage() {
     // Register Firestore real-time sync refresh
     if (typeof ClubStorage.registerUIRefresh === "function") {
         ClubStorage.registerUIRefresh("club_members", () => loadMembersData());
+        ClubStorage.registerUIRefresh("club_users", () => loadMembersData());
         ClubStorage.registerUIRefresh("club_departments", () => populateDeptDropdown("filter-dept"));
     }
     
@@ -572,17 +573,26 @@ function initMemberEditPage() {
             let users = ClubStorage.getData("club_users") || [];
             // Generate standard username from full name
             const username = mName.split(" ").pop().toLowerCase() + mId.toLowerCase();
+
+            // Hash default password with SHA-256 for security and consistency
+            const hashedPassword = (typeof ClubUtils !== "undefined" && ClubUtils.sha256) 
+                ? ClubUtils.sha256("123") 
+                : "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3";
+
+            // Remove existing user with same memberId or username if any
+            users = users.filter(u => u.memberId !== mId && u.username.toLowerCase() !== username.toLowerCase());
+
             users.push({
                 username: username,
-                password: "123",
+                password: hashedPassword,
                 memberId: mId,
                 role: mRole,
                 status: mStat
             });
             ClubStorage.saveData("club_users", users);
 
-            ClubUtils.addLog(`Tạo thành viên mới: ${mName} (${mId})`);
-            ClubUtils.showAlert("Tạo thành viên thành công!", `Đã tạo thành viên mới. Tên đăng nhập mặc định: "${username}", mật khẩu: "123"`, "success")
+            ClubUtils.addLog(`Tạo thành viên và tài khoản mới: ${mName} (${mId}) - User: ${username}`);
+            ClubUtils.showAlert("Tạo thành viên thành công!", `Đã tạo thành viên và tài khoản đăng nhập tương ứng.<br>Tên đăng nhập: <strong>${username}</strong><br>Mật khẩu mặc định: <strong>123</strong>`, "success")
                 .then(() => {
                     window.location.href = "members.html";
                 });

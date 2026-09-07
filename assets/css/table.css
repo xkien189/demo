@@ -1,6 +1,18 @@
 .table-responsive {
     border-radius: var(--border-radius);
-    overflow: hidden;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table-responsive::-webkit-scrollbar {
+    height: 6px;
+}
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+.table-responsive::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 .table {
@@ -15,13 +27,13 @@
     text-transform: uppercase;
     font-size: 0.75rem;
     letter-spacing: 0.5px;
-    padding: 1rem 1.25rem;
+    padding: 0.75rem 0.85rem;
     border-bottom-width: 1px;
     border-color: var(--border-color);
 }
 
 .table td {
-    padding: 1rem 1.25rem;
+    padding: 0.75rem 0.85rem;
     color: var(--text-secondary);
     border-bottom: 1px solid var(--border-color);
     background-color: var(--bg-secondary);
