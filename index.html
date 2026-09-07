@@ -5,9 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hệ thống Quản lý CLB CNTT UHL</title>
     <script>
-        const user = sessionStorage.getItem("club_current_user");
-        if (user) {
-            window.location.href = "dashboard.html";
+        const userStr = sessionStorage.getItem("club_current_user");
+        if (userStr) {
+            try {
+                const u = JSON.parse(userStr);
+                if (u && ["member", "guest"].includes(u.role)) {
+                    window.location.href = "workspace.html";
+                } else {
+                    window.location.href = "dashboard.html";
+                }
+            } catch(e) {
+                window.location.href = "dashboard.html";
+            }
         } else {
             window.location.href = "login.html";
         }

@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // Confirm session
-    if (!ClubAuth.checkRouteGuard()) return;
+    // Confirm session & permission
+    if (!ClubAuth.checkRouteGuard(["admin", "vice", "leader", "assistant"])) return;
 
     // Load Settings slogan
     const settings = ClubStorage.getData("club_settings") || {};

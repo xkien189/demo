@@ -482,7 +482,10 @@
                 if (result && result.success) {
                     btn.classList.add("success");
                     btn.innerHTML = `<i class="bi bi-check2-circle"></i><span>Thành công!</span>`;
-                    setTimeout(() => { window.location.href = "dashboard.html"; }, 900);
+                    setTimeout(() => { 
+                        const redirectUrl = (typeof ClubAuth !== "undefined" && ClubAuth.getDefaultRoute) ? ClubAuth.getDefaultRoute() : "dashboard.html";
+                        window.location.href = redirectUrl; 
+                    }, 900);
                 } else {
                     btn.disabled = false;
                     btn.classList.remove("success");

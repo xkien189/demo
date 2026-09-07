@@ -45,34 +45,113 @@
 
     <!-- Event Detail & Participants Modal -->
     <div class="modal fade" id="eventDetailModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="e-detail-title">Tên sự kiện</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="fw-bold small text-muted text-uppercase">Thời gian</label>
-                        <div class="text-dark" id="e-detail-date">-</div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="fw-bold small text-muted text-uppercase">Thời gian</label>
+                            <div class="text-dark" id="e-detail-date">-</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="fw-bold small text-muted text-uppercase">Địa điểm</label>
+                            <div class="text-dark" id="e-detail-location">-</div>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="fw-bold small text-muted text-uppercase">Mô tả sự kiện</label>
+                            <div class="text-dark" id="e-detail-desc">-</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="fw-bold small text-muted text-uppercase">Thành viên phụ trách</label>
+                            <div class="text-dark" id="e-detail-leader">-</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="fw-bold small text-muted text-uppercase">Số lượng người tham gia</label>
+                            <div class="text-dark"><i class="bi bi-people me-1"></i><span id="e-detail-attendees" class="fw-bold text-primary">0</span> người đã đăng ký</div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="fw-bold small text-muted text-uppercase">Địa điểm</label>
-                        <div class="text-dark" id="e-detail-location">-</div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="fw-bold small text-muted text-uppercase">Mô tả sự kiện</label>
-                        <div class="text-dark" id="e-detail-desc">-</div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="fw-bold small text-muted text-uppercase">Thành viên phụ trách</label>
-                        <div class="text-dark" id="e-detail-leader">-</div>
-                    </div>
-                    <div class="mb-2">
-                        <label class="fw-bold small text-muted text-uppercase">Đăng ký tham gia (Giả lập)</label>
-                        <div class="text-dark"><i class="bi bi-people me-1"></i><span id="e-detail-attendees">0</span> thành viên đăng ký</div>
+
+                    <div class="border-top pt-3 mt-2">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="fw-bold mb-0"><i class="bi bi-person-lines-fill me-1"></i> Danh sách thành viên đăng ký</h6>
+                            <button class="btn btn-sm btn-outline-primary" id="btn-open-register-from-detail" onclick="openRegisterModalFromDetail()">
+                                <i class="bi bi-pencil-square me-1"></i> Đăng ký tham gia
+                            </button>
+                        </div>
+                        <div class="table-responsive" style="max-height: 200px; overflow-y: auto;">
+                            <table class="table table-sm table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Họ & Tên</th>
+                                        <th>Email / SĐT</th>
+                                        <th>Ban / Vai trò</th>
+                                        <th>Ghi chú</th>
+                                        <th>Thời gian ĐK</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="e-detail-participants-tbody">
+                                    <!-- Dynamic participants list -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Event Modal -->
+    <div class="modal fade" id="eventRegisterModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-calendar-check text-primary me-2"></i>Đăng ký tham gia sự kiện</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="event-register-form">
+                    <input type="hidden" id="reg-event-id">
+                    <div class="modal-body">
+                        <div class="alert alert-info py-2 px-3 small mb-3">
+                            <i class="bi bi-info-circle me-1"></i> Sự kiện: <strong id="reg-event-title">-</strong>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reg-name" class="form-label">Họ và tên *</label>
+                            <input type="text" id="reg-name" class="form-control" required placeholder="Nhập họ và tên của bạn">
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <label for="reg-email" class="form-label">Email liên hệ *</label>
+                                <input type="email" id="reg-email" class="form-control" required placeholder="name@example.com">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="reg-phone" class="form-label">Số điện thoại *</label>
+                                <input type="tel" id="reg-phone" class="form-control" required placeholder="09xxxxxxxx">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reg-dept" class="form-label">Ban bộ phận / Đơn vị</label>
+                            <input type="text" id="reg-dept" class="form-control" placeholder="Ban Chuyên môn / Lớp / Khoa...">
+                        </div>
+                        <div class="mb-3">
+                            <label for="reg-note" class="form-label">Ghi chú / Đóng góp / Mong muốn</label>
+                            <textarea id="reg-note" class="form-control" rows="2" placeholder="Ví dụ: Mong muốn tham gia hỗ trợ ban tổ chức, câu hỏi cho diễn giả..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary" id="btn-submit-register">
+                            <i class="bi bi-check2-circle me-1"></i> Xác nhận đăng ký
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

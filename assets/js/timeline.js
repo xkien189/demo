@@ -7,7 +7,7 @@ let currentTimelines = [];
 let aiGeneratedNodes = [];
 
 document.addEventListener("DOMContentLoaded", () => {
-    if (!ClubAuth.checkRouteGuard()) return;
+    if (!ClubAuth.checkRouteGuard(["admin", "vice", "leader", "assistant"])) return;
 
     initTimelinePage();
 });

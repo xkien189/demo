@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     document.getElementById("event-edit-form").addEventListener("submit", handleEventFormSubmit);
+    document.getElementById("event-register-form")?.addEventListener("submit", handleEventRegisterSubmit);
 
     // Event image file upload handler
     const fileInput = document.getElementById("e-image-file");
@@ -72,6 +73,11 @@ function renderEventsGrid() {
             `;
         }
 
+        const participants = e.participants || [];
+        const attendeesCount = participants.length > 0 ? participants.length : (e.attendeesCount || 0);
+
+        const isUserRegistered = participants.some(p => p.username === user.username || (user.memberId && p.memberId === user.memberId));
+
         return `
             <div class="col-md-6 col-lg-4 mb-4">
                 <div class="card h-100 shadow-none border">
@@ -84,13 +90,17 @@ function renderEventsGrid() {
                         <p class="text-secondary small text-truncate" style="max-height: 40px;">${e.description}</p>
                         
                         <div class="small text-muted mb-1"><i class="bi bi-geo-alt me-1"></i>${e.location}</div>
-                        <div class="small text-muted"><i class="bi bi-person me-1"></i>Phụ trách: ${leader ? leader.name : "N/A"}</div>
+                        <div class="small text-muted mb-2"><i class="bi bi-person me-1"></i>Phụ trách: ${leader ? leader.name : "N/A"}</div>
+                        <div class="small text-primary mb-2"><i class="bi bi-people me-1"></i><strong>${attendeesCount}</strong> người đã đăng ký</div>
                         
                         ${editButtons}
                     </div>
-                    <div class="card-footer bg-transparent border-0 pt-0 pb-3">
-                        <button class="btn btn-secondary btn-sm w-100" onclick="showEventDetails('${e.id}')">
-                            <i class="bi bi-info-circle"></i> Xem chi tiết sự kiện
+                    <div class="card-footer bg-transparent border-0 pt-0 pb-3 d-flex gap-2">
+                        <button class="btn btn-secondary btn-sm flex-fill" onclick="showEventDetails('${e.id}')">
+                            <i class="bi bi-info-circle"></i> Chi tiết
+                        </button>
+                        <button class="btn ${isUserRegistered ? 'btn-success' : 'btn-primary'} btn-sm flex-fill" onclick="openRegisterModal('${e.id}')">
+                            <i class="bi ${isUserRegistered ? 'bi-check-circle' : 'bi-pencil-square'} me-1"></i> ${isUserRegistered ? 'Đã đăng ký' : 'Đăng ký'}
                         </button>
                     </div>
                 </div>
@@ -111,7 +121,10 @@ function populateLeadersDropdown() {
     dropdown.innerHTML = html;
 }
 
+let currentViewingEventId = null;
+
 window.showEventDetails = function(eventId) {
+    currentViewingEventId = eventId;
     const events = ClubStorage.getData("club_events") || [];
     const e = events.find(item => item.id === eventId);
     if (!e) return;
@@ -119,14 +132,71 @@ window.showEventDetails = function(eventId) {
     const members = ClubStorage.getData("club_members") || [];
     const leader = members.find(m => m.id === e.leaderId);
 
+    const participants = e.participants || [];
+    const count = participants.length > 0 ? participants.length : (e.attendeesCount || 0);
+
     document.getElementById("e-detail-title").innerText = e.title;
     document.getElementById("e-detail-date").innerText = ClubUtils.formatDate(e.date);
     document.getElementById("e-detail-location").innerText = e.location;
     document.getElementById("e-detail-desc").innerText = e.description;
     document.getElementById("e-detail-leader").innerText = leader ? `${leader.name} (${leader.id})` : "N/A";
-    document.getElementById("e-detail-attendees").innerText = e.attendeesCount || 0;
+    document.getElementById("e-detail-attendees").innerText = count;
+
+    // Render participants table
+    const tbody = document.getElementById("e-detail-participants-tbody");
+    if (tbody) {
+        if (participants.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-3">Chưa có thành viên nào đăng ký</td></tr>`;
+        } else {
+            tbody.innerHTML = participants.map((p, idx) => `
+                <tr>
+                    <td>${idx + 1}</td>
+                    <td class="fw-semibold">${p.name || "N/A"}</td>
+                    <td>
+                        <div>${p.email || "-"}</div>
+                        <small class="text-muted">${p.phone || "-"}</small>
+                    </td>
+                    <td><span class="badge bg-light text-dark">${p.department || p.role || "Thành viên"}</span></td>
+                    <td class="small text-muted">${p.note || "-"}</td>
+                    <td class="small text-muted">${p.registeredAt ? ClubUtils.formatDate(p.registeredAt) : "-"}</td>
+                </tr>
+            `).join("");
+        }
+    }
 
     const modal = new bootstrap.Modal(document.getElementById("eventDetailModal"));
+    modal.show();
+};
+
+window.openRegisterModalFromDetail = function() {
+    const detailModalEl = document.getElementById("eventDetailModal");
+    const detailModal = bootstrap.Modal.getInstance(detailModalEl);
+    if (detailModal) detailModal.hide();
+
+    if (currentViewingEventId) {
+        openRegisterModal(currentViewingEventId);
+    }
+};
+
+window.openRegisterModal = function(eventId) {
+    const events = ClubStorage.getData("club_events") || [];
+    const e = events.find(item => item.id === eventId);
+    if (!e) return;
+
+    const user = ClubAuth.getCurrentUser();
+    const member = ClubAuth.getCurrentMember();
+
+    document.getElementById("reg-event-id").value = e.id;
+    document.getElementById("reg-event-title").innerText = e.title;
+
+    // Auto-fill user info if logged in
+    document.getElementById("reg-name").value = member?.name || user?.username || "";
+    document.getElementById("reg-email").value = member?.email || user?.email || "";
+    document.getElementById("reg-phone").value = member?.phone || "";
+    document.getElementById("reg-dept").value = member?.department || ClubAuth.ROLES[user?.role]?.title || "";
+    document.getElementById("reg-note").value = "";
+
+    const modal = new bootstrap.Modal(document.getElementById("eventRegisterModal"));
     modal.show();
 };
 
@@ -248,3 +318,74 @@ window.deleteEvent = function(eventId) {
         }
     });
 };
+
+function handleEventRegisterSubmit(e) {
+    e.preventDefault();
+
+    const eventId = document.getElementById("reg-event-id").value;
+    const name = document.getElementById("reg-name").value.trim();
+    const email = document.getElementById("reg-email").value.trim();
+    const phone = document.getElementById("reg-phone").value.trim();
+    const department = document.getElementById("reg-dept").value.trim();
+    const note = document.getElementById("reg-note").value.trim();
+
+    if (!name || !email || !phone) {
+        ClubUtils.showAlert("Thiếu thông tin", "Vui lòng điền đầy đủ Họ tên, Email và Số điện thoại!", "warning");
+        return;
+    }
+
+    let events = ClubStorage.getData("club_events") || [];
+    const index = events.findIndex(ev => ev.id === eventId);
+    if (index === -1) return;
+
+    const user = ClubAuth.getCurrentUser();
+    const member = ClubAuth.getCurrentMember();
+
+    if (!events[index].participants) {
+        events[index].participants = [];
+    }
+
+    // Check if already registered
+    const existingIndex = events[index].participants.findIndex(p => 
+        (user && p.username === user.username) || 
+        (p.email && p.email.toLowerCase() === email.toLowerCase())
+    );
+
+    const participantData = {
+        name,
+        email,
+        phone,
+        department: department || (member?.department || "CLB"),
+        role: user?.role || "member",
+        username: user?.username || "",
+        memberId: user?.memberId || member?.id || "",
+        note,
+        registeredAt: new Date().toISOString()
+    };
+
+    if (existingIndex !== -1) {
+        // Update existing registration
+        events[index].participants[existingIndex] = participantData;
+        ClubUtils.showToast("Cập nhật thành công!", "Thông tin đăng ký sự kiện của bạn đã được cập nhật.", "success");
+    } else {
+        events[index].participants.push(participantData);
+        events[index].attendeesCount = events[index].participants.length;
+        ClubUtils.showToast("Đăng ký thành công!", `Bạn đã đăng ký tham gia sự kiện: ${events[index].title}`, "success");
+        ClubUtils.addLog(`Đăng ký sự kiện: ${events[index].title} (${name})`);
+    }
+
+    ClubStorage.saveData("club_events", events);
+
+    // Close register modal
+    const modalEl = document.getElementById("eventRegisterModal");
+    const modalInstance = bootstrap.Modal.getInstance(modalEl);
+    if (modalInstance) modalInstance.hide();
+
+    renderEventsGrid();
+
+    // If detail modal is open, re-render its participants list
+    const detailModalEl = document.getElementById("eventDetailModal");
+    if (detailModalEl && detailModalEl.classList.contains("show")) {
+        showEventDetails(eventId);
+    }
+}

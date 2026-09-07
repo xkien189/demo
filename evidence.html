@@ -147,7 +147,7 @@
     <script src="assets/js/sidebar.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            if (!ClubAuth.checkRouteGuard()) return;
+            if (!ClubAuth.checkRouteGuard(["admin", "vice", "leader", "assistant"])) return;
 
             // Populate dept filter
             const depts = ClubStorage.getData("club_departments") || [];

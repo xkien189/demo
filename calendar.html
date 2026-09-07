@@ -99,7 +99,7 @@
     
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            if (!ClubAuth.checkRouteGuard()) return;
+            if (!ClubAuth.checkRouteGuard(["admin", "vice", "leader", "assistant"])) return;
 
             const tasks = ClubStorage.getData("club_tasks") || [];
             const events = ClubStorage.getData("club_events") || [];

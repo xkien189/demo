@@ -109,6 +109,16 @@ const ClubAuth = {
         window.location.href = "login.html";
     },
 
+    // Default landing page based on role
+    getDefaultRoute: function() {
+        const user = this.getCurrentUser();
+        if (!user) return "login.html";
+        if (["member", "guest"].includes(user.role)) {
+            return "workspace.html";
+        }
+        return "dashboard.html";
+    },
+
     // Protection check called on page load
     checkRouteGuard: function(requiredRoles = []) {
         const user = this.getCurrentUser();
@@ -119,7 +129,7 @@ const ClubAuth = {
 
         if (requiredRoles.length > 0 && !requiredRoles.includes(user.role)) {
             alert("Bạn không có quyền truy cập trang này!");
-            window.location.href = "dashboard.html";
+            window.location.href = this.getDefaultRoute();
             return false;
         }
         return true;
