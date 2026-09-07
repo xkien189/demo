@@ -162,6 +162,137 @@
         }
         .dept-member-row:last-child { border-bottom: none; }
         .dept-member-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+
+        /* ─── Org Tree Hierarchy Styles ─────────────────────────────────── */
+        .org-tree-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            padding: 2rem 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+        }
+        .org-tree {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 900px;
+        }
+        .org-node {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 14px;
+            padding: 0.85rem 1.25rem;
+            box-shadow: var(--card-shadow);
+            transition: all 0.25s ease;
+            position: relative;
+            text-align: center;
+        }
+        .org-node:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--card-shadow-lg);
+        }
+        .org-node.root-admin {
+            border-color: #2563eb;
+            background: linear-gradient(135deg, rgba(37,99,235,0.06), var(--bg-secondary));
+            min-width: 250px;
+        }
+        .org-node.vice-node {
+            border-color: #06b6d4;
+            background: linear-gradient(135deg, rgba(6,182,212,0.06), var(--bg-secondary));
+            min-width: 220px;
+        }
+        .org-node.dept-node {
+            border-color: #f59e0b;
+            background: var(--bg-secondary);
+            min-width: 170px;
+            max-width: 210px;
+        }
+        .org-node-img {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 0.4rem;
+        }
+        .org-node-title {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.2rem;
+        }
+        .org-node-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .org-node-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Tree connector lines */
+        .org-line-v {
+            width: 2px;
+            height: 28px;
+            background: #94a3b8;
+            margin: 0 auto;
+        }
+        .org-branch-row {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            position: relative;
+            width: 100%;
+        }
+        .org-branch-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            flex: 1;
+        }
+        /* Top horizontal connector bar across department columns */
+        .org-dept-container {
+            position: relative;
+            width: 100%;
+        }
+        .org-horizontal-bar {
+            position: absolute;
+            top: 0;
+            height: 2px;
+            background: #94a3b8;
+        }
+        .org-members-box {
+            margin-top: 0.75rem;
+            width: 100%;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            padding: 0.6rem;
+            border: 1px dashed var(--border-color);
+            font-size: 0.78rem;
+        }
+        .org-member-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 0.2rem 0.55rem;
+            margin: 0.2rem;
+            font-size: 0.75rem;
+        }
+        .org-member-pill img {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
         [data-theme="dark"] .about-hero { background: linear-gradient(135deg, #030712 0%, #0f2240 50%, #030712 100%); }
     </style>
 </head>
@@ -377,16 +508,22 @@
                             </div>
                         </div>
 
-                        <!-- Departments overview -->
-                        <div class="card">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="card-title mb-0"><i class="bi bi-diagram-3 me-2"></i>Cơ cấu tổ chức CLB</h5>
-                                <span class="badge bg-primary" id="about-total-active-badge">0 thành viên đang hoạt động</span>
-                            </div>
-                            <div class="card-body">
-                                <div class="row g-3" id="about-depts-grid">
-                                    <!-- Dynamic -->
-                                </div>
+                    </div>
+                </div>
+
+                <!-- Org Structure Hierarchy Tree Section (Full Width) -->
+                <div class="card mt-4 mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <h5 class="card-title mb-0"><i class="bi bi-diagram-3 me-2"></i>Sơ đồ Cơ cấu Tổ chức CLB (Từ trên xuống)</h5>
+                            <small class="text-muted">Cơ cấu điều hành từ Chủ nhiệm, Phó Chủ nhiệm đến các Ban bộ phận và Thành viên</small>
+                        </div>
+                        <span class="badge bg-primary" id="about-total-active-badge">0 thành viên đang hoạt động</span>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="org-tree-wrapper">
+                            <div class="org-tree" id="about-org-tree">
+                                <!-- Dynamic tree rendered by JS -->
                             </div>
                         </div>
                     </div>
@@ -500,40 +637,98 @@
             }
             animateCounter("about-stat-paid-members", paidCount);
 
-            // ─── Departments Grid ─────────────────────────────────────────────
-            const deptsGrid = document.getElementById("about-depts-grid");
-            const colors = ["#2563eb","#10b981","#f59e0b","#ef4444","#8b5cf6"];
-            if (deptsGrid) {
-                if (depts.length === 0) {
-                    deptsGrid.innerHTML = `<div class="col-12 text-center text-muted py-3">Chưa có dữ liệu ban bộ phận</div>`;
-                } else {
-                    deptsGrid.innerHTML = depts.map((d, i) => {
-                        const leaderM = members.find(m => m.id === d.leader);
-                        const deptMembers = members.filter(m => m.department === d.name && m.status === "Active");
-                        const color = colors[i % colors.length];
+            // ─── Org Hierarchy Tree (Top - Down) ──────────────────────────────
+            const orgTreeContainer = document.getElementById("about-org-tree");
+            const colors = ["#2563eb","#10b981","#f59e0b","#ef4444","#8b5cf6","#06b6d4"];
 
-                        const memberAvatars = deptMembers.slice(0, 3).map(m =>
-                            `<img src="${m.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'}"
-                                  class="dept-member-avatar" title="${m.name}"
-                                  style="margin-left:-8px;border:2px solid var(--bg-secondary);z-index:1;">`
-                        ).join("");
+            if (orgTreeContainer) {
+                // Find Chủ nhiệm (admin)
+                const president = members.find(m => m.role === "admin" && m.status === "Active") || 
+                                  members.find(m => m.role === "admin") || 
+                                  { name: "Ban Chủ nhiệm", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150", id: "ADMIN" };
 
-                        return `
-                        <div class="col-md-6">
-                            <div class="dept-leader-card">
-                                <img src="${leaderM ? (leaderM.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150') : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'}" alt="${d.name}">
-                                <div class="fw-bold fs-6" style="color:${color}">${d.code}</div>
-                                <div class="fw-semibold mt-1">${d.name}</div>
-                                <div class="text-muted small mb-2">${leaderM ? '👑 TB: ' + leaderM.name : 'Chưa phân nhiệm vụ'}</div>
-                                <div class="text-muted small mb-2" style="font-size:0.78rem;">${d.description || ''}</div>
-                                <div class="d-flex align-items-center justify-content-center gap-2 flex-wrap">
-                                    <div class="d-flex" style="margin-left:8px;">${memberAvatars}</div>
-                                    <span class="badge" style="background:${color}20;color:${color};">${deptMembers.length} thành viên</span>
+                // Find Phó Chủ nhiệm (vice)
+                const vicePresidents = members.filter(m => m.role === "vice" && m.status === "Active");
+
+                // Departments & their leaders, assistants, and members
+                const deptCardsHtml = depts.map((d, i) => {
+                    const color = colors[i % colors.length];
+                    const leaderM = members.find(m => m.id === d.leader);
+                    const assistantM = members.find(m => m.id === d.assistant);
+                    const deptMembers = members.filter(m => m.department === d.name && m.id !== d.leader && m.id !== d.assistant && m.status === "Active");
+
+                    const memberPills = deptMembers.map(m => `
+                        <span class="org-member-pill" title="${m.name} (${ClubAuth.ROLES[m.role]?.title || 'Thành viên'})">
+                            <img src="${m.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'}" alt="${m.name}">
+                            <span>${m.name}</span>
+                        </span>
+                    `).join("");
+
+                    return `
+                        <div class="org-branch-col">
+                            <!-- Vertical link from horizontal bar down to department node -->
+                            <div class="org-line-v" style="background:${color};"></div>
+                            <div class="org-node dept-node" style="border-color:${color};">
+                                <div class="org-node-title" style="color:${color};">${d.code} - ${d.name}</div>
+                                <img src="${leaderM ? (leaderM.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150') : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'}" class="org-node-img" alt="${leaderM ? leaderM.name : 'Trưởng ban'}" style="border-color:${color};">
+                                <div class="org-node-name">${leaderM ? leaderM.name : "Chưa phân nhiệm"}</div>
+                                <div class="org-node-sub"><span class="badge" style="background:${color}20;color:${color};font-size:0.7rem;">Trưởng ban</span></div>
+                                ${assistantM ? `
+                                    <div class="mt-2 pt-2 border-top small text-muted" style="font-size:0.75rem;">
+                                        <i class="bi bi-person-badge me-1"></i>Phó ban: <strong class="text-dark">${assistantM.name}</strong>
+                                    </div>
+                                ` : ''}
+                            </div>
+
+                            <!-- Line down to members box -->
+                            <div class="org-line-v" style="height:16px; background:${color};"></div>
+                            <div class="org-members-box">
+                                <div class="fw-bold mb-1 text-muted small" style="font-size:0.7rem;"><i class="bi bi-people me-1"></i>Thành viên (${deptMembers.length})</div>
+                                <div class="d-flex flex-wrap justify-content-center">
+                                    ${memberPills || '<span class="text-muted small" style="font-size:0.7rem;">Chưa có TV</span>'}
                                 </div>
                             </div>
-                        </div>`;
-                    }).join("");
-                }
+                        </div>
+                    `;
+                }).join("");
+
+                // Render Tree HTML
+                orgTreeContainer.innerHTML = `
+                    <!-- Level 1: Chủ nhiệm (Root Node) -->
+                    <div class="org-node root-admin">
+                        <span class="badge bg-primary px-3 py-1 mb-2" style="font-size:0.75rem;"><i class="bi bi-award me-1"></i>BAN CHỦ NHIỆM CLB</span>
+                        <div>
+                            <img src="${president.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'}" class="org-node-img" alt="${president.name}" style="width:64px;height:64px;border-color:#2563eb;">
+                        </div>
+                        <div class="org-node-name fs-6 text-primary">${president.name}</div>
+                        <div class="org-node-sub fw-semibold text-muted">Chủ nhiệm Câu lạc bộ</div>
+                    </div>
+
+                    <!-- Line from President to Vice / Departments -->
+                    <div class="org-line-v" style="height:32px; background:#2563eb;"></div>
+
+                    <!-- Level 2: Phó Chủ nhiệm (Nếu có) -->
+                    ${vicePresidents.length > 0 ? `
+                        <div class="org-branch-row mb-2">
+                            ${vicePresidents.map(v => `
+                                <div class="org-node vice-node">
+                                    <div class="org-node-title text-info"><i class="bi bi-star me-1"></i>PHÓ CHỦ NHIỆM</div>
+                                    <img src="${v.avatar || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150'}" class="org-node-img" alt="${v.name}" style="width:48px;height:48px;border-color:#06b6d4;">
+                                    <div class="org-node-name">${v.name}</div>
+                                    <div class="org-node-sub">${v.department || "Ban Điều hành"}</div>
+                                </div>
+                            `).join("")}
+                        </div>
+                        <div class="org-line-v" style="height:32px; background:#06b6d4;"></div>
+                    ` : ''}
+
+                    <!-- Level 3: Các Ban Bộ phận (Ngang nhau phân nhánh từ trên xuống) -->
+                    <div class="org-dept-container">
+                        <div class="org-branch-row">
+                            ${deptCardsHtml || '<div class="text-muted py-3">Chưa có ban bộ phận nào</div>'}
+                        </div>
+                    </div>
+                `;
             }
 
             // ─── Events Grid ──────────────────────────────────────────────────
