@@ -109,9 +109,17 @@
                                 <div class="row g-3 align-items-center mb-3">
                                     <div class="col-md-5">
                                         <label class="form-label small fw-semibold">Chọn Đợt / Kỳ Đóng Quỹ</label>
-                                        <select id="select-fund-period" class="form-select fw-bold">
-                                            <!-- Dynamic periods -->
-                                        </select>
+                                        <div class="input-group">
+                                            <select id="select-fund-period" class="form-select fw-bold">
+                                                <!-- Dynamic periods -->
+                                            </select>
+                                            <button class="btn btn-outline-primary" id="btn-edit-period" onclick="openEditPeriodModal()" title="Chỉnh sửa đợt thu này" style="display:none;">
+                                                <i class="bi bi-pencil-square"></i> Sửa
+                                            </button>
+                                            <button class="btn btn-outline-danger" id="btn-delete-period" onclick="deleteActivePeriod()" title="Xóa đợt thu này" style="display:none;">
+                                                <i class="bi bi-trash"></i> Xóa
+                                            </button>
+                                        </div>
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label small fw-semibold">Lọc theo trạng thái</label>
@@ -172,6 +180,7 @@
                                                 <th>Minh chứng</th>
                                                 <th>Người lập</th>
                                                 <th>Thời gian</th>
+                                                <th class="text-end" id="th-ledger-action" style="display:none;">Thao tác</th>
                                             </tr>
                                         </thead>
                                         <tbody id="ledger-tbody">
@@ -321,6 +330,50 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                         <button type="submit" class="btn btn-success"><i class="bi bi-plus-lg me-1"></i>Khởi tạo đợt thu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Period Modal -->
+    <div class="modal fade" id="editPeriodModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Chỉnh sửa Đợt thu Quỹ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="edit-period-form">
+                    <input type="hidden" id="edit-p-id">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Tên đợt thu quỹ *</label>
+                            <input type="text" id="edit-p-title" class="form-control" placeholder="Ví dụ: Quỹ Học kỳ 1 (2026-2027)" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Số tiền mỗi thành viên (VNĐ) *</label>
+                            <input type="number" id="edit-p-amount" class="form-control" placeholder="Ví dụ: 100000" min="10000" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Hạn nộp *</label>
+                            <input type="date" id="edit-p-duedate" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Trạng thái đợt thu</label>
+                            <select id="edit-p-status" class="form-select">
+                                <option value="Active">Đang diễn ra (Active)</option>
+                                <option value="Closed">Đã kết thúc (Closed)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mô tả mục đích thu</label>
+                            <textarea id="edit-p-desc" class="form-control" rows="2" placeholder="Ghi chú mục đích sử dụng đợt thu này..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>Lưu thay đổi</button>
                     </div>
                 </form>
             </div>

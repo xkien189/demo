@@ -101,15 +101,25 @@ const ClubUtils = {
     // Theme state load
     initTheme: function() {
         const savedTheme = localStorage.getItem('club_theme') || 'light';
-        document.body.setAttribute('data-theme', savedTheme);
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        if (document.body) document.body.setAttribute('data-theme', savedTheme);
+        const btn = document.getElementById("theme-btn-icon");
+        if (btn) {
+            btn.className = savedTheme === 'dark' ? 'bi bi-sun' : 'bi bi-moon-stars';
+        }
         return savedTheme;
     },
 
     toggleTheme: function() {
-        const currentTheme = document.body.getAttribute('data-theme');
+        const currentTheme = document.documentElement.getAttribute('data-theme') || (document.body ? document.body.getAttribute('data-theme') : 'light');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        document.body.setAttribute('data-theme', newTheme);
+        document.documentElement.setAttribute('data-theme', newTheme);
+        if (document.body) document.body.setAttribute('data-theme', newTheme);
         localStorage.setItem('club_theme', newTheme);
+        const btn = document.getElementById("theme-btn-icon");
+        if (btn) {
+            btn.className = newTheme === 'dark' ? 'bi bi-sun' : 'bi bi-moon-stars';
+        }
         return newTheme;
     },
 
@@ -249,7 +259,13 @@ const ClubUtils = {
     }
 };
 
-// Auto run theme & form warning setup
+// Auto run theme immediately & form warning setup
+try {
+    const savedTheme = localStorage.getItem('club_theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    if (document.body) document.body.setAttribute('data-theme', savedTheme);
+} catch(e) {}
+
 document.addEventListener("DOMContentLoaded", () => {
     ClubUtils.initTheme();
     ClubUtils.initFormUnsavedWarning();

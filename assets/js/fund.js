@@ -30,6 +30,21 @@ function initFundPage() {
         btnCreateTx.style.display = (user.role === "admin") ? "" : "none";
     }
 
+    // Toggle Period edit & delete buttons for Admin
+    const btnEditPeriod = document.getElementById("btn-edit-period");
+    const btnDeletePeriod = document.getElementById("btn-delete-period");
+    if (btnEditPeriod && btnDeletePeriod) {
+        const isAdmin = (user.role === "admin");
+        btnEditPeriod.style.display = isAdmin ? "" : "none";
+        btnDeletePeriod.style.display = isAdmin ? "" : "none";
+    }
+
+    // Toggle Ledger action column for Admin
+    const thLedgerAction = document.getElementById("th-ledger-action");
+    if (thLedgerAction) {
+        thLedgerAction.style.display = (user.role === "admin") ? "" : "none";
+    }
+
     // Populate periods
     populatePeriodDropdown();
 
@@ -45,6 +60,10 @@ function initFundPage() {
     document.getElementById("upload-proof-form").addEventListener("submit", handleUploadProofSubmit);
     document.getElementById("create-tx-form").addEventListener("submit", handleCreateTxSubmit);
     document.getElementById("create-period-form").addEventListener("submit", handleCreatePeriodSubmit);
+    const editPeriodForm = document.getElementById("edit-period-form");
+    if (editPeriodForm) {
+        editPeriodForm.addEventListener("submit", handleEditPeriodSubmit);
+    }
 
     // File input preview in proof modal
     document.getElementById("proof-file-input").addEventListener("change", (e) => {
@@ -85,11 +104,14 @@ function populatePeriodDropdown() {
 
     if (periods.length === 0) {
         select.innerHTML = `<option value="">Chưa có đợt thu quỹ nào</option>`;
+        activePeriodId = "";
         return;
     }
 
-    select.innerHTML = periods.map(p => `<option value="${p.id}">${p.title} (${p.amountPerMember.toLocaleString('vi-VN')} VNĐ/người)</option>`).join("");
-    activePeriodId = periods[0].id;
+    select.innerHTML = periods.map(p => `<option value="${p.id}">${p.title} (${Number(p.amountPerMember).toLocaleString('vi-VN')} VNĐ/người)</option>`).join("");
+    if (!activePeriodId || !periods.some(p => p.id === activePeriodId)) {
+        activePeriodId = periods[0].id;
+    }
     select.value = activePeriodId;
 }
 
@@ -177,7 +199,8 @@ function renderPeriodMembersTable() {
                 actionsHtml += `<button onclick="viewProofModal('${m.name}', '${record.proofUrl}')" class="btn btn-sm btn-info text-white me-1"><i class="bi bi-eye me-1"></i>Xem biên lai</button>`;
             }
             if (canManage) {
-                actionsHtml += `<span class="small text-muted"><i class="bi bi-check-all text-success me-1"></i>Đã duyệt</span>`;
+                actionsHtml += `<button onclick="revertPaymentStatus('${period.id}', '${m.id}', '${txCode}')" class="btn btn-sm btn-outline-danger me-1" title="Hủy trạng thái đã thu nếu duyệt nhầm"><i class="bi bi-arrow-counterclockwise me-1"></i>Hủy thu</button>`;
+                actionsHtml += `<span class="small text-success fw-semibold"><i class="bi bi-check-all me-1"></i>Đã duyệt</span>`;
             }
         } else {
             // Unpaid
@@ -222,11 +245,14 @@ function renderPeriodMembersTable() {
 
 function renderLedgerTable() {
     const transactions = ClubStorage.getData("club_fund_transactions") || [];
+    const user = ClubAuth.getCurrentUser();
+    const canManage = user && user.role === "admin";
     const tbody = document.getElementById("ledger-tbody");
     if (!tbody) return;
 
+    const colSpan = canManage ? 9 : 8;
     if (transactions.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted">Chưa có phiếu Thu / Chi nào</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="${colSpan}" class="text-center py-4 text-muted">Chưa có phiếu Thu / Chi nào</td></tr>`;
         return;
     }
 
@@ -240,6 +266,10 @@ function renderLedgerTable() {
             ? `<img src="${t.proofUrl}" class="proof-thumb-sm" onclick="viewProofModal('${t.purpose}', '${t.proofUrl}')">`
             : `<span class="text-muted small">Không có</span>`;
 
+        const actionTd = canManage 
+            ? `<td class="text-end"><button onclick="deleteTransaction('${t.id}')" class="btn btn-sm btn-outline-danger py-0 px-2" title="Xóa phiếu"><i class="bi bi-trash"></i></button></td>` 
+            : ``;
+
         return `
             <tr>
                 <td><code class="fw-bold text-muted">${t.id}</code></td>
@@ -250,6 +280,7 @@ function renderLedgerTable() {
                 <td>${proofThumb}</td>
                 <td><small class="fw-bold">${t.createdBy}</small></td>
                 <td><small class="text-muted">${ClubUtils.formatDateTime(t.date)}</small></td>
+                ${actionTd}
             </tr>
         `;
     }).join("");
@@ -491,3 +522,166 @@ function handleCreatePeriodSubmit(e) {
     populatePeriodDropdown();
     renderPeriodMembersTable();
 }
+
+// ──────────────────────────────────────────────────────────────
+// Hủy thu quỹ – revert status Paid → Unpaid, xóa giao dịch tương ứng
+// ──────────────────────────────────────────────────────────────
+window.revertPaymentStatus = function(periodId, memberId, txCode) {
+    ClubUtils.showConfirm(
+        "Hủy trạng thái đã thu?",
+        `Thao tác này sẽ đặt lại trạng thái của thành viên về <b>Chưa nộp</b> và xóa giao dịch thu quỹ (Mã: ${txCode}) khỏi sổ thu chi. Tiếp tục?`,
+        "Đồng ý Hủy thu",
+        "Quay lại"
+    ).then((result) => {
+        if (!result.isConfirmed) return;
+
+        let periods = ClubStorage.getData("club_fund_periods") || [];
+        const pIdx = periods.findIndex(p => p.id === periodId);
+        if (pIdx === -1) return;
+
+        periods[pIdx].memberRecords = periods[pIdx].memberRecords || [];
+        const mRecIdx = periods[pIdx].memberRecords.findIndex(r => r.memberId === memberId);
+
+        if (mRecIdx !== -1) {
+            periods[pIdx].memberRecords[mRecIdx] = {
+                memberId: memberId,
+                status: "Unpaid",
+                transactionCode: txCode,
+                proofUrl: "",
+                paidAt: "",
+                confirmedBy: ""
+            };
+        } else {
+            periods[pIdx].memberRecords.push({
+                memberId: memberId,
+                status: "Unpaid",
+                transactionCode: txCode,
+                proofUrl: "",
+                paidAt: "",
+                confirmedBy: ""
+            });
+        }
+
+        // Xóa giao dịch tương ứng trong sổ thu chi (khớp txCode trong purpose)
+        let transactions = ClubStorage.getData("club_fund_transactions") || [];
+        transactions = transactions.filter(t => !t.purpose.includes(txCode));
+
+        ClubStorage.saveData("club_fund_periods", periods);
+        ClubStorage.saveData("club_fund_transactions", transactions);
+
+        ClubUtils.addLog(`Hủy thu quỹ cho thành viên ${memberId} (Mã: ${txCode})`);
+        ClubUtils.showToast("Đã hủy thu!", "Trạng thái đóng quỹ đã được đặt lại về Chưa nộp.", "info");
+        renderPeriodMembersTable();
+        renderLedgerTable();
+        renderFundMetrics();
+    });
+};
+
+// ──────────────────────────────────────────────────────────────
+// Sửa đợt thu quỹ
+// ──────────────────────────────────────────────────────────────
+window.openEditPeriodModal = function() {
+    const periods = ClubStorage.getData("club_fund_periods") || [];
+    const period = periods.find(p => p.id === activePeriodId);
+    if (!period) {
+        ClubUtils.showAlert("Thông báo", "Vui lòng chọn một đợt thu quỹ trước.", "info");
+        return;
+    }
+
+    document.getElementById("edit-p-id").value = period.id;
+    document.getElementById("edit-p-title").value = period.title;
+    document.getElementById("edit-p-amount").value = period.amountPerMember;
+    document.getElementById("edit-p-duedate").value = period.dueDate;
+    document.getElementById("edit-p-status").value = period.status || "Active";
+    document.getElementById("edit-p-desc").value = period.description || "";
+
+    new bootstrap.Modal(document.getElementById("editPeriodModal")).show();
+};
+
+function handleEditPeriodSubmit(e) {
+    e.preventDefault();
+
+    const periodId = document.getElementById("edit-p-id").value;
+    const title = document.getElementById("edit-p-title").value.trim();
+    const amountPerMember = Number(document.getElementById("edit-p-amount").value);
+    const dueDate = document.getElementById("edit-p-duedate").value;
+    const status = document.getElementById("edit-p-status").value;
+    const description = document.getElementById("edit-p-desc").value.trim();
+
+    let periods = ClubStorage.getData("club_fund_periods") || [];
+    const pIdx = periods.findIndex(p => p.id === periodId);
+    if (pIdx === -1) return;
+
+    periods[pIdx].title = title;
+    periods[pIdx].amountPerMember = amountPerMember;
+    periods[pIdx].dueDate = dueDate;
+    periods[pIdx].status = status;
+    periods[pIdx].description = description;
+
+    ClubStorage.saveData("club_fund_periods", periods);
+    ClubUtils.addLog(`Chỉnh sửa đợt thu quỹ: ${title}`);
+    ClubUtils.showToast("Thành công!", "Đã cập nhật thông tin đợt thu quỹ.", "success");
+
+    bootstrap.Modal.getInstance(document.getElementById("editPeriodModal")).hide();
+    populatePeriodDropdown();
+    renderPeriodMembersTable();
+    renderFundMetrics();
+}
+
+// ──────────────────────────────────────────────────────────────
+// Xóa đợt thu quỹ đang chọn
+// ──────────────────────────────────────────────────────────────
+window.deleteActivePeriod = function() {
+    if (!activePeriodId) {
+        ClubUtils.showAlert("Thông báo", "Vui lòng chọn một đợt thu quỹ để xóa.", "info");
+        return;
+    }
+
+    const periods = ClubStorage.getData("club_fund_periods") || [];
+    const period = periods.find(p => p.id === activePeriodId);
+    if (!period) return;
+
+    ClubUtils.showConfirm(
+        "Xóa đợt thu quỹ?",
+        `Bạn chắc chắn muốn xóa đợt thu <b>${period.title}</b>? Thao tác này không thể hoàn tác và sẽ xóa tất cả dữ liệu đóng quỹ của đợt này.`,
+        "Xóa đợt thu",
+        "Hủy"
+    ).then((result) => {
+        if (!result.isConfirmed) return;
+
+        let updatedPeriods = ClubStorage.getData("club_fund_periods") || [];
+        updatedPeriods = updatedPeriods.filter(p => p.id !== activePeriodId);
+
+        ClubStorage.saveData("club_fund_periods", updatedPeriods);
+        activePeriodId = "";
+
+        ClubUtils.addLog(`Xóa đợt thu quỹ: ${period.title}`);
+        ClubUtils.showToast("Đã xóa!", `Đợt thu "${period.title}" đã được xóa.`, "success");
+        populatePeriodDropdown();
+        renderPeriodMembersTable();
+        renderFundMetrics();
+    });
+};
+
+// ──────────────────────────────────────────────────────────────
+// Xóa phiếu thu chi khỏi sổ quỹ
+// ──────────────────────────────────────────────────────────────
+window.deleteTransaction = function(txId) {
+    ClubUtils.showConfirm(
+        "Xóa phiếu thu/chi?",
+        `Bạn có chắc muốn xóa phiếu <b>${txId}</b> khỏi sổ quỹ? Lưu ý: nếu đây là phiếu thu quỹ thành viên, hãy dùng nút <b>Hủy thu</b> trên bảng đóng quỹ để đồng bộ trạng thái.`,
+        "Xóa phiếu",
+        "Hủy"
+    ).then((result) => {
+        if (!result.isConfirmed) return;
+
+        let transactions = ClubStorage.getData("club_fund_transactions") || [];
+        transactions = transactions.filter(t => t.id !== txId);
+
+        ClubStorage.saveData("club_fund_transactions", transactions);
+        ClubUtils.addLog(`Xóa phiếu thu/chi: ${txId}`);
+        ClubUtils.showToast("Đã xóa!", "Phiếu thu/chi đã được xóa khỏi sổ quỹ.", "success");
+        renderLedgerTable();
+        renderFundMetrics();
+    });
+};

@@ -24,9 +24,16 @@
             <div id="topbar-container"></div>
             
             <div class="content-container fade-in">
-                <div class="mb-4">
-                    <h4 class="mb-1 fw-bold">Danh sách Ban bộ phận</h4>
-                    <p class="text-muted small mb-0">Cơ cấu tổ chức và sơ đồ phân nhiệm các ban trong Câu lạc bộ.</p>
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <div>
+                        <h4 class="mb-1 fw-bold">Danh sách Ban bộ phận</h4>
+                        <p class="text-muted small mb-0">Cơ cấu tổ chức và sơ đồ phân nhiệm các ban trong Câu lạc bộ.</p>
+                    </div>
+                    <div id="dept-actions-top">
+                        <button class="btn btn-primary" onclick="openCreateDeptModal()">
+                            <i class="bi bi-plus-circle me-1"></i>Thêm Ban bộ phận
+                        </button>
+                    </div>
                 </div>
 
                 <div class="row" id="departments-list">
@@ -66,6 +73,53 @@
         </div>
     </div>
 
+    <!-- Modal Add/Edit Department -->
+    <div class="modal fade" id="deptEditModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="dept-modal-title">Thêm Ban bộ phận mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="dept-edit-form">
+                    <input type="hidden" id="dept-old-code" value="">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="dept-code" class="form-label">Mã Ban (viết tắt) *</label>
+                            <input type="text" id="dept-code" class="form-control" placeholder="VD: BCM, BTT, BSK..." required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="dept-name" class="form-label">Tên Ban bộ phận *</label>
+                            <input type="text" id="dept-name" class="form-control" placeholder="VD: Ban Chuyên môn, Ban Truyền thông..." required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="dept-leader" class="form-label">Trưởng ban phụ trách</label>
+                            <select id="dept-leader" class="form-select">
+                                <!-- Dynamic options -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="dept-assistant" class="form-label">Phó ban phụ trách</label>
+                            <select id="dept-assistant" class="form-select">
+                                <!-- Dynamic options -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="dept-desc" class="form-label">Mô tả chức năng & nhiệm vụ</label>
+                            <textarea id="dept-desc" class="form-control" rows="3" placeholder="Mô tả tóm tắt vai trò và trách nhiệm của ban..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                        <button type="submit" class="btn btn-primary" id="btn-save-dept">
+                            <i class="bi bi-save me-1"></i>Lưu thông tin
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -86,14 +140,35 @@
         window.renderDepartmentsGrid = function() {
             const depts = ClubStorage.getData("club_departments") || [];
             const members = ClubStorage.getData("club_members") || [];
+            const user = ClubAuth.getCurrentUser();
+            const canManage = user && ["admin", "vice"].includes(user.role);
             const container = document.getElementById("departments-list");
 
             if (!container) return;
+
+            if (depts.length === 0) {
+                container.innerHTML = `<div class="col-12 text-center text-muted py-5">Chưa có ban bộ phận nào được khởi tạo.</div>`;
+                return;
+            }
 
             container.innerHTML = depts.map(d => {
                 const leaderMember = members.find(m => m.id === d.leader);
                 const assistantMember = members.find(m => m.id === d.assistant);
                 const deptMembersCount = members.filter(m => m.department === d.name).length;
+
+                let manageButtons = "";
+                if (canManage) {
+                    manageButtons = `
+                        <div class="border-top pt-2 mt-2 d-flex justify-content-end gap-2">
+                            <button class="btn btn-sm btn-outline-primary py-1 px-2" onclick="openEditDeptModal('${d.code}')" title="Sửa ban">
+                                <i class="bi bi-pencil me-1"></i>Sửa
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger py-1 px-2" onclick="deleteDepartment('${d.code}')" title="Xóa ban">
+                                <i class="bi bi-trash me-1"></i>Xóa
+                            </button>
+                        </div>
+                    `;
+                }
 
                 return `
                     <div class="col-md-6 col-lg-4 mb-4">
@@ -104,7 +179,7 @@
                             </div>
                             <div class="card-body py-2">
                                 <h5 class="fw-bold text-primary mb-2">${d.name}</h5>
-                                <p class="text-secondary small" style="min-height: 48px;">${d.description}</p>
+                                <p class="text-secondary small" style="min-height: 48px;">${d.description || 'Chưa có mô tả chi tiết'}</p>
                                 
                                 <div class="mt-3 pt-3 border-top">
                                     <div class="d-flex justify-content-between mb-1">
@@ -116,10 +191,11 @@
                                         <span class="small fw-bold">${assistantMember ? assistantMember.name : "Chưa phân nhiệm"}</span>
                                     </div>
                                 </div>
+                                ${manageButtons}
                             </div>
                             <div class="card-footer bg-transparent border-0 pt-0 pb-3">
                                 <button class="btn btn-secondary w-100 btn-sm" onclick="showDeptMembers('${d.name}')">
-                                    <i class="bi bi-eye"></i> Xem danh sách thành viên
+                                    <i class="bi bi-eye me-1"></i> Xem danh sách thành viên
                                 </button>
                             </div>
                         </div>
@@ -128,10 +204,223 @@
             }).join("");
         };
 
+        function populateDeptMemberOptions(leaderId = "", assistantId = "") {
+            const members = ClubStorage.getData("club_members") || [];
+            const leaderSelect = document.getElementById("dept-leader");
+            const assistantSelect = document.getElementById("dept-assistant");
+
+            let optionsHtml = '<option value="">-- Chưa phân nhiệm --</option>';
+            members.forEach(m => {
+                optionsHtml += `<option value="${m.id}">${m.name} (${m.id}) - ${m.department}</option>`;
+            });
+
+            if (leaderSelect) {
+                leaderSelect.innerHTML = optionsHtml;
+                leaderSelect.value = leaderId;
+            }
+            if (assistantSelect) {
+                assistantSelect.innerHTML = optionsHtml;
+                assistantSelect.value = assistantId;
+            }
+        }
+
+        window.openCreateDeptModal = function() {
+            document.getElementById("dept-modal-title").innerText = "Thêm Ban bộ phận mới";
+            document.getElementById("dept-old-code").value = "";
+            document.getElementById("dept-code").value = "";
+            document.getElementById("dept-code").readOnly = false;
+            document.getElementById("dept-name").value = "";
+            document.getElementById("dept-desc").value = "";
+            populateDeptMemberOptions("", "");
+
+            const modal = new bootstrap.Modal(document.getElementById("deptEditModal"));
+            modal.show();
+        };
+
+        window.openEditDeptModal = function(code) {
+            const depts = ClubStorage.getData("club_departments") || [];
+            const dept = depts.find(d => d.code === code);
+            if (!dept) return;
+
+            document.getElementById("dept-modal-title").innerText = `Chỉnh sửa Ban: ${dept.name}`;
+            document.getElementById("dept-old-code").value = dept.code;
+            document.getElementById("dept-code").value = dept.code;
+            document.getElementById("dept-code").readOnly = false;
+            document.getElementById("dept-name").value = dept.name;
+            document.getElementById("dept-desc").value = dept.description || "";
+            populateDeptMemberOptions(dept.leader || "", dept.assistant || "");
+
+            const modal = new bootstrap.Modal(document.getElementById("deptEditModal"));
+            modal.show();
+        };
+
+        function handleDeptFormSubmit(e) {
+            e.preventDefault();
+            const oldCode = document.getElementById("dept-old-code").value.trim();
+            const code = document.getElementById("dept-code").value.trim().toUpperCase();
+            const name = document.getElementById("dept-name").value.trim();
+            const leader = document.getElementById("dept-leader").value;
+            const assistant = document.getElementById("dept-assistant").value;
+            const desc = document.getElementById("dept-desc").value.trim();
+
+            if (!code || !name) {
+                ClubUtils.showAlert("Thiếu thông tin", "Vui lòng nhập Mã ban và Tên ban!", "warning");
+                return;
+            }
+
+            let depts = ClubStorage.getData("club_departments") || [];
+            let members = ClubStorage.getData("club_members") || [];
+            let tasks = ClubStorage.getData("club_tasks") || [];
+
+            const isEdit = oldCode !== "";
+
+            if (isEdit) {
+                const idx = depts.findIndex(d => d.code === oldCode);
+                if (idx === -1) return;
+
+                // Check duplicate code or name with other depts
+                if (depts.some((d, i) => i !== idx && d.code === code)) {
+                    ClubUtils.showAlert("Trùng lặp", `Mã ban "${code}" đã tồn tại!`, "warning");
+                    return;
+                }
+                if (depts.some((d, i) => i !== idx && d.name.toLowerCase() === name.toLowerCase())) {
+                    ClubUtils.showAlert("Trùng lặp", `Tên ban "${name}" đã tồn tại!`, "warning");
+                    return;
+                }
+
+                const oldName = depts[idx].name;
+                depts[idx] = {
+                    ...depts[idx],
+                    code,
+                    name,
+                    leader,
+                    assistant,
+                    description: desc
+                };
+
+                // If name changed, update members & tasks department attribute
+                if (oldName !== name) {
+                    members.forEach(m => {
+                        if (m.department === oldName) m.department = name;
+                    });
+                    tasks.forEach(t => {
+                        if (t.department === oldName) t.department = name;
+                    });
+                    ClubStorage.saveData("club_tasks", tasks);
+                }
+
+                // If leader or assistant assigned, ensure their department and role match
+                if (leader) {
+                    const lIdx = members.findIndex(m => m.id === leader);
+                    if (lIdx !== -1) {
+                        members[lIdx].department = name;
+                        if (!["admin", "vice"].includes(members[lIdx].role)) {
+                            members[lIdx].role = "leader";
+                        }
+                    }
+                }
+                if (assistant) {
+                    const aIdx = members.findIndex(m => m.id === assistant);
+                    if (aIdx !== -1) {
+                        members[aIdx].department = name;
+                        if (!["admin", "vice", "leader"].includes(members[aIdx].role)) {
+                            members[aIdx].role = "assistant";
+                        }
+                    }
+                }
+
+                ClubStorage.saveData("club_members", members);
+                ClubStorage.saveData("club_departments", depts);
+                ClubUtils.addLog(`Cập nhật Ban bộ phận: ${name} (${code})`);
+                ClubUtils.showToast("Thành công!", `Đã cập nhật ban "${name}".`, "success");
+            } else {
+                // Check duplicate code or name
+                if (depts.some(d => d.code === code)) {
+                    ClubUtils.showAlert("Trùng lặp", `Mã ban "${code}" đã tồn tại!`, "warning");
+                    return;
+                }
+                if (depts.some(d => d.name.toLowerCase() === name.toLowerCase())) {
+                    ClubUtils.showAlert("Trùng lặp", `Tên ban "${name}" đã tồn tại!`, "warning");
+                    return;
+                }
+
+                depts.push({
+                    id: "DEPT_" + code,
+                    code,
+                    name,
+                    leader,
+                    assistant,
+                    description: desc
+                });
+
+                if (leader) {
+                    const lIdx = members.findIndex(m => m.id === leader);
+                    if (lIdx !== -1) {
+                        members[lIdx].department = name;
+                        if (!["admin", "vice"].includes(members[lIdx].role)) {
+                            members[lIdx].role = "leader";
+                        }
+                    }
+                }
+                if (assistant) {
+                    const aIdx = members.findIndex(m => m.id === assistant);
+                    if (aIdx !== -1) {
+                        members[aIdx].department = name;
+                        if (!["admin", "vice", "leader"].includes(members[aIdx].role)) {
+                            members[aIdx].role = "assistant";
+                        }
+                    }
+                }
+
+                ClubStorage.saveData("club_members", members);
+                ClubStorage.saveData("club_departments", depts);
+                ClubUtils.addLog(`Thêm Ban bộ phận mới: ${name} (${code})`);
+                ClubUtils.showToast("Thành công!", `Đã thêm ban "${name}" mới.`, "success");
+            }
+
+            const modalEl = document.getElementById("deptEditModal");
+            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+            if (modalInstance) modalInstance.hide();
+
+            renderDepartmentsGrid();
+        }
+
+        window.deleteDepartment = function(code) {
+            let depts = ClubStorage.getData("club_departments") || [];
+            const dept = depts.find(d => d.code === code);
+            if (!dept) return;
+
+            ClubUtils.showConfirm(
+                `Xác nhận xóa "${dept.name}"?`,
+                `Tất cả dữ liệu của ban "${dept.name}" sẽ bị gỡ bỏ! Các thành viên thuộc ban này sẽ được chuyển về "Chưa phân ban".`,
+                "Xóa ngay",
+                "Hủy"
+            ).then((result) => {
+                if (result.isConfirmed) {
+                    depts = depts.filter(d => d.code !== code);
+                    ClubStorage.saveData("club_departments", depts);
+
+                    // Update members belonging to this dept
+                    let members = ClubStorage.getData("club_members") || [];
+                    members.forEach(m => {
+                        if (m.department === dept.name) {
+                            m.department = "Chưa phân ban";
+                        }
+                    });
+                    ClubStorage.saveData("club_members", members);
+
+                    ClubUtils.addLog(`Xóa Ban bộ phận: ${dept.name} (${code})`);
+                    ClubUtils.showToast("Đã xóa!", `Ban "${dept.name}" đã được xóa khỏi hệ thống.`, "success");
+                    renderDepartmentsGrid();
+                }
+            });
+        };
+
         document.addEventListener("DOMContentLoaded", () => {
             if (!ClubAuth.checkRouteGuard(["admin", "vice"])) return;
 
             renderDepartmentsGrid();
+            document.getElementById("dept-edit-form")?.addEventListener("submit", handleDeptFormSubmit);
 
             if (typeof ClubStorage.registerUIRefresh === "function") {
                 ClubStorage.registerUIRefresh("club_departments", renderDepartmentsGrid);

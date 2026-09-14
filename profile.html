@@ -113,6 +113,10 @@
                             <div class="card-body">
                                 <form id="profile-info-form">
                                     <div class="row g-3">
+                                        <div class="col-md-12">
+                                            <label for="p-name" class="form-label">Họ và tên *</label>
+                                            <input type="text" id="p-name" class="form-control" required placeholder="Nhập họ và tên">
+                                        </div>
                                         <div class="col-md-6">
                                             <label for="p-email" class="form-label">Email liên hệ *</label>
                                             <input type="email" id="p-email" class="form-control" required>
@@ -122,7 +126,7 @@
                                             <input type="tel" id="p-phone" class="form-control" required>
                                         </div>
                                     </div>
-                                    <button type="submit" class="btn btn-primary mt-3"><i class="bi bi-save"></i> Cập nhật thông tin</button>
+                                    <button type="submit" class="btn btn-primary mt-3"><i class="bi bi-save me-1"></i> Cập nhật thông tin</button>
                                 </form>
                             </div>
                         </div>
@@ -199,8 +203,9 @@
                 document.getElementById("p-avatar-img").src = member.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150";
                 document.getElementById("p-name-txt").innerText = member.name;
                 document.getElementById("p-role-txt").innerText = (ClubAuth.ROLES[user.role]?.title || user.role) + " — " + member.department;
-                document.getElementById("p-email").value = member.email;
-                document.getElementById("p-phone").value = member.phone;
+                if (document.getElementById("p-name")) document.getElementById("p-name").value = member.name || "";
+                document.getElementById("p-email").value = member.email || "";
+                document.getElementById("p-phone").value = member.phone || "";
                 document.getElementById("p-score-txt").innerText = member.activityScore || 0;
             }
 
@@ -233,19 +238,32 @@
             // Info submit
             document.getElementById("profile-info-form").addEventListener("submit", (e) => {
                 e.preventDefault();
+                const name = document.getElementById("p-name") ? document.getElementById("p-name").value.trim() : "";
                 const email = document.getElementById("p-email").value.trim();
                 const phone = document.getElementById("p-phone").value.trim();
+
+                if (!name) {
+                    ClubUtils.showAlert("Thiếu họ tên", "Vui lòng nhập họ và tên của bạn!", "warning");
+                    return;
+                }
 
                 let members = ClubStorage.getData("club_members") || [];
                 const index = members.findIndex(m => m.id === user.memberId);
 
                 if (index !== -1) {
+                    members[index].name = name;
                     members[index].email = email;
                     members[index].phone = phone;
                     ClubStorage.saveData("club_members", members);
-                    ClubUtils.addLog("Cập nhật thông tin hồ sơ cá nhân");
-                    ClubUtils.showToast("Cập nhật thành công!", "Dữ liệu liên hệ của bạn đã được thay đổi.", "success");
-                    setTimeout(() => location.reload(), 1200);
+
+                    // Also update name display on page immediately
+                    document.getElementById("p-name-txt").innerText = name;
+
+                    ClubUtils.addLog(`Cập nhật thông tin hồ sơ cá nhân: ${name}`);
+                    ClubUtils.showToast("Cập nhật thành công!", "Họ tên và thông tin liên hệ của bạn đã được cập nhật.", "success");
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    ClubUtils.showAlert("Lỗi", "Không tìm thấy hồ sơ thành viên liên kết!", "error");
                 }
             });
 
@@ -259,7 +277,8 @@
                 const index = users.findIndex(u => u.username === user.username);
 
                 if (index !== -1) {
-                    if (users[index].password !== oldPass) {
+                    const hashedOld = (typeof ClubUtils !== "undefined" && ClubUtils.sha256) ? ClubUtils.sha256(oldPass) : oldPass;
+                    if (users[index].password !== hashedOld && users[index].password !== oldPass) {
                         ClubUtils.showAlert("Lỗi mật khẩu", "Mật khẩu hiện tại không chính xác!", "error");
                         return;
                     }
@@ -268,12 +287,13 @@
                         return;
                     }
 
-                    users[index].password = newPass;
+                    const hashedNew = (typeof ClubUtils !== "undefined" && ClubUtils.sha256) ? ClubUtils.sha256(newPass) : newPass;
+                    users[index].password = hashedNew;
                     ClubStorage.saveData("club_users", users);
                     sessionStorage.setItem("club_current_user", JSON.stringify(users[index]));
 
                     ClubUtils.addLog("Đổi mật khẩu tài khoản");
-                    ClubUtils.showToast("Đổi mật khẩu thành công!", "Mật khẩu của bạn đã được đổi.", "success");
+                    ClubUtils.showToast("Đổi mật khẩu thành công!", "Mật khẩu của bạn đã được thay đổi thành công.", "success");
                     document.getElementById("p-old-pass").value = "";
                     document.getElementById("p-new-pass").value = "";
                 }
