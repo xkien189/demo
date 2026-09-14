@@ -17,235 +17,264 @@
     <link rel="stylesheet" href="assets/css/responsive.css">
 </head>
 <body>
+<div class="app-wrapper">
+    <div id="sidebar-container"></div>
+    <div class="main-content">
+        <div id="topbar-container"></div>
+        <div class="content-container fade-in">
 
-    <div class="app-wrapper">
-        <div id="sidebar-container"></div>
-
-        <div class="main-content">
-            <div id="topbar-container"></div>
-
-            <div class="content-container fade-in">
-
-                <!-- HEADER -->
-                <div class="dashboard-header d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
-                    <div>
-                        <div class="d-flex align-items-center gap-2 mb-1">
-                            <span class="text-muted small"><a href="dashboard.html" class="text-muted text-decoration-none">CLB</a> / Tổng quan</span>
-                        </div>
-                        <h4 class="mb-0 fw-bold">Tổng quan CLB</h4>
-                        <p class="text-muted small mb-0" id="slogan-txt">Theo dõi toàn bộ hoạt động và công việc của CLB</p>
-                    </div>
-                    <div id="quick-action-btns" class="d-flex gap-2 flex-wrap align-items-center"></div>
+            <!-- 1. HEADER SECTION -->
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-1 text-muted small">
+                            <li class="breadcrumb-item"><a href="dashboard.html" class="text-muted text-decoration-none">CLB</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Tổng quan</li>
+                        </ol>
+                    </nav>
+                    <h4 class="fw-bold mb-1">Tổng quan CLB</h4>
+                    <p class="text-muted small mb-0" id="slogan-txt">Theo dõi toàn diện tiến độ hoạt động và điều hành câu lạc bộ</p>
                 </div>
+                <div id="quick-action-btns" class="d-flex gap-2 flex-wrap align-items-center">
+                    <!-- Dynamic Header Action Buttons -->
+                </div>
+            </div>
 
-                <!-- ROW 1: 6 KPI CARDS -->
-                <div class="row g-3 mb-4" id="kpi-row">
-                    <div class="col-xl-2 col-md-4 col-6">
-                        <div class="kpi-card kpi-info">
-                            <div class="kpi-icon-wrap"><i class="bi bi-people-fill"></i></div>
-                            <div class="kpi-body">
-                                <div class="kpi-value" id="kpi-members">0</div>
-                                <div class="kpi-label">Tổng thành viên</div>
-                                <div class="kpi-trend" id="kpi-members-trend"></div>
-                            </div>
+            <!-- 2. KPI METRICS (6 clean cards) -->
+            <div class="row g-3 mb-4">
+                <div class="col-xl-2 col-md-4 col-6">
+                    <div class="kpi-tile">
+                        <div class="kpi-tile-header">
+                            <span class="kpi-tile-label">Tổng thành viên</span>
+                            <div class="kpi-tile-icon"><i class="bi bi-people"></i></div>
                         </div>
-                    </div>
-                    <div class="col-xl-2 col-md-4 col-6">
-                        <div class="kpi-card kpi-success">
-                            <div class="kpi-icon-wrap"><i class="bi bi-person-plus-fill"></i></div>
-                            <div class="kpi-body">
-                                <div class="kpi-value" id="kpi-new-members">0</div>
-                                <div class="kpi-label">TV mới tháng này</div>
-                                <div class="kpi-trend" id="kpi-new-trend"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-2 col-md-4 col-6">
-                        <div class="kpi-card kpi-primary">
-                            <div class="kpi-icon-wrap"><i class="bi bi-list-task"></i></div>
-                            <div class="kpi-body">
-                                <div class="kpi-value" id="kpi-inprogress">0</div>
-                                <div class="kpi-label">CV đang thực hiện</div>
-                                <div class="kpi-trend" id="kpi-task-trend"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-2 col-md-4 col-6">
-                        <div class="kpi-card kpi-danger">
-                            <div class="kpi-icon-wrap"><i class="bi bi-exclamation-circle-fill"></i></div>
-                            <div class="kpi-body">
-                                <div class="kpi-value" id="kpi-overdue">0</div>
-                                <div class="kpi-label">CV quá hạn</div>
-                                <div class="kpi-trend" id="kpi-overdue-trend"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-2 col-md-4 col-6">
-                        <div class="kpi-card kpi-warning">
-                            <div class="kpi-icon-wrap"><i class="bi bi-calendar-event-fill"></i></div>
-                            <div class="kpi-body">
-                                <div class="kpi-value" id="kpi-events">0</div>
-                                <div class="kpi-label">Sự kiện sắp tới</div>
-                                <div class="kpi-trend" id="kpi-event-trend"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-2 col-md-4 col-6">
-                        <div class="kpi-card kpi-teal">
-                            <div class="kpi-icon-wrap"><i class="bi bi-bar-chart-fill"></i></div>
-                            <div class="kpi-body">
-                                <div class="kpi-value" id="kpi-completion">0%</div>
-                                <div class="kpi-label">Tỷ lệ hoàn thành</div>
-                                <div class="kpi-trend" id="kpi-completion-trend"></div>
+                        <div>
+                            <div class="kpi-tile-value" id="kpi-members">0</div>
+                            <div class="kpi-tile-sub text-success" id="kpi-members-trend">
+                                <i class="bi bi-check2"></i> Đang hoạt động
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- ROW 2: ADMIN ALERTS + QUICK ACTIONS + NOTIFICATIONS -->
-                <div class="row g-3 mb-4">
-
-                    <!-- Admin Alert Panel (only visible to admin/vice) -->
-                    <div class="col-xl-8" id="admin-alert-col" style="display:none;">
-                        <div class="card h-100 border-0">
-                            <div class="card-header d-flex align-items-center justify-content-between">
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="alert-pulse"></span>
-                                    <h5 class="card-title mb-0 fw-bold">Admin cần xử lý</h5>
-                                </div>
-                                <span class="badge bg-danger" id="total-alert-count">0</span>
+                <div class="col-xl-2 col-md-4 col-6">
+                    <div class="kpi-tile">
+                        <div class="kpi-tile-header">
+                            <span class="kpi-tile-label">TV mới tháng này</span>
+                            <div class="kpi-tile-icon"><i class="bi bi-person-plus"></i></div>
+                        </div>
+                        <div>
+                            <div class="kpi-tile-value" id="kpi-new-members">0</div>
+                            <div class="kpi-tile-sub text-primary" id="kpi-new-trend">
+                                <i class="bi bi-calendar-check"></i> Tháng hiện tại
                             </div>
-                            <div class="card-body p-0">
-                                <div id="admin-alerts-list"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-2 col-md-4 col-6">
+                    <div class="kpi-tile">
+                        <div class="kpi-tile-header">
+                            <span class="kpi-tile-label">Đang thực hiện</span>
+                            <div class="kpi-tile-icon"><i class="bi bi-kanban"></i></div>
+                        </div>
+                        <div>
+                            <div class="kpi-tile-value" id="kpi-inprogress">0</div>
+                            <div class="kpi-tile-sub" id="kpi-task-trend">
+                                <i class="bi bi-arrow-repeat"></i> Công việc đang chạy
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-2 col-md-4 col-6">
+                    <div class="kpi-tile" id="kpi-overdue-tile">
+                        <div class="kpi-tile-header">
+                            <span class="kpi-tile-label">CV quá hạn</span>
+                            <div class="kpi-tile-icon"><i class="bi bi-exclamation-triangle"></i></div>
+                        </div>
+                        <div>
+                            <div class="kpi-tile-value" id="kpi-overdue">0</div>
+                            <div class="kpi-tile-sub" id="kpi-overdue-trend">
+                                Cần xử lý ngay
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-2 col-md-4 col-6">
+                    <div class="kpi-tile">
+                        <div class="kpi-tile-header">
+                            <span class="kpi-tile-label">Sự kiện sắp tới</span>
+                            <div class="kpi-tile-icon"><i class="bi bi-calendar-event"></i></div>
+                        </div>
+                        <div>
+                            <div class="kpi-tile-value" id="kpi-events">0</div>
+                            <div class="kpi-tile-sub text-muted" id="kpi-event-trend">
+                                Trong 30 ngày tới
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-2 col-md-4 col-6">
+                    <div class="kpi-tile">
+                        <div class="kpi-tile-header">
+                            <span class="kpi-tile-label">Tỷ lệ hoàn thành</span>
+                            <div class="kpi-tile-icon"><i class="bi bi-patch-check"></i></div>
+                        </div>
+                        <div>
+                            <div class="kpi-tile-value" id="kpi-completion">0%</div>
+                            <div class="kpi-tile-sub text-muted" id="kpi-completion-trend">
+                                Tiến độ chung
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. MAIN WORKSPACE GRID -->
+            <div class="row g-3">
+
+                <!-- LEFT COLUMN (8 cols): Action Center, Charts, Timeline -->
+                <div class="col-xl-8 col-lg-7">
+
+                    <!-- Admin Action Center -->
+                    <div class="dashboard-card action-center-card" id="admin-alert-card" style="display:none;">
+                        <div class="dashboard-card-header">
+                            <h5 class="dashboard-card-title">
+                                <i class="bi bi-shield-exclamation text-danger"></i>
+                                Cần Admin xử lý
+                            </h5>
+                            <span class="badge bg-danger rounded-pill" id="total-alert-count">0</span>
+                        </div>
+                        <div id="admin-alerts-list">
+                            <!-- Dynamic alert items -->
+                        </div>
+                    </div>
+
+                    <!-- Work Progress by Department (Chart) -->
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header flex-wrap gap-2">
+                            <h5 class="dashboard-card-title">
+                                <i class="bi bi-bar-chart-line text-primary"></i>
+                                Tiến độ công việc theo Ban
+                            </h5>
+                            <div class="chart-pills">
+                                <span class="chart-pill c-done">Hoàn thành</span>
+                                <span class="chart-pill c-prog">Đang làm</span>
+                                <span class="chart-pill c-pend">Chờ xử lý</span>
+                                <span class="chart-pill c-over">Quá hạn</span>
+                            </div>
+                        </div>
+                        <div class="p-3">
+                            <div style="position:relative; height:260px;">
+                                <canvas id="tasksChart"></canvas>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Right column: Quick Actions + Notifications -->
-                    <div class="col-xl-4" id="right-sidebar-col">
-                        <div class="card mb-3 border-0">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0"><i class="bi bi-lightning-fill text-warning me-2"></i>Thao tác nhanh</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="quick-actions-grid" id="quick-actions-grid"></div>
-                            </div>
+                    <!-- Recent Activity Feed -->
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header">
+                            <h5 class="dashboard-card-title">
+                                <i class="bi bi-clock-history text-muted"></i>
+                                Hoạt động gần đây
+                            </h5>
+                            <a href="logs.html" class="btn btn-sm btn-link text-muted p-0 text-decoration-none" id="btn-view-logs" style="font-size:0.8rem;">
+                                Xem nhật ký <i class="bi bi-arrow-right"></i>
+                            </a>
                         </div>
-                        <div class="card border-0">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="card-title mb-0"><i class="bi bi-bell-fill text-primary me-2"></i>Thông báo mới</h5>
-                                <a href="notifications.html" class="btn btn-sm btn-outline-secondary">Xem tất cả</a>
-                            </div>
-                            <div class="card-body p-0">
-                                <div id="notifications-mini" class="notif-mini-list"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Non-admin: full width quick actions + notifications -->
-                    <div class="col-xl-12" id="nonadmin-row2" style="display:none;">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="card h-100 border-0">
-                                    <div class="card-header">
-                                        <h5 class="card-title mb-0"><i class="bi bi-lightning-fill text-warning me-2"></i>Thao tác nhanh</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="quick-actions-grid" id="quick-actions-grid-na"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="card h-100 border-0">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h5 class="card-title mb-0"><i class="bi bi-bell-fill text-primary me-2"></i>Thông báo mới</h5>
-                                        <a href="notifications.html" class="btn btn-sm btn-outline-secondary">Xem tất cả</a>
-                                    </div>
-                                    <div class="card-body p-0">
-                                        <div id="notifications-mini-na" class="notif-mini-list"></div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="p-3">
+                            <ul class="timeline-list" id="activity-feed-list">
+                                <!-- Dynamic timeline items -->
+                            </ul>
                         </div>
                     </div>
 
                 </div>
 
-                <!-- ROW 3: CHART + NEW MEMBERS -->
-                <div class="row g-3 mb-4">
-                    <div class="col-xl-7">
-                        <div class="card h-100 border-0">
-                            <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                <h5 class="card-title mb-0"><i class="bi bi-bar-chart-line-fill text-primary me-2"></i>Tiến độ công việc theo Ban</h5>
-                                <div class="d-flex gap-3 flex-wrap chart-legend">
-                                    <span class="legend-dot success">Hoàn thành</span>
-                                    <span class="legend-dot primary">Đang làm</span>
-                                    <span class="legend-dot warning">Chờ xử lý</span>
-                                    <span class="legend-dot danger">Quá hạn</span>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div style="position: relative; height: 260px;">
-                                    <canvas id="tasksChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-5">
-                        <div class="card h-100 border-0">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="card-title mb-0"><i class="bi bi-person-check-fill text-success me-2"></i>Thành viên mới</h5>
-                                <a href="members.html" class="btn btn-sm btn-outline-primary">Xem tất cả</a>
-                            </div>
-                            <div class="card-body p-0">
-                                <div id="new-members-list"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- RIGHT COLUMN (4 cols): Quick Shortcuts, Events, New Members, Notifications -->
+                <div class="col-xl-4 col-lg-5">
 
-                <!-- ROW 4: UPCOMING EVENTS + ACTIVITY FEED -->
-                <div class="row g-3 mb-4">
-                    <div class="col-xl-5">
-                        <div class="card h-100 border-0">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="card-title mb-0"><i class="bi bi-calendar2-week-fill text-warning me-2"></i>Sự kiện sắp tới</h5>
-                                <a href="events.html" class="btn btn-sm btn-outline-secondary">Xem tất cả</a>
-                            </div>
-                            <div class="card-body p-0">
-                                <div id="upcoming-events-list"></div>
+                    <!-- Quick Shortcuts -->
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header">
+                            <h5 class="dashboard-card-title">
+                                <i class="bi bi-lightning-charge text-warning"></i>
+                                Thao tác nhanh
+                            </h5>
+                        </div>
+                        <div class="p-3">
+                            <div class="quick-grid" id="quick-actions-grid">
+                                <!-- Dynamic Quick Buttons -->
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-7">
-                        <div class="card h-100 border-0">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="card-title mb-0"><i class="bi bi-activity text-info me-2"></i>Hoạt động gần đây</h5>
-                                <a href="logs.html" class="btn btn-sm btn-outline-secondary" id="btn-view-logs">Xem nhật ký</a>
-                            </div>
-                            <div class="card-body">
-                                <ul class="activity-feed" id="activity-feed-list"></ul>
-                            </div>
+
+                    <!-- Upcoming Events -->
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header">
+                            <h5 class="dashboard-card-title">
+                                <i class="bi bi-calendar3 text-primary"></i>
+                                Sự kiện sắp tới
+                            </h5>
+                            <a href="events.html" class="btn btn-sm btn-link text-muted p-0 text-decoration-none" style="font-size:0.8rem;">
+                                Tất cả <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                        <div id="upcoming-events-list">
+                            <!-- Dynamic Events -->
                         </div>
                     </div>
+
+                    <!-- New Members -->
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header">
+                            <h5 class="dashboard-card-title">
+                                <i class="bi bi-person-check text-success"></i>
+                                Thành viên mới
+                            </h5>
+                            <a href="members.html" class="btn btn-sm btn-link text-muted p-0 text-decoration-none" style="font-size:0.8rem;">
+                                Xem danh sách <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                        <div id="new-members-list">
+                            <!-- Dynamic New Members -->
+                        </div>
+                    </div>
+
+                    <!-- Recent Notifications -->
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header">
+                            <h5 class="dashboard-card-title">
+                                <i class="bi bi-bell text-info"></i>
+                                Thông báo mới
+                            </h5>
+                            <a href="notifications.html" class="btn btn-sm btn-link text-muted p-0 text-decoration-none" style="font-size:0.8rem;">
+                                Xem tất cả <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                        <div id="notifications-mini">
+                            <!-- Dynamic Mini Notifications -->
+                        </div>
+                    </div>
+
                 </div>
 
             </div>
-        </div>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
-    <script src="assets/js/firebase-config.js"></script>
-    <script src="assets/js/storage.js"></script>
-    <script src="assets/js/utils.js"></script>
-    <script src="assets/js/auth.js"></script>
-    <script src="assets/js/sidebar.js"></script>
-    <script src="assets/js/dashboard.js"></script>
+        </div><!-- /content-container -->
+    </div><!-- /main-content -->
+</div><!-- /app-wrapper -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+<script src="assets/js/firebase-config.js"></script>
+<script src="assets/js/storage.js"></script>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/sidebar.js"></script>
+<script src="assets/js/dashboard.js"></script>
 </body>
 </html>
