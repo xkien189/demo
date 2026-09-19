@@ -3,6 +3,7 @@ const ClubAuth = {
     ROLES: {
         admin: { title: "Chủ nhiệm", level: 6 },
         vice: { title: "Phó Chủ nhiệm", level: 5 },
+        treasurer: { title: "Thủ quỹ", level: 4 },
         leader: { title: "Trưởng ban", level: 4 },
         assistant: { title: "Phó ban", level: 3 },
         member: { title: "Thành viên", level: 2 },

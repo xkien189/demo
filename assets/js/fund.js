@@ -13,7 +13,7 @@ function initFundPage() {
     // Render top management buttons for Admin ONLY
     const topActions = document.getElementById("fund-actions-top");
     if (topActions) {
-        if (user.role === "admin") {
+        if (["admin", "treasurer"].includes(user.role)) {
             topActions.innerHTML = `
                 <button class="btn btn-success" onclick="openCreatePeriodModal()">
                     <i class="bi bi-calendar-plus me-1"></i>Tạo Đợt Thu Quỹ
@@ -27,14 +27,14 @@ function initFundPage() {
     // Hide Create Transaction button for non-admin
     const btnCreateTx = document.getElementById("btn-create-tx");
     if (btnCreateTx) {
-        btnCreateTx.style.display = (user.role === "admin") ? "" : "none";
+        btnCreateTx.style.display = (["admin", "treasurer"].includes(user.role)) ? "" : "none";
     }
 
     // Toggle Period edit & delete buttons for Admin
     const btnEditPeriod = document.getElementById("btn-edit-period");
     const btnDeletePeriod = document.getElementById("btn-delete-period");
     if (btnEditPeriod && btnDeletePeriod) {
-        const isAdmin = (user.role === "admin");
+        const isAdmin = (["admin", "treasurer"].includes(user.role));
         btnEditPeriod.style.display = isAdmin ? "" : "none";
         btnDeletePeriod.style.display = isAdmin ? "" : "none";
     }
@@ -42,7 +42,7 @@ function initFundPage() {
     // Toggle Ledger action column for Admin
     const thLedgerAction = document.getElementById("th-ledger-action");
     if (thLedgerAction) {
-        thLedgerAction.style.display = (user.role === "admin") ? "" : "none";
+        thLedgerAction.style.display = (["admin", "treasurer"].includes(user.role)) ? "" : "none";
     }
 
     // Populate periods
@@ -191,7 +191,7 @@ function renderPeriodMembersTable() {
 
         // Action buttons based on role & record status
         let actionsHtml = "";
-        const canManage = user.role === "admin";
+        const canManage = ["admin", "treasurer"].includes(user.role);
         const isSelf = currentMember && currentMember.id === m.id;
 
         if (isPaid) {
@@ -246,7 +246,7 @@ function renderPeriodMembersTable() {
 function renderLedgerTable() {
     const transactions = ClubStorage.getData("club_fund_transactions") || [];
     const user = ClubAuth.getCurrentUser();
-    const canManage = user && user.role === "admin";
+    const canManage = user && ["admin", "treasurer"].includes(user.role);
     const tbody = document.getElementById("ledger-tbody");
     if (!tbody) return;
 
