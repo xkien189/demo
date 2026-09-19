@@ -220,13 +220,28 @@ function initTaskDetailPage() {
 
     // Permissions: Edit Buttons configuration
     const user = ClubAuth.getCurrentUser();
+    const currentMember = ClubAuth.getCurrentMember();
+    
+    let actionBtnsHtml = "";
     if (["admin", "vice", "leader"].includes(user.role)) {
-        document.getElementById("task-action-btns").innerHTML = `
+        actionBtnsHtml += `
             <a href="task-edit.html?id=${activeTask.id}" class="btn btn-primary btn-sm">
                 <i class="bi bi-pencil"></i> Sửa
             </a>
         `;
     }
+    
+    // Task Claiming Logic
+    const canClaim = !activeTask.assigneeId && (user.role === "admin" || user.role === "vice" || (currentMember && currentMember.department === activeTask.department));
+    if (canClaim) {
+        actionBtnsHtml += `
+            <button onclick="claimTask('${activeTask.id}')" class="btn btn-success btn-sm ms-2">
+                <i class="bi bi-hand-index-thumb"></i> Nhận việc này
+            </button>
+        `;
+    }
+    document.getElementById("task-action-btns").innerHTML = actionBtnsHtml;
+
 
     // Render lists
     renderComments();
@@ -238,6 +253,33 @@ function initTaskDetailPage() {
     document.getElementById("progress-form").addEventListener("submit", handleProgressSubmit);
     document.getElementById("upload-form").addEventListener("submit", handleProofSubmit);
 }
+
+window.claimTask = function(taskId) {
+    const user = ClubAuth.getCurrentUser();
+    const member = ClubAuth.getCurrentMember();
+    if (!member && !["admin", "vice"].includes(user.role)) return;
+    
+    ClubUtils.showConfirm("Nhận việc này?", "Bạn sẽ được phân công phụ trách công việc này.", "Đồng ý", "Hủy")
+    .then(res => {
+        if (res.isConfirmed) {
+            let tasks = ClubStorage.getData("club_tasks") || [];
+            let tIdx = tasks.findIndex(t => t.id === taskId);
+            if (tIdx !== -1) {
+                tasks[tIdx].assigneeId = member ? member.id : "M001";
+                tasks[tIdx].history = tasks[tIdx].history || [];
+                tasks[tIdx].history.unshift({
+                    user: user.username || "Hệ thống",
+                    text: `Đã chủ động nhận công việc này`,
+                    time: ClubUtils.nowString()
+                });
+                ClubStorage.saveData("club_tasks", tasks).then(() => {
+                    ClubUtils.showToast("Thành công!", "Bạn đã nhận công việc này.", "success");
+                    setTimeout(() => location.reload(), 1000);
+                });
+            }
+        }
+    });
+};
 
 function renderComments() {
     const comments = activeTask.comments || [];
@@ -582,13 +624,40 @@ function initTaskEditPage() {
             };
 
             tasksList.push(newTask);
-            ClubStorage.saveData("club_tasks", tasksList);
             
-            ClubUtils.addLog(`Giao công việc mới: ${title} (${newId})`);
-            ClubUtils.showAlert("Giao việc thành công!", `Đã thêm mới nhiệm vụ "${title}" trên hệ thống.`, "success")
-                .then(() => {
-                    window.location.href = "tasks.html";
+            // Generate notification
+            let notifs = ClubStorage.getData("club_notifications") || [];
+            if (assignee) {
+                const assigneeMember = (ClubStorage.getData("club_members") || []).find(m => m.id === assignee);
+                notifs.unshift({
+                    id: "N" + Date.now(),
+                    title: "Phân công nhiệm vụ",
+                    text: `Bạn vừa được giao nhiệm vụ mới: "${title}". Vui lòng kiểm tra.`,
+                    type: "General",
+                    target: assigneeMember ? assigneeMember.name : "All",
+                    sender: currentUser.username || "Hệ thống",
+                    date: ClubUtils.nowString()
                 });
+            } else {
+                notifs.unshift({
+                    id: "N" + Date.now(),
+                    title: "Công việc mới chưa phân công",
+                    text: `Có công việc mới trong Ban: "${title}". Ai rảnh nhận nhé!`,
+                    type: "Department",
+                    target: dept,
+                    sender: currentUser.username || "Hệ thống",
+                    date: ClubUtils.nowString()
+                });
+            }
+            ClubStorage.saveData("club_notifications", notifs);
+
+            ClubStorage.saveData("club_tasks", tasksList).then(() => {
+                ClubUtils.addLog(`Giao công việc mới: ${title} (${newId})`);
+                ClubUtils.showAlert("Giao việc thành công!", `Đã thêm mới nhiệm vụ "${title}" trên hệ thống.`, "success")
+                    .then(() => {
+                        window.location.href = "tasks.html";
+                    });
+            });
         }
     });
 }

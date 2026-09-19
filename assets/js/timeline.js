@@ -415,29 +415,49 @@ function convertTimelineToTask(timelineId) {
         id: "T" + Date.now(),
         title: `[Task Timeline] ${node.title}`,
         department: node.department || "Ban Chuyên môn",
-        assigneeId: user ? user.username : "M001",
+        assigneeId: "",
+        creatorId: user ? (user.memberId || "M001") : "M001",
+        startDate: node.startDate || ClubUtils.nowString().substring(0, 10).replace(/\//g, '-'),
         deadline: node.endDate || node.startDate || "2026-10-30",
         priority: "High",
         progress: 0,
         status: "Pending",
-        description: node.description || ""
+        description: node.description || "",
+        comments: [],
+        history: [{ user: user?.username || "Admin", text: "Tạo công việc từ Timeline", time: ClubUtils.nowString() }],
+        attachments: []
     };
 
     tasks.push(newTask);
-    ClubStorage.saveData("club_tasks", tasks);
+    
+    // Add Notification
+    let notifs = ClubStorage.getData("club_notifications") || [];
+    notifs.unshift({
+        id: "N" + Date.now(),
+        title: "Công việc mới chưa phân công",
+        text: `Có công việc mới trong Ban: "${newTask.title}". Ai rảnh nhận nhé!`,
+        type: "Department",
+        target: newTask.department,
+        sender: user?.username || "Hệ thống",
+        date: ClubUtils.nowString()
+    });
+    ClubStorage.saveData("club_notifications", notifs);
+    
     ClubUtils.addLog("Task", `Tạo Task từ Timeline: ${node.title}`, user?.username || "Admin");
 
-    Swal.fire({
-        icon: "success",
-        title: "Đã chuyển đổi thành Công việc (Task)!",
-        text: `Nhiệm vụ "${newTask.title}" đã được thêm vào danh sách Quản lý Công việc.`,
-        confirmButtonText: "Đến trang Công việc",
-        showCancelButton: true,
-        cancelButtonText: "Ở lại Timeline"
-    }).then((result) => {
-        if (result.isConfirmed) {
-            window.location.href = "tasks.html";
-        }
+    ClubStorage.saveData("club_tasks", tasks).then(() => {
+        Swal.fire({
+            icon: "success",
+            title: "Đã chuyển đổi thành Công việc (Task)!",
+            text: `Nhiệm vụ "${newTask.title}" đã được thêm vào danh sách Quản lý Công việc.`,
+            confirmButtonText: "Đến trang Công việc",
+            showCancelButton: true,
+            cancelButtonText: "Ở lại Timeline"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "tasks.html";
+            }
+        });
     });
 }
 
@@ -460,19 +480,20 @@ function convertTimelineToEvent(timelineId) {
     };
 
     events.push(newEvent);
-    ClubStorage.saveData("club_events", events);
     ClubUtils.addLog("Event", `Tạo Sự kiện từ Timeline: ${node.title}`, user?.username || "Admin");
 
-    Swal.fire({
-        icon: "success",
-        title: "Đã chuyển đổi thành Sự kiện (Event)!",
-        text: `Sự kiện "${newEvent.title}" đã được tạo thành công trong danh sách Quản lý Sự kiện.`,
-        confirmButtonText: "Đến trang Sự kiện",
-        showCancelButton: true,
-        cancelButtonText: "Ở lại Timeline"
-    }).then((result) => {
-        if (result.isConfirmed) {
-            window.location.href = "events.html";
-        }
+    ClubStorage.saveData("club_events", events).then(() => {
+        Swal.fire({
+            icon: "success",
+            title: "Đã chuyển đổi thành Sự kiện (Event)!",
+            text: `Sự kiện "${newEvent.title}" đã được tạo thành công trong danh sách Quản lý Sự kiện.`,
+            confirmButtonText: "Đến trang Sự kiện",
+            showCancelButton: true,
+            cancelButtonText: "Ở lại Timeline"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "events.html";
+            }
+        });
     });
 }

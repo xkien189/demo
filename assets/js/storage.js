@@ -367,7 +367,7 @@
                         window._firestoreLocalWrite[key]();
                     }
                     const db = firebase.firestore();
-                    db.collection("app_data").doc(key).set({
+                    return db.collection("app_data").doc(key).set({
                         data: data,
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     }).catch(err => {
@@ -375,8 +375,11 @@
                     });
                 } catch (e) {
                     console.warn("Firestore sync skipped:", e.message);
+                    return Promise.resolve();
                 }
             }
+            
+            return Promise.resolve();
         },
         registerUIRefresh: function(key, fn) {
             if (!_uiRefreshRegistry[key]) _uiRefreshRegistry[key] = [];
