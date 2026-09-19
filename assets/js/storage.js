@@ -10,7 +10,12 @@
     ];
 
     const DEFAULT_USERS = [
-        { username: "admin", password: "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3", memberId: "M001", role: "admin", status: "Active" }
+        { username: "admin", password: "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3", memberId: "M001", role: "admin", status: "Active" },
+        { username: "vice", password: "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3", memberId: "M002", role: "vice", status: "Active" },
+        { username: "leader", password: "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3", memberId: "M003", role: "leader", status: "Active" },
+        { username: "assistant", password: "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3", memberId: "M004", role: "assistant", status: "Active" },
+        { username: "member", password: "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3", memberId: "M005", role: "member", status: "Active" },
+        { username: "guest", password: "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3", memberId: "M006", role: "guest", status: "Active" }
     ];
 
     const DEFAULT_DEPARTMENTS = [
@@ -236,21 +241,19 @@
             try {
                 const users = JSON.parse(localStorage.getItem(key));
                 if (Array.isArray(users)) {
-                    const demoUsernames = ["vice", "leader", "assistant", "member", "guest"];
-                    const filtered = users.filter(u => !demoUsernames.includes(u.username));
-                    filtered.forEach(u => {
+                    users.forEach(u => {
                         if (u.password === "123") u.password = "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3";
                     });
-                    if (!filtered.some(u => u.username === "admin")) {
-                        filtered.unshift({ username: "admin", password: "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3", memberId: "M001", role: "admin", status: "Active" });
+                    if (!users.some(u => u.username === "admin")) {
+                        users.unshift({ username: "admin", password: "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3", memberId: "M001", role: "admin", status: "Active" });
                     }
-                    localStorage.setItem(key, JSON.stringify(filtered));
+                    localStorage.setItem(key, JSON.stringify(users));
                     
                     // Sync cleaned data to Firestore Cloud immediately
                     if (typeof firebase !== "undefined" && firebase.apps.length) {
                         try {
                             firebase.firestore().collection("app_data").doc(key).set({
-                                data: filtered,
+                                data: users,
                                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                             });
                         } catch(e) {}
@@ -289,13 +292,31 @@
                     let cloudData = doc.data().data;
                     if (!cloudData) return;
 
-                    // Clean up legacy demo accounts from cloud
-                    if (key === "club_users" && Array.isArray(cloudData)) {
-                        const demoUsernames = ["vice", "leader", "assistant", "member", "guest"];
-                        const hasDemo = cloudData.some(u => demoUsernames.includes(u.username));
-                        if (hasDemo) {
-                            cloudData = cloudData.filter(u => !demoUsernames.includes(u.username));
-                            docRef.set({ data: cloudData, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+                    // Auto-generate missing accounts for members if they don't exist
+                    if (key === "club_members" && Array.isArray(cloudData)) {
+                        let localUsers = JSON.parse(localStorage.getItem("club_users")) || [];
+                        let usersModified = false;
+                        
+                        cloudData.forEach(member => {
+                            if (!localUsers.some(u => u.memberId === member.id)) {
+                                const username = member.name.split(" ").pop().toLowerCase() + member.id.toLowerCase();
+                                localUsers.push({
+                                    username: username,
+                                    password: "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3", // 123
+                                    memberId: member.id,
+                                    role: member.role,
+                                    status: member.status
+                                });
+                                usersModified = true;
+                            }
+                        });
+                        
+                        if (usersModified) {
+                            localStorage.setItem("club_users", JSON.stringify(localUsers));
+                            docRef.firestore.collection("app_data").doc("club_users").set({
+                                data: localUsers,
+                                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
                         }
                     }
 

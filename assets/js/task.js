@@ -65,12 +65,24 @@ function renderTasksList() {
 
     // Role filtration rule: member & guest only view their assigned tasks. Others view all.
     let allowedTasks = tasks;
+    
+    // Normalize department names in case of legacy hardcoded data
+    const normalizeDept = (d) => {
+        if (!d) return "";
+        if (d === "ban-truyen-thong") return "Ban Truyền thông";
+        if (d === "ban-su-kien") return "Ban Sự kiện";
+        if (d === "ban-hoc-tap") return "Ban Học tập";
+        if (d === "ban-doi-noi") return "Ban Đối nội";
+        if (d === "ban-doi-ngoai") return "Ban Đối ngoại";
+        return d;
+    };
+
     if (["admin", "vice"].includes(user.role)) {
         allowedTasks = tasks;
     } else if (["leader", "assistant"].includes(user.role) && member) {
-        allowedTasks = tasks.filter(t => t.department === member.department);
+        allowedTasks = tasks.filter(t => normalizeDept(t.department) === member.department);
     } else if (["member", "guest"].includes(user.role) && member) {
-        allowedTasks = tasks.filter(t => t.assigneeId === member.id);
+        allowedTasks = tasks.filter(t => t.assigneeId === member.id || (normalizeDept(t.department) === member.department && (!t.assigneeId || t.assigneeId.trim() === "")));
     }
 
     const filtered = allowedTasks.filter(t => {
@@ -529,6 +541,16 @@ function initTaskEditPage() {
             deptSelect.disabled = true; // Leader cannot change department
             populateAssigneesDropdown(currentMember.department, "");
         }
+        
+        // Trưởng ban không được phép để trống người phụ trách
+        const assigneeSelect = document.getElementById("t-assignee");
+        if (assigneeSelect) {
+            assigneeSelect.required = true;
+            const assigneeLabel = document.querySelector('label[for="t-assignee"]');
+            if (assigneeLabel && !assigneeLabel.innerHTML.includes("*")) {
+                assigneeLabel.innerHTML += " *";
+            }
+        }
     }
 
     // Dynamic selection of assigned members based on selected department
@@ -669,8 +691,8 @@ function populateDeptDropdown(elementId, selectedVal = "") {
     const member = ClubAuth.getCurrentMember();
     let depts = ClubStorage.getData("club_departments") || [];
     
-    // Leader can only see/use their own department
-    if (user && user.role === "leader" && member) {
+    // Admin and Vice can see all. Everyone else can only see their own department.
+    if (user && !["admin", "vice"].includes(user.role) && member) {
         depts = depts.filter(d => d.name === member.department);
     }
     

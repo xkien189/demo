@@ -50,24 +50,7 @@
                                     </select>
                                 </div>
 
-                                <script>
-                                const departments = [
-                                    { value: "ban-su-kien", name: "Ban Sự kiện" },
-                                    { value: "ban-truyen-thong", name: "Ban Truyền thông" },
-                                    { value: "ban-hoc-tap", name: "Ban Học tập" },
-                                    { value: "ban-doi-noi", name: "Ban Đối nội" },
-                                    { value: "ban-doi-ngoai", name: "Ban Đối ngoại" }
-                                ];
-
-                                const select = document.getElementById("t-dept");
-
-                                departments.forEach(dept => {
-                                    const option = document.createElement("option");
-                                    option.value = dept.value;
-                                    option.textContent = dept.name;
-                                    select.appendChild(option);
-                                });
-                                </script>
+                                <!-- Department options are populated by task.js -->
                                 <div class="col-md-6">
                                     <label for="t-assignee" class="form-label">Người phụ trách thực hiện</label>
                                     <select id="t-assignee" class="form-select">
